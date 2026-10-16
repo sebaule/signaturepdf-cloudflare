@@ -17,14 +17,14 @@
     {
       "binding": "DB",
       "database_name": "signaturepdf",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "1b4cc485-fc4a-43c0-99fa-7b9601247357",
       "migrations_dir": "migrations"
     }
   ],
 
   // Contenu chiffré des PDF et des signatures (remplace l'id après `npx wrangler kv namespace create BLOBS`)
   "kv_namespaces": [
-    { "binding": "BLOBS", "id": "00000000000000000000000000000000" }
+    { "binding": "BLOBS", "id": "bb19bbfbf81f44de8646cd52ed0e79be" }
   ],
 
   // Purge des partages expirés, toutes les heures
