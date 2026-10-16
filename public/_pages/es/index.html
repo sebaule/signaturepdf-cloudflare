@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="es" dir="ltr" style="direction: ltr;">
+<head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="/vendor/bootstrap.ltr.min.css?5.3.3" rel="stylesheet">
+<link href="/vendor/bootstrap-icons.min.css?1.11.3" rel="stylesheet">
+<link href="/css/app.css?mvbicmxa" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon.png" />
+<style>
+    @font-face {
+        font-family: 'Caveat';
+        font-style: normal;
+        font-weight: 400;
+        src: url('/vendor/fonts/Caveat-Regular.ttf') format('truetype');
+    }
+
+    @font-face {
+        font-family: 'Tajawal';
+        font-style: normal;
+        font-weight: 400;
+        src: url('/vendor/fonts/Tajawal-Medium.ttf') format('truetype');
+    }
+</style>
+    <title>Signature PDF - Signer et manipuler des PDF en ligne librement</title>
+    <meta name="description" content="Signature PDF est un logiciel libre en ligne pour signer (seul ou à plusieurs), organiser ou compresser des fichiers PDF">
+</head>
+<body>
+<noscript>
+    <div class="alert alert-danger text-center" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> La página no funciona sin JavaScript habilitado    </div>
+</noscript>
+<div class="p-2 mb-3">
+    <nav class=" rounded pb-2 mx-auto position-relative">
+        <a class="link-dark" href="/"><img src="/logo-small.svg" alt="Logo de signature pdf" style="height: 42px; position: absolute;top: 6px;left: 8px;" />
+        <span class="d-none d-lg-inline" style="font-size: 15px; position: absolute;top: 10px;left: 56px;">Signature PDF</span>
+        <span class="opacity-50 d-none d-lg-inline" style="font-size: 12px; position: absolute;top: 30px;left: 56px;">Firma y maneja archivos PDF libremente</span></a>
+        <div class="dropdown position-absolute top-0 end-0 mt-2 me-2">
+            <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class='bi bi-translate'></i><span class="d-none d-lg-inline"> Idioma</span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                    <li><a class="dropdown-item" href="?lang=ar">العربية</a></li>
+                                    <li><a class="dropdown-item" href="?lang=de">Deutsch</a></li>
+                                    <li><a class="dropdown-item" href="?lang=en">English</a></li>
+                                    <li><a class="dropdown-item" href="?lang=es">Español</a></li>
+                                    <li><a class="dropdown-item" href="?lang=eu">Euskara</a></li>
+                                    <li><a class="dropdown-item" href="?lang=fr">Français</a></li>
+                                    <li><a class="dropdown-item" href="?lang=it">Italiano</a></li>
+                                    <li><a class="dropdown-item" href="?lang=gl">Galego</a></li>
+                                    <li><a class="dropdown-item" href="?lang=kab">Taqbaylit</a></li>
+                                    <li><a class="dropdown-item" href="?lang=nl">Nederlands</a></li>
+                                    <li><a class="dropdown-item" href="?lang=oc">Occitan</a></li>
+                                    <li><a class="dropdown-item" href="?lang=pl">Polski</a></li>
+                                    <li><a class="dropdown-item" href="?lang=ro">Română</a></li>
+                                    <li><a class="dropdown-item" href="?lang=ta">தமிழ்</a></li>
+                                    <li><a class="dropdown-item" href="?lang=tr">Türkçe</a></li>
+                            </ul>
+        </div>
+        <ul class="nav nav-pills justify-content-center pt-2">
+                        <li class="nav-item d-none d-sm-block">
+                <a class="nav-link active" href="/"><i class="bi bi-search"></i><span class="d-none d-md-inline-block"></span></a>
+            </li>
+                        <li class="nav-item ">
+                <a class="nav-link " href="/signature"><i class="bi bi-vector-pen"></i> <span class="d-none d-md-inline-block">Firmar</span></a>
+            </li>
+                        <li class="nav-item">
+                <a class="nav-link " href="/organization"><i class="bi bi-ui-checks-grid"></i> <span class="d-none d-md-inline-block">Organizar</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link " href="/metadata"><i class="bi bi-tags"></i> <span class="d-none d-md-inline-block">Metadatos</span></a>
+            </li>
+                    </ul>
+    </nav>
+</div>
+<div class="container pt-4 fullpage">
+    <p class="lead text-center mb-2"><img src="/logo.svg" alt="Logo de signature pdf" style="height: 160px;" class="text-center" /></p>
+    <h1 class="text-center lead opacity-50 d-lg-none mb-4">Signature PDF</h1>
+    <p class="fs-5 mt-3 text-center mb-0">Software libre de código abierto para firma y manejo de archivos PDF</p>
+    <div class="row justify-content-center mt-4">
+        <div class="col-xxl-5 col-xl-6 col-lg-7 col-md-10">
+            <div class="position-relative">
+            <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y fs-6" style="left: 14px  !important; opacity: 0.65;"></i>
+            <input id="search_tools" autofocus="autofocus" type="text" class="form-control form-control-lg fs-6 shadow-sm" style="padding-left: 40px;" placeholder="Search for a tool (e.g., sign, compress, extract, watermark...)">
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-center mt-2">
+    <div class="col-lg-5 col-md-10 col-sm-12 mt-4">
+        <div class="card shadow-sm">
+            <a tabindex="-1" href="/signature" class="card-header text-body-secondary link-underline link-underline-opacity-0">Firmar</a>
+            <div class="list-group list-group-flush">
+            <a href="/signature" class="list-group-item list-group-item-action"><i class="bi bi-vector-pen"></i> Agregar una firma</a>
+            <a href="/signature" class="list-group-item list-group-item-action"><i class="bi bi-type"></i> Agregar iniciales</a>
+            <a href="/signature" class="list-group-item list-group-item-action"><i class="bi bi-card-text"></i> Agregar un timbre</a>
+            <a href="/signature" class="list-group-item list-group-item-action"><i class="bi bi-textarea-t"></i> Escribir texto</a>
+            <a href="/signature" class="list-group-item list-group-item-action"><i class="bi bi-type-strikethrough"></i> Tachar texto</a>
+            <a href="/signature" class="list-group-item list-group-item-action"><i class="bi bi-people-fill"></i> Permitir a varias personas firmar a través de un enlace compartido</a>
+            <a href="/signature" class="list-group-item list-group-item-action"><i class="bi bi-patch-check"></i> Firmar utilizando el certificado de este servidor</a>
+            <a href="/signature" class="list-group-item list-group-item-action position-relative"><i class="bi bi-droplet-half"></i> Agregar una marca da agua<span class="badge rounded-pill text-dark border border-dark position-absolute top-50 end-0 translate-middle-y me-3">Nuevo</span></a>
+            <!-- <a href="/signature" class="list-group-item list-group-item-action"><i class="bi bi-bounding-box"></i> Ocultar áreas</a> -->
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5 col-md-10 col-sm-12 mt-4">
+        <div class="card shadow-sm">
+          <a tabindex="-1" href="/organization" class="card-header text-body-secondary link-underline link-underline-opacity-0">Organizar</a>
+          <div class="list-group list-group-flush">
+            <a href="/organization" class="list-group-item list-group-item-action"><i class="bi bi-file-earmark-plus"></i> Combinar múltiples archivos PDF</a>
+            <a href="/organization" class="list-group-item list-group-item-action"><i class="bi bi-arrows-move"></i> Reordenar páginas</a>
+            <a href="/organization" class="list-group-item list-group-item-action"><i class="bi bi-download"></i> Extraer páginas</a>
+            <a href="/organization" class="list-group-item list-group-item-action"><i class="bi bi-arrow-clockwise"></i> Rotar páginas</a>
+            <a href="/organization" class="list-group-item list-group-item-action position-relative"><i class="bi bi-rulers"></i> Cambiar o uniformar el tamaño del papel<span class="badge rounded-pill text-dark border border-dark position-absolute top-50 end-0 translate-middle-y me-3">Nuevo</span></a>
+            <a href="/organization" class="list-group-item list-group-item-action"><i class="bi bi-trash"></i> Eliminar páginas</a>
+            <a href="/organization#booklet" class="list-group-item list-group-item-action position-relative"><i class="bi bi-book"></i> Crear un folleto<span class="badge rounded-pill text-dark border border-dark position-absolute top-50 end-0 translate-middle-y me-3">Nuevo</span></a>
+            <a href="/organization" class="list-group-item list-group-item-action position-relative"><i class="bi bi-images"></i> Convertir imágenes a PDF<span class="badge rounded-pill text-dark border border-dark position-absolute top-50 end-0 translate-middle-y me-3">Nuevo</span></a>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5 col-md-10 col-sm-12 mt-4">
+        <div class="card shadow-sm">
+          <a tabindex="-1" href="/metadata" class="card-header text-body-secondary link-underline link-underline-opacity-0">Metadatos</a>
+          <div class="list-group list-group-flush">
+            <a href="/metadata" class="list-group-item list-group-item-action"><i class="bi bi-tags"></i> Agregar, editar o eliminar metadatos de un PDF</a>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+<footer class="text-center text-muted mb-2 mt-3 opacity-75 small">
+    <a href="https://github.com/24eme/signaturepdf?tab=readme-ov-file#signature-pdf-libre">Signature PDF</a> - Software libre de código abierto <span class="d-none d-md-inline">bajo licencia AGPL 3.0 : <a href="https://github.com/TON-COMPTE/signaturepdf-cloudflare">ver el código fuente</a> (<a href="https://github.com/24eme/signaturepdf/tree/9e2811a">24eme/signaturepdf 9e2811a</a>)</span>
+</footer>
+
+<span id="is_mobile" class="d-md-none"></span>
+<script src="/vendor/bootstrap.bundle.min.js?5.3.3"></script>
+<script src="/js/common.js?mvbicmxa"></script>
+<script>
+    document.querySelector('#search_tools').addEventListener('keyup', function(e) {
+        let searchTerm = this.value;
+        console.log(searchTerm);
+        document.querySelectorAll('.list-group-item-action').forEach(function(item) {
+            if(!searchTerm || item.innerText.match(new RegExp(searchTerm, "i"))) {
+                item.classList.remove('d-none');
+            } else {
+                item.classList.add('d-none');
+            }
+        })
+        document.querySelectorAll('.card').forEach(function(item) {
+            if(item.querySelectorAll('.list-group-item-action.d-none').length == item.querySelectorAll('.list-group-item-action').length) {
+                item.parentNode.classList.add('d-none');
+            } else {
+                item.parentNode.classList.remove('d-none');
+            }
+        });
+    })
+</script>
+</body>
+</html>

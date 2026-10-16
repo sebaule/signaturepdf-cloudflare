@@ -1,0 +1,9 @@
+Signature PDF sur Cloudflare — projet dérivé de Signature PDF (https://github.com/24eme/signaturepdf),
+Copyright (C) 24eme, licence GNU AGPL-3.0 (voir LICENSE). Base : commit 9e2811af332082ecbab13d21ffb24cc59e018273.
+
+Modifications apportées :
+- Remplacement du backend PHP (Fat-Free, pdftk, rsvg-convert, gpg, ImageMagick, potrace, ghostscript)
+  par un Worker Cloudflare (src/worker.js) + D1 + KV.
+- Chiffrement AES-GCM et assemblage des PDF dans le navigateur (site/public/js/cf-share.js).
+- Adaptation de signature.js et des gabarits (site/templates) ; suppression de la compression PDF et de l'OCR.
+- Génération statique des pages par langue (build/).

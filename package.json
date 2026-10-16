@@ -1,0 +1,19 @@
+{
+  "name": "signaturepdf-cloudflare",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Signature PDF (24eme/signaturepdf) portée sur Cloudflare Workers + D1 + KV, signature collaborative chiffrée de bout en bout",
+  "license": "AGPL-3.0-or-later",
+  "scripts": {
+    "build": "node build/build.mjs",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:migrate": "wrangler d1 migrations apply signaturepdf --remote",
+    "db:migrate:local": "wrangler d1 migrations apply signaturepdf --local",
+    "test": "node test/cf-share.test.mjs",
+    "set-source": "node build/set-source.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

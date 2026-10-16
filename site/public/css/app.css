@@ -1,0 +1,278 @@
+#container-pages {
+    overflow: auto;
+}
+
+#sidebarTools {
+    width: 350px;
+}
+
+#sidebarTools .list-item-add label:hover, #sidebarTools .btn-svg-list-more-options:hover {
+    background: #e8ebed;
+    border: 1px solid #505050;
+}
+
+#sidebarTools .list-item-add label:active, #sidebarTools .list-item-add label.active, #sidebarTools .list-item-add .btn-check:active + .btn-outline-secondary, #sidebarTools .list-item-add .btn-check:checked + .btn-outline-secondary {
+    background: #c9d1d8;
+    border: 1px solid #000;
+    box-shadow: 0 .25rem .5rem rgba(0,0,0,.075) !important;
+}
+
+#top_bar {
+    z-index: 10000;
+}
+
+#search_tools::placeholder {
+    opacity: 0.65;
+}
+
+.block-drag {
+    background: #fafafa !important;
+    cursor: pointer !important;
+
+    label {
+        cursor: pointer;
+    }
+
+    &:hover, &.active, &:active {
+        background: #cff4fc !important;
+        color: #055160 !important;
+        border-color: #055160 !important;
+
+        input {
+            background: #edfcff !important;
+            border-color: #98c9d4 !important;
+            color: #055160 !important;
+            &::file-selector-button {
+                background: #c0e7f0 !important;
+            }
+        }
+    }
+}
+
+a.block-drag {
+    text-decoration: none;
+}
+
+a.block-drag:hover, a.block-drag.active, a.block-drag:active {
+    color: #055160 !important;
+    text-decoration: none;
+}
+
+#modalFichier {
+    z-index: 10001;
+}
+
+#input-text-signature:dir(ltr) {
+    font-family: Caveat;
+    font-size: 48px;
+}
+
+#input-text-signature:dir(rtl) {
+    font-family: Tajawal;
+    font-size: 48px;
+}
+
+#img-upload {
+    max-width: 460px;
+    max-height: 200px;
+}
+
+.btn-svg-list-suppression {
+    top: 2px;
+}
+
+.btn-svg-list-suppression:dir(ltr) {
+    right: 6px;
+}
+
+.btn-svg-list-suppression:dir(rtl) {
+    left: 6px;
+}
+
+#color-picker {
+    display: block; position: fixed; height:28px; width: 28px; border-radius: 24px; background: #000; top: 14px; right: 366px; border: 2px solid #fff; color: #fff; font-size: 10px; text-align: center; line-height: 20px; opacity: 0.25;
+}
+
+#color-picker:hover {
+     opacity: 1;
+}
+
+#watermark-color-picker {
+    display: inline-block; position: absolute; height:28px; width: 28px; border-radius: 24px; top: 5px; right: 6px; z-index: 20;
+}
+
+#watermark-color-picker::-moz-color-swatch, #watermark-color-picker::-webkit-color-swatch {
+    border-radius: 24px;
+}
+
+#toolbox {
+    opacity: 0.9;
+}
+
+#toolbox .dropdown-menu {
+    padding-top: 0;
+    padding-bottom: 0;
+    background: #f8f9fa;
+    border-radius: 0.375rem;
+}
+
+#toolbox .dropdown-menu .dropdown-item {
+    background: #f8f9fa;
+    border-radius: 0.375rem;
+}
+
+#toolbox .dropdown-menu .dropdown-item:hover {
+    background: #dee2e6;
+}
+
+#toolbox .toolbox-action {
+    padding: 5px 10px;
+    cursor: pointer;
+    display: block;
+    float: left;
+    border-left: 1px solid #dee2e6;
+}
+
+
+#toolbox .toolbox-action:first-child {
+    border-left: 0;
+}
+
+.canvas-container .btn-drag, .canvas-container .btn-rotate, .canvas-container .btn-delete, .canvas-container .btn-select, .canvas-container .btn-download, .canvas-container .btn-restore, .canvas-container .btn-drag-here, .canvas-container .btn-drag-here_mobile, .canvas-container .btn-cancel {
+    font-size: 30px;
+    cursor: move;
+    background: rgb(255,255,255,0.6);
+}
+
+.canvas-container .btn-drag-here, .canvas-container .btn-drag-here_mobile, .canvas-container .btn-cancel {
+    cursor: pointer;
+    z-index: 9999;
+}
+
+.canvas-container .btn-rotate, .canvas-container .btn-delete, .canvas-container .btn-select, .canvas-container .btn-download, .canvas-container .btn-restore, .canvas-container .btn-drag-here {
+    cursor: pointer;
+    font-size: 25px;
+}
+
+.canvas-container .btn-rotate:hover, .canvas-container .btn-delete:hover, .canvas-container .btn-select:hover, .canvas-container .btn-download:hover, .canvas-container .btn-restore:hover, .canvas-container .btn-drag:hover {
+    background: rgb(255, 255, 255, 1);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+}
+
+.canvas-container .btn-cancel {
+    font-size: 20px;
+}
+
+.border-transparent {
+    border-color: transparent !important;
+}
+
+.delete-metadata {
+    display: none;
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+    top: 0;
+    font-size: 1.2rem;
+    user-select: none;
+}
+
+.input-metadata > label {
+    width: 110%;
+}
+
+.input-metadata:hover > .delete-metadata {
+    display: block;
+}
+
+#page-metadata #container-main {
+    width: 55%;
+}
+
+#page-metadata #sidebarTools {
+    width: 45%;
+}
+
+#page-metadata #bottom_bar {
+    z-index: 3;
+}
+
+#page-metadata .text-highlight .textLayer span {
+    background: rgba(255, 191, 0, 0.25);
+}
+
+#page-metadata .textLayer span:hover, #page-metadata .textLayer span.active, #page-metadata #pdf_text span:hover, #page-metadata #pdf_text span.active {
+    background: rgba(255, 191, 0, 0.25) !important;
+}
+
+#page-metadata .textLayer span:hover, #page-metadata .textLayer span.active {
+    border: 1px dotted #000;
+}
+
+@media (max-width: 1500px) {
+    #page-metadata #container-main {
+        width: 50%;
+    }
+    #page-metadata #sidebarTools {
+        width: 50%;
+    }
+}
+
+@media (max-width: 575.98px) {
+    #page-metadata #container-main {
+        width: 100%;
+    }
+    #page-metadata #sidebarTools {
+        display:none;
+        width: 100%;
+    }
+}
+@media (max-width: 480px) {
+    .subtitle {
+        font-size: .875em
+    }
+}
+
+html.ltr .decalage-pdf-div {
+    padding-right: 350px;
+}
+
+html.rtl .decalage-pdf-div {
+    padding-left: 350px;
+}
+
+#container-btn-zoom {
+    top: 6px;
+}
+
+html.ltr #container-btn-zoom {
+    right: 368px;
+}
+
+html.rtl #container-btn-zoom {
+    left: 357px;
+}
+
+html.ltr .file-list-checkbox {
+    right: 10px;
+}
+
+html.rtl .file-list-checkbox {
+    left: 10px;
+}
+
+.fullpage {
+    min-height: calc(100dvh - 134px);
+}
+
+.clamp-2-lines {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hiddenCanvasElement {
+    display: none;
+}

@@ -1,0 +1,1718 @@
+let canvasEditions = [];
+let fontCaveat = null;
+let copiedObject = null;
+let forceAddLock = true;
+let addLock = true;
+let activeCanvas = null;
+let activeCanvasPointer = null;
+let pdfRenderTasks = [];
+let pdfPages = [];
+let svgCollections = [];
+let resizeTimeout;
+let pdfHistory = {};
+let currentScale = 1.5;
+let windowWidth = window.innerWidth;
+let menu = null;
+let menuOffcanvas = null;
+let currentCursor = null;
+let signaturePad = null;
+const penColorPicker = document.getElementById('penColorPicker');
+let penColor = localStorage.getItem('penColor') ?? '#000000'
+let nblayers = null;
+let hasModifications = false;
+let currentTextScale = 1;
+const defaultScale = 1.5;
+let customText = '';
+let isLocalPath = false;
+let isDavPath = false;
+
+fabric.Object.prototype.controls.mtr.x = 0;
+fabric.Object.prototype.controls.mtr.y = 0.5;      // bas de l'objet
+fabric.Object.prototype.controls.mtr.offsetY = 30; // 30px sous l'objet
+fabric.Object.prototype.controls.mtr.withConnection = true;
+
+async function loadPDF(pdfBlob) {
+    let filename = pdfBlob.name;
+    let url = await URL.createObjectURL(pdfBlob);
+
+    document.title = filename + ' - ' + document.title;
+    let text_document_name = document.querySelector('#text_document_name');
+    text_document_name.querySelector('span').innerText = filename;
+    text_document_name.setAttribute('title', filename);
+
+    let dataTransfer = new DataTransfer();
+    dataTransfer.items.add(new File([pdfBlob], filename, {
+        type: 'application/pdf'
+    }));
+    if(document.getElementById('input_pdf')) {
+        document.getElementById('input_pdf').files = dataTransfer.files;
+    }
+    if(document.getElementById('input_pdf_share')) {
+        document.getElementById('input_pdf_share').files = dataTransfer.files;
+    }
+    let loadingTask = pdfjsLib.getDocument(url);
+    loadingTask.promise.then(function(pdf) {
+
+        if(pdf.numPages > maxPage) {
+            alert("Le PDF de doit pas dépasser "+maxPage+" pages");
+            document.location = "/";
+            return;
+        }
+        for(let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++ ) {
+            pdf.getPage(pageNumber).then(function(page) {
+              let scale = 1.5;
+              let viewport = page.getViewport({scale: scale});
+              if(viewport.width > document.getElementById('container-pages').clientWidth - 40) {
+                  viewport = page.getViewport({scale: 1});
+                  scale = (document.getElementById('container-pages').clientWidth - 40) / viewport.width;
+                  viewport = page.getViewport({ scale: scale });
+              }
+
+              currentScale = scale;
+
+              let pageIndex = page.pageNumber - 1;
+
+              document.getElementById('form_block').insertAdjacentHTML('beforeend', '<input name="svg[' + pageIndex + ']" id="data-svg-' + pageIndex + '" type="hidden" value="" />');
+              document.getElementById('container-pages').insertAdjacentHTML('beforeend', '<div class="position-relative mt-1 ms-1 me-1 d-inline-block" id="canvas-container-' + pageIndex +'"><canvas id="canvas-pdf-'+pageIndex+'" class="shadow-sm canvas-pdf"></canvas><div class="position-absolute top-0 start-0"><canvas id="canvas-edition-'+pageIndex+'"></canvas></div></div>');
+
+              let canvasPDF = document.getElementById('canvas-pdf-' + pageIndex);
+              let canvasEditionHTML = document.getElementById('canvas-edition-' + pageIndex);
+              // Prepare canvas using PDF page dimensions
+              let context = canvasPDF.getContext('2d');
+              canvasPDF.height = viewport.height;
+              canvasPDF.width = viewport.width;
+              canvasEditionHTML.height = canvasPDF.height;
+              canvasEditionHTML.width = canvasPDF.width;
+
+              let renderContext = {
+                canvasContext: context,
+                viewport: viewport,
+                enhanceTextSelection: true
+              };
+              let renderTask = page.render(renderContext);
+              pdfRenderTasks.push(renderTask);
+              pdfPages.push(page);
+              let canvasEdition = new fabric.Canvas('canvas-edition-' + pageIndex, {
+                selection : false,
+                allowTouchScrolling: true
+              });
+
+              document.getElementById('canvas-container-' + pageIndex).addEventListener('drop', function(event) {
+                  var input_selected = document.querySelector('input[name="svg_2_add"]:checked');
+                  if(!input_selected) {
+                      return;
+                  }
+
+                  createAndAddSvgInCanvas(canvasEdition, input_selected.value, event.layerX, event.layerY, input_selected.dataset.height);
+                  input_selected.checked = false;
+                  input_selected.dispatchEvent(new Event("change"));
+              });
+              canvasEdition.on('mouse:move', function(event) {
+                  activeCanvas = this;
+                  activeCanvasPointer = event.pointer;
+              });
+              canvasEdition.on('mouse:down:before', function(event) {
+                  currentCursor = this.defaultCursor;
+              });
+              canvasEdition.on('mouse:down', function(event) {
+                  if(event.target) {
+                      this.defaultCursor = 'default';
+                      return;
+                  }
+                  var input_selected = document.querySelector('input[name="svg_2_add"]:checked');
+                  if(currentCursor == 'default' && input_selected) {
+                       this.defaultCursor = 'copy';
+                  }
+                  if(currentCursor != 'copy') {
+                      return;
+                  }
+                  if(!input_selected) {
+                      return;
+                  }
+
+                  createAndAddSvgInCanvas(this, input_selected.value, event.pointer.x, event.pointer.y, input_selected.dataset.height);
+
+                  if(addLock) {
+                      return;
+                  }
+                  input_selected.checked = false;
+                  input_selected.dispatchEvent(new Event("change"));
+              });
+              canvasEdition.on('object:scaling', function(event) {
+                  if (event.target instanceof fabric.Line) {
+                      return;
+                  }
+                  if (event.target instanceof fabric.Rect) {
+                      return;
+                  }
+                  if(event.transform.action == "scaleX") {
+                      event.target.scaleY = event.target.scaleX;
+                  }
+                  if(event.transform.action == "scaleY") {
+                      event.target.scaleX = event.target.scaleY;
+                  }
+              });
+              canvasEdition.on('object:modified', function(event) {
+                  if (event.target instanceof fabric.IText) {
+                      currentTextScale = event.target.scaleX;
+                      return;
+                  }
+                  var item = getSvgItem(event.target.svgOrigin);
+                  if(!item) {
+                      return;
+                  }
+                  item.scale = event.target.width * event.target.scaleX / event.target.canvas.width;
+                  storeCollections();
+              });
+              canvasEdition.on("text:changed", function(event) {
+                   if (!event.target instanceof fabric.IText) {
+                       return;
+                   }
+                  const textLinesMaxWidth = event.target.textLines.reduce((max, _, i) => Math.max(max, event.target.getLineWidth(i)), 0);
+                  event.target.set({width: textLinesMaxWidth});
+              });
+              canvasEdition.on("selection:created", function(event) {
+                  if (event.selected.length > 1 || event.selected.length === 0) {
+                      return;
+                  }
+
+                  toolBox.init(event.selected[0])
+              });
+              canvasEdition.on("selection:updated", function(event) {
+                  toolBox.reset()
+                  if (event.selected.length > 1 || event.selected.length === 0) {
+                      return;
+                  }
+
+                  toolBox.init(event.selected[0])
+              });
+              canvasEdition.on("object:modified", function(event) {
+                  toolBox.init(event.target)
+              });
+              canvasEdition.on("object:moving", function(event) {
+                  toolBox.reset()
+              });
+              canvasEdition.on("selection:cleared", function(event) {
+                  toolBox.reset()
+              });
+              canvasEdition.on("object:modified", storeCustomText);
+              canvasEditions.push(canvasEdition);
+            });
+        }
+    }, function (reason) {
+        console.error(reason);
+    });
+};
+
+async function reloadPDF(url) {
+    pdfjsLib.getDocument(url).promise.then(function(pdf) {
+        for(let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++ ) {
+            pdf.getPage(pageNumber).then(function(page) {
+                page.render({
+                  canvasContext: document.getElementById('canvas-pdf-' + (page.pageNumber - 1)).getContext('2d'),
+                  viewport: page.getViewport({scale: currentScale}),
+                  enhanceTextSelection: true
+                });
+            });
+        }
+    });
+}
+
+function responsiveDisplay() {
+    if(is_mobile()) {
+        document.getElementById('page-signature').classList.remove('decalage-pdf-div');
+        menu.classList.remove('show');
+        menuOffcanvas.hide();
+        document.getElementById('container-pages').classList.remove('vh-100');
+    } else {
+        menuOffcanvas.show();
+        document.getElementById('page-signature').classList.add('decalage-pdf-div');
+        document.getElementById('container-pages').classList.add('vh-100');
+    }
+    menu.classList.remove('d-md-block');
+    menu.classList.remove('d-none');
+};
+
+function storeCollections() {
+    localStorage.setItem('svgCollections', JSON.stringify(svgCollections));
+};
+
+function storeCustomText(e) {
+    if (! (e.target instanceof fabric.IText)) {
+        return;
+    }
+
+    if (! e.target.text || e.transform || e.target.text === trad['Text to modify']) {
+        return;
+    }
+
+    let storedStrings = JSON.parse(localStorage.getItem('storedStrings'))
+    if (storedStrings === null) {
+        storedStrings = []
+    }
+    storedStrings.push(e.target.text.trim())
+    storedStrings = [...new Set(storedStrings)] // array_unique version js
+    localStorage.setItem('storedStrings', JSON.stringify(storedStrings))
+}
+
+function getSvgItem(svg) {
+    for (index in svgCollections) {
+        let svgItem = svgCollections[index];
+        if(svgItem.svg == svg) {
+
+            return svgItem;
+        }
+    }
+
+    return null;
+};
+
+function svgClick(label, event) {
+    if(event.detail == 1) {
+        label.dataset.lock = parseInt(addLock*1);
+    }
+    if(event.detail > 1){
+        stateAddLock(parseInt(label.dataset.lock*1) != 1);
+    }
+    if(event.detail > 1) {
+        return;
+    }
+    if(!document.getElementById(label.htmlFor)) {
+        return;
+    }
+    if(!document.getElementById(label.htmlFor).checked) {
+        return;
+    }
+    document.getElementById(label.htmlFor).checked = false;
+    document.getElementById(label.htmlFor).dispatchEvent(new Event("change"));
+    event.preventDefault();
+};
+
+function svgDblClick(label, event) {
+    if(parseInt(label.dataset.lock*1) == 1) {
+        return;
+    }
+    stateAddLock(true);
+};
+
+function svgDragStart(label, event) {
+    document.getElementById(label.htmlFor).checked = true;
+    document.getElementById(label.htmlFor).dispatchEvent(new Event("change"));
+};
+
+function svgChange(input, event) {
+    if(input.checked) {
+        document.getElementById('btn_svn_select').classList.add('d-none');
+        document.getElementById('svg_object_actions').classList.add('d-none');
+        document.getElementById('svg_selected_container').classList.remove('d-none');
+        if(input.value.match(/^data:/)) {
+            document.getElementById('svg_selected').src = input.value;
+        } else if(input.dataset.svg) {
+            document.getElementById('svg_selected').src = input.dataset.svg;
+        }
+    } else {
+        document.getElementById('btn_svn_select').classList.remove('d-none');
+        document.getElementById('svg_object_actions').classList.add('d-none');
+        document.getElementById('svg_selected_container').classList.add('d-none');
+        document.getElementById('svg_selected').src = "";
+    }
+
+    stateAddLock(false);
+
+    let input_selected = document.querySelector('input[name="svg_2_add"]:checked');
+
+    if(input_selected && !input_selected.value.match(/^data:/) && input_selected.value != "text" && input_selected.value != "strikethrough" && input_selected.value != "rectangle") {
+        input_selected = null;
+    }
+
+    document.querySelectorAll('.btn-svg').forEach(function(item) {
+        if(input_selected && item.htmlFor == input_selected.id) {
+            item.style.setProperty('cursor', 'copy');
+        } else {
+            item.style.removeProperty('cursor');
+        }
+    });
+
+    canvasEditions.forEach(function(canvasEdition, index) {
+        if(input_selected) {
+            canvasEdition.defaultCursor = 'copy';
+        } else {
+            canvasEdition.defaultCursor = 'default';
+        }
+    })
+    if(is_mobile()) {
+        menuOffcanvas.hide();
+    }
+};
+
+function getHtmlSvg(svg, i) {
+    let inputRadio = document.createElement('input');
+    inputRadio.type = "radio";
+    inputRadio.classList.add("btn-check");
+    inputRadio.id="radio_svg_"+i;
+    inputRadio.name = "svg_2_add";
+    inputRadio.autocomplete = "off";
+    inputRadio.value = svg.svg;
+    inputRadio.addEventListener('change', function() {
+        svgChange(this, event);
+    });
+    let svgButton = document.createElement('label');
+    svgButton.id = "label_svg_"+i;
+    svgButton.classList.add('position-relative');
+    svgButton.classList.add('btn');
+    svgButton.classList.add('btn-svg');
+    svgButton.classList.add('btn-outline-secondary');
+    svgButton.htmlFor = "radio_svg_"+i;
+    if(svg.type == 'signature') {
+        svgButton.innerHTML += '<i class="bi bi-vector-pen text-black align-middle float-start"></i>';
+    }
+    if(svg.type == 'initials') {
+        svgButton.innerHTML += '<i class="bi bi-type text-black align-middle float-start"></i>';
+    }
+    if(svg.type == 'rubber_stamber') {
+        svgButton.innerHTML += '<i class="bi bi-card-text text-black align-middle float-start"></i>';
+    }
+    if(svg.type) {
+        document.querySelector('.btn-add-svg-type[data-type="'+svg.type+'"]').classList.add('d-none');
+    }
+    svgButton.innerHTML += '<a title="Supprimer" data-index="'+i+'" class="btn-svg-list-suppression opacity-50 link-dark position-absolute"><i class="bi bi-trash"></i></a>';
+    svgButton.draggable = true;
+    svgButton.addEventListener('dragstart', function(event) {
+        svgDragStart(this, event);
+    });
+    svgButton.addEventListener('click', function(event) {
+        svgClick(this, event);
+    });
+    svgButton.addEventListener('dblclick', function(event) {
+        svgDblClick(this, event);
+    });
+    svgButton.addEventListener('mouseout', function(event) {
+        this.style.removeProperty('cursor');
+    })
+    let svgImg = document.createElement('img');
+    svgImg.src = svg.svg;
+    svgImg.draggable = false;
+    svgImg.style = "max-width: 180px;max-height: 70px;";
+    svgButton.appendChild(svgImg);
+    let svgContainer = document.createElement('div');
+    svgContainer.classList.add('d-grid');
+    svgContainer.classList.add('gap-2');
+    svgContainer.appendChild(inputRadio);
+    svgContainer.appendChild(svgButton);
+
+    return svgContainer;
+};
+
+function stateAddLock(state) {
+    if(forceAddLock) {
+        state = true;
+    }
+    let checkbox = document.getElementById('add-lock-checkbox');
+    let input_selected = document.querySelector('input[name="svg_2_add"]:checked');
+
+    addLock = state;
+
+    if(!input_selected) {
+        addLock = false;
+        checkbox.disabled = true;
+    } else {
+        checkbox.disabled = false;
+    }
+
+    if(addLock && input_selected) {
+        let svgButton = document.querySelector('.btn-svg[for="'+input_selected.id+'"]');
+        checkbox.checked = true;
+        return;
+    }
+
+    checkbox.checked = false;
+};
+
+function displaysSVG() {
+    document.getElementById('svg_list').innerHTML = "";
+    document.getElementById('svg_list_signature').innerHTML = "";
+    document.getElementById('svg_list_initials').innerHTML = "";
+    document.getElementById('svg_list_rubber_stamber').innerHTML = "";
+    document.querySelectorAll('.btn-add-svg-type').forEach(function(item) {
+        item.classList.remove('d-none');
+    });
+    svgCollections.forEach((svg, i) => {
+        let svgHtmlChild = getHtmlSvg(svg, i);
+        if(svg.type) {
+            document.getElementById('svg_list_'+svg.type).appendChild(svgHtmlChild);
+            return;
+        }
+        document.getElementById('svg_list').appendChild(svgHtmlChild);
+    });
+
+    if(svgCollections.length > 0) {
+        document.getElementById('btn-add-svg').classList.add('btn-light');
+        document.getElementById('btn-add-svg').classList.remove('btn-primary');
+    }
+
+    if(document.getElementById('btn-add-svg').classList.contains('btn-primary')) {
+        document.getElementById('btn-add-svg').focus();
+    }
+
+    document.querySelectorAll('.btn-svg-list-suppression').forEach(function(item) {
+        item.addEventListener('click', function() {
+            svgCollections.splice(this.dataset.index, 1);
+            displaysSVG();
+            storeCollections();
+        });
+    });
+};
+
+function uploadSVG(formData, convert = true) {
+    document.getElementById('btn_modal_ajouter').setAttribute('disabled', 'disabled');
+    document.getElementById('btn_modal_ajouter_spinner').classList.remove('d-none');
+    document.getElementById('btn_modal_ajouter_check').classList.add('d-none');
+
+    function updateImage(image) {
+        document.getElementById('img-upload').src = image;
+        document.getElementById('img-upload').classList.remove("d-none");
+        document.getElementById('btn_modal_ajouter').removeAttribute('disabled');
+        document.getElementById('btn_modal_ajouter_spinner').classList.add('d-none');
+        document.getElementById('btn_modal_ajouter_check').classList.remove('d-none');
+        document.getElementById('btn_modal_ajouter').focus();
+    }
+
+    const f = formData.get('file');
+
+    // Version Cloudflare : tout se fait dans le navigateur (plus de /image2svg côté serveur)
+    if (convert === false) {
+        const fr = new FileReader();
+        fr.onload = (e) => { updateImage(e.target.result); };
+        fr.readAsDataURL(f);
+        return;
+    }
+
+    CF.vectorizeImage(f).then(function (svg) {
+        updateImage(svgToDataUrl(trimSvgWhitespace(svg)));
+    }).catch(function (e) {
+        console.error(e);
+        const fr = new FileReader();
+        fr.onload = (ev) => { updateImage(ev.target.result); };
+        fr.readAsDataURL(f);
+    });
+};
+
+function deleteActiveObject() {
+    canvasEditions.forEach(function(canvasEdition, index) {
+        canvasEdition.getActiveObjects().forEach(function(activeObject) {
+            canvasEdition.remove(activeObject);
+            if(activeObject.type == "rect") {
+                updateFlatten();
+            }
+        });
+    })
+};
+
+function addObjectInCanvas(canvas, item) {
+    item.on('selected', function(event) {
+        if(!is_mobile()) {
+            return;
+        }
+        document.getElementById('svg_object_actions').classList.remove('d-none');
+        document.getElementById('svg_selected_container').classList.add('d-none');
+        document.getElementById('btn_svn_select').classList.add('d-none');
+    });
+
+    item.on('deselected', function(event) {
+        if(!is_mobile()) {
+            return;
+        }
+        if(document.querySelector('input[name="svg_2_add"]:checked')) {
+            document.getElementById('svg_selected_container').classList.remove('d-none');
+        } else {
+            document.getElementById('btn_svn_select').classList.remove('d-none');
+        }
+        document.getElementById('svg_object_actions').classList.add('d-none');
+    });
+
+    return canvas.add(item);
+};
+
+function initFilenameChange() {
+    const open = document.querySelector('#text_document_name')
+    open.addEventListener('mouseup', openDialogDocumentName)
+
+    function openDialogDocumentName(e) {
+        if (window.getSelection().toString()) {
+            return;
+        }
+
+        if (e.target.closest('.bi')) {
+            return;
+        }
+
+        if (this.classList.contains('editable') === false) {
+            return
+        }
+
+        const oldname = open.querySelector('span').innerText
+
+        let newname = prompt(this.dataset.promptlabel, oldname)
+
+        if (newname === null || newname === "") { return }
+
+        newname = newname.endsWith('.pdf') ? newname : newname + '.pdf'
+        open.title = newname
+        open.querySelector('span').innerText = newname
+
+        // Changement du fichier pour le partage
+        const oldfile = document.getElementById('input_pdf_share').files[0]
+        const dt = new DataTransfer()
+        dt.items.add(new File([oldfile], newname, {type: oldfile.type}))
+        document.getElementById('input_pdf_share').files = dt.files
+        dt.items.clear()
+    }
+}
+
+function updateWatermark() {
+    if (document.querySelector('input[name=watermark]') === null) {
+        return
+    }
+
+    const text = new fabric.Text(document.querySelector('input[name=watermark]').value, {angle: -40, fill: document.querySelector("#watermark-color-picker").value, fontSize: 27 * currentScale})
+    text.scale = 0.
+    const overlay = new fabric.Rect({
+        fill: new fabric.Pattern({
+            source: text.toCanvasElement(),
+        }),
+    })
+
+    canvasEditions.forEach(function (canvas) {
+        overlay.height = canvas.height
+        overlay.width = canvas.width
+
+        canvas.objectCaching = false
+        canvas.setOverlayImage(overlay, canvas.renderAll.bind(canvas), {
+            objectCaching: false
+        })
+    })
+}
+
+
+function updateFlatten() {
+    let flatten = Boolean(document.querySelector('input[name=watermark]').value);
+
+    flatten = flatten || canvasEditions.some(function (canvas) {
+        return canvas.getObjects().some(function (object) {
+            return object.type === "rect"
+        })
+    })
+
+    document.querySelector('input[name=flatten]').checked = flatten;
+    if(document.getElementById('save_flatten_indicator')) {
+        document.getElementById('save_flatten_indicator').classList.toggle('invisible', !flatten);
+    }
+}
+
+function setIsChanged(changed) {
+    hasModifications = changed
+
+    if(document.querySelector('#alert-signature-help')) {
+        document.querySelector('#alert-signature-help').classList.toggle('d-none', changed);
+    }
+    if(document.getElementById('save')) {
+        document.getElementById('save').toggleAttribute('disabled', !changed);
+    }
+    if(document.getElementById('save_mobile')) {
+        document.getElementById('save_mobile').toggleAttribute('disabled', !changed);
+    }
+    if(document.getElementById('btn_download')) {
+        document.getElementById('btn_download').classList.toggle('btn-outline-dark', !changed);
+        document.getElementById('btn_download').classList.toggle('btn-outline-secondary', changed);
+    }
+    if(document.getElementById('btn_share')) {
+        document.getElementById('btn_share').classList.toggle('btn-outline-dark', !changed);
+        document.getElementById('btn_share').classList.toggle('btn-outline-secondary', changed);
+    }
+
+    if(document.getElementById('save_local')) {
+        document.getElementById('save_local').disabled = !changed;
+        document.getElementById('save_local').classList.toggle('btn-primary', changed);
+        document.getElementById('save_local').classList.toggle('btn-outline-primary', !changed);
+    }
+    // document.getElementById('save_mobile_local').classList.toggle('btn-primary', changed);
+    // document.getElementById('save_mobile_local').classList.toggle('btn-outline-primary', !changed);
+}
+
+function createAndAddSvgInCanvas(canvas, item, x, y, height = null) {
+    setIsChanged(true)
+
+    if(!height) {
+        height = 100;
+    }
+
+    if(item == 'text') {
+        const text = (customText) ? customText : trad['Text to modify']
+        customText = ''
+
+        let textbox = new fabric.Textbox(text, {
+        left: x,
+        top: y - 20,
+        fontSize: 20,
+        direction: direction,
+        fontFamily: 'Monospace',
+        fill: penColor
+      });
+
+      fabric.Textbox.prototype.customEnterAction = function (e) {
+          if (e.ctrlKey) {
+            this.insertChars('\n', undefined, this.selectionStart)
+            this.exitEditing();
+            this.enterEditing();
+            this.moveCursorRight(e);
+            return
+          }
+
+          this.exitEditing()
+      }
+
+      addObjectInCanvas(canvas, textbox).setActiveObject(textbox);
+      textbox.keysMap[13] = "customEnterAction";
+      textbox.lockScalingFlip = true;
+      textbox.scaleX = currentTextScale;
+      textbox.scaleY = currentTextScale;
+      textbox.enterEditing();
+      textbox.selectAll();
+
+
+      return;
+    }
+
+    if(item == 'strikethrough') {
+        let line = new fabric.Line([x, y, x + 250, y], {
+          fill: penColor,
+          stroke: penColor,
+          lockScalingFlip: true,
+          strokeWidth: 2,
+          padding: 10,
+        });
+        line.setControlsVisibility({ bl: false, br: false, mt: false, mb: false, tl: false, tr: false})
+
+        addObjectInCanvas(canvas, line).setActiveObject(line);
+
+        return;
+    }
+
+    if(item == 'rectangle') {
+        let rect = new fabric.Rect({
+          left: x,
+          top: y,
+          width: 200,
+          height: 100,
+          fill: '#000',
+          lockScalingFlip: true
+        });
+        rect.setControlsVisibility({ tl: false, tr: false, bl: false, br: false,})
+
+        addObjectInCanvas(canvas, rect).setActiveObject(rect);
+
+        updateFlatten();
+        return;
+    }
+
+    if (item.startsWith('data:image/png')) {
+        fabric.Image.fromURL(item, function(img) {
+            img.scaleToHeight(height);
+
+            if(img.getScaledWidth() > 200) {
+                img.scaleToWidth(200);
+            }
+
+            img.top = y - (img.getScaledHeight() / 2);
+            img.left = x - (img.getScaledWidth() / 2);
+
+            addObjectInCanvas(canvas, img);
+        });
+
+        return
+    }
+
+    fabric.loadSVGFromURL(item, function(objects, options) {
+        let svg = fabric.util.groupSVGElements(objects, options);
+        svg.svgOrigin = item;
+        svg.lockScalingFlip = true;
+        svg.scaleToHeight(height);
+        if(svg.getScaledWidth() > 200) {
+            svg.scaleToWidth(200);
+        }
+        let svgItem = getSvgItem(item);
+        if(svgItem && svgItem.scale) {
+            svg.scaleToWidth(canvas.width * svgItem.scale);
+        }
+        svg.top = y - (svg.getScaledHeight() / 2);
+        svg.left = x - (svg.getScaledWidth() / 2);
+
+        svg.fill = penColor
+
+        addObjectInCanvas(canvas, svg);
+    });
+};
+
+function autoZoom() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(resizePDF, 100);
+};
+
+function zoomChange(inOrOut) {
+    if(resizeTimeout) {
+        return;
+    }
+
+    let deltaScale = 0.2 * inOrOut;
+
+    if(currentScale + deltaScale < 0) {
+        return
+    }
+    if(currentScale + deltaScale > 3) {
+        return
+    }
+
+    clearTimeout(resizeTimeout);
+    currentScale += deltaScale;
+
+    resizeTimeout = setTimeout(resizePDF(currentScale), 50);
+};
+
+function resizePDF(scale = 'auto') {
+    renderComplete = true;
+    pdfRenderTasks.forEach(function(renderTask) {
+        if(!renderTask) {
+            renderComplete = false;
+        }
+    });
+
+    if(!renderComplete) {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(function(){ resizePDF(scale) }, 50);
+        return;
+    }
+
+    pdfPages.forEach(function(page, pageIndex) {
+        let renderTask = pdfRenderTasks[pageIndex];
+
+        if(scale == 'auto' && page.getViewport({scale: 1.5}).width > document.getElementById('container-pages').clientWidth - 40) {
+            scale = (document.getElementById('container-pages').clientWidth - 40) / page.getViewport({scale: 1}).width;
+        }
+
+        if(scale == 'auto') {
+            scale = 1.5;
+        }
+
+        let viewport = page.getViewport({scale: scale});
+        currentScale = scale;
+
+        let canvasPDF = document.getElementById('canvas-pdf-' + pageIndex);
+        let context = canvasPDF.getContext('2d');
+        canvasPDF.height = viewport.height;
+        canvasPDF.width = viewport.width;
+        canvasEdition = canvasEditions[pageIndex];
+
+        let scaleMultiplier = canvasPDF.width / canvasEdition.width;
+        let objects = canvasEdition.getObjects();
+        for (let i in objects) {
+           objects[i].scaleX = objects[i].scaleX * scaleMultiplier;
+           objects[i].scaleY = objects[i].scaleY * scaleMultiplier;
+           objects[i].left = objects[i].left * scaleMultiplier;
+           objects[i].top = objects[i].top * scaleMultiplier;
+           objects[i].setCoords();
+        }
+
+        canvasEdition.setWidth(canvasEdition.getWidth() * scaleMultiplier);
+        canvasEdition.setHeight(canvasEdition.getHeight() * scaleMultiplier);
+        canvasEdition.renderAll();
+        canvasEdition.calcOffset();
+
+        let renderContext = {
+          canvasContext: context,
+          viewport: viewport,
+          enhanceTextSelection: true
+        };
+        renderTask.cancel();
+        pdfRenderTasks[pageIndex] = null;
+        renderTask = page.render(renderContext);
+        renderTask.promise.then(function () {
+            pdfRenderTasks[pageIndex] = renderTask;
+            clearTimeout(resizeTimeout);
+            resizeTimeout = null;
+        });
+    });
+
+    updateWatermark();
+};
+
+function createEventsListener() {
+
+    document.getElementById('add-lock-checkbox').addEventListener('change', function() {
+        stateAddLock(this.checked);
+    });
+
+    document.querySelectorAll('.btn-add-svg-type').forEach(function(item) {
+        item.addEventListener('click', function(event) {
+            document.getElementById('input-svg-type').value = this.dataset.type;
+            if(this.dataset.modalnav) {
+                bootstrap.Tab.getOrCreateInstance(document.querySelector('#modalAddSvg #nav-tab '+this.dataset.modalnav)).show();
+            }
+        });
+    });
+
+    document.querySelectorAll('label.btn-svg').forEach(function(item) {
+        item.addEventListener('dragstart', function(event) {
+            svgDragStart(this, event);
+        });
+        item.addEventListener('click', function(event) {
+            svgClick(this, event);
+        });
+        item.addEventListener('dblclick', function(event) {
+            svgDblClick(this, event);
+        });
+    });
+
+    document.querySelectorAll('input[name="svg_2_add"]').forEach(function (item) {
+        item.addEventListener('change', function(event) {
+            svgChange(this, event);
+        });
+    });
+
+    document.getElementById('btn_modal_ajouter').addEventListener('click', function() {
+        let svgItem = {};
+        if(document.getElementById('input-svg-type').value) {
+            svgItem.type = document.getElementById('input-svg-type').value;
+        }
+        if(document.getElementById('nav-draw-tab').classList.contains('active')) {
+            svgItem.svg = document.getElementById('img-upload').src;
+        }
+        if(document.getElementById('nav-type-tab').classList.contains('active')) {
+            let fontPath = fontCaveat.getPath(document.getElementById('input-text-signature').value, 0, 0, 42);
+            let fabricPath = new fabric.Path(fontPath.toPathData());
+            fabricPath.top = 0;
+            fabricPath.left = 0;
+            fabricPath.height = fabricPath.getScaledHeight();
+            let textCanvas = document.createElement('canvas');
+            textCanvas.width = fabricPath.getScaledWidth();
+            textCanvas.height = fabricPath.getScaledHeight();
+            let textCanvasFabric = new fabric.Canvas(textCanvas);
+            textCanvasFabric.add(fabricPath).renderAll();
+            svgItem.svg = svgToDataUrl(textCanvasFabric.toSVG());
+        }
+        if(document.getElementById('nav-import-tab').classList.contains('active')) {
+            svgItem.svg = document.getElementById('img-upload').src;
+        }
+        svgCollections.push(svgItem);
+        displaysSVG();
+        localStorage.setItem('svgCollections', JSON.stringify(svgCollections));
+
+        let svg_list_id = "svg_list";
+        if(svgItem.type) {
+            svg_list_id = svg_list_id + "_" + svgItem.type;
+        }
+
+        document.querySelector('#'+svg_list_id+' label:last-child').click();
+
+        if(document.querySelector('#save').disabled && document.querySelector('#alert-signature-help.auto-open') && !is_mobile()) {
+            document.querySelector('#alert-signature-help').classList.remove('d-none');
+        }
+    });
+
+
+    document.getElementById('signature-pad-reset').addEventListener('click', function(event) {
+        signaturePad.clear();
+        event.preventDefault();
+    })
+
+    document.querySelectorAll('#modalAddSvg .nav-link').forEach(function(item) { item.addEventListener('shown.bs.tab', function (event) {
+        let firstInput = document.querySelector(event.target.dataset.bsTarget).querySelector('input');
+        if(firstInput) {
+            firstInput.focus();
+        }
+    })});
+
+    document.getElementById('modalAddSvg').addEventListener('shown.bs.modal', function (event) {
+        document.querySelector('#modalAddSvg #nav-tab button:first-child').focus();
+        let tab = document.querySelector('#modalAddSvg .tab-pane.active');
+        if(tab.querySelector('input')) {
+            tab.querySelector('input').focus();
+        }
+        let input_selected = document.querySelector('input[name="svg_2_add"]:checked');
+        if(input_selected) {
+            input_selected.checked = false;
+            input_selected.dispatchEvent(new Event("change"));
+        }
+    })
+
+    document.getElementById('modalAddSvg').addEventListener('hidden.bs.modal', function (event) {
+        signaturePad.clear();
+        document.getElementById('btn_modal_ajouter').setAttribute('disabled', 'disabled');
+        document.getElementById('input-svg-type').value = null;
+        document.getElementById('input-text-signature').value = null;
+        document.getElementById('input-image-upload').value = null;
+        document.getElementById('img-upload').src = "";
+        document.getElementById('img-upload').classList.add("d-none");
+        bootstrap.Tab.getOrCreateInstance(document.querySelector('#modalAddSvg #nav-tab button:first-child')).show();
+    })
+
+    document.getElementById('input-text-signature').addEventListener('keydown', function(event) {
+        document.getElementById('btn_modal_ajouter').removeAttribute('disabled');
+        if(event.key == 'Enter') {
+            document.getElementById('btn_modal_ajouter').click()
+        }
+    })
+
+    document.getElementById('switch-vectorized').addEventListener('change', function() {
+        const input = document.getElementById('input-image-upload')
+        if (input.files.length) {
+            input.dispatchEvent(new Event('change'))
+        }
+    })
+
+    document.getElementById('input-image-upload').addEventListener('change', function(event) {
+        const switchVectorized = document.getElementById('switch-vectorized')
+        const data = new FormData();
+        data.append('file', document.getElementById('input-image-upload').files[0]);
+
+        uploadSVG(data, switchVectorized.checked);
+        event.preventDefault();
+    });
+
+    document.querySelector('.input-watermark-placeholder')?.addEventListener('click', function (e) {
+        const div = e.target
+        const input = div.parentNode.querySelector('.input-group')
+
+        input.classList.remove('d-none')
+        div.classList.add('d-none')
+        input.querySelector('input[type=text]').focus()
+    })
+
+    document.querySelector('input[name=watermark]')?.addEventListener('keyup', debounce(function (e) {
+        setIsChanged(hasModifications || !!e.target.value)
+        updateFlatten();
+        updateWatermark();
+    }, 750))
+
+    document.querySelector('input[name=watermark]')?.addEventListener('change', function (e) {
+        setIsChanged(hasModifications || !!e.target.value)
+        updateFlatten();
+        updateWatermark();
+    });
+
+    const modalMoreOptions = document.getElementById('modal-text-more-options')
+    modalMoreOptions.addEventListener('click', function (e) {
+        const checkbox = document.querySelector('#label_svg_text')
+        const el = e.target.closest('.btn-custom-text')
+        const inlimit = e.target.closest('.custom-text-list')
+
+        if (el && inlimit) {
+            if (document.getElementById(checkbox.htmlFor).checked) {
+                checkbox.click() // sans ça, désélectionne l'input text de la sidebar
+            }
+
+            // si element sélectionné, alors on remplace le texte
+            const activeCanvas = canvasEditions.find((c) => c.getActiveObject())
+
+            if (activeCanvas) {
+                const activeText = activeCanvas.getActiveObject()
+                activeText.text = el.querySelector('span.custom-text').innerText.trim()
+                activeCanvas.discardActiveObject()
+                activeCanvas.requestRenderAll()
+            } else {
+                customText = el.querySelector('span.custom-text').innerText.trim()
+            }
+
+            const openModal = el.closest('.modal.show')
+            const modalInstance = bootstrap.Modal.getInstance(openModal);
+            modalInstance.hide()
+
+            checkbox.click()
+        }
+    })
+    modalMoreOptions.addEventListener('show.bs.modal', function (e) {
+        // on construit la liste de texte custom du local storage
+
+        const modal = e.target
+
+        const newItemText = function(iconClass, textString) {
+            const div = document.createElement('div')
+                  div.classList.add("d-grid", "gap-2", "mb-2", "list-item-add", "btn-custom-text")
+            const span = document.createElement('span')
+                  span.classList.add("btn", "btn-outline-secondary", "text-black", "text-start")
+            const icon = document.createElement('i')
+                  icon.classList.add("bi", iconClass, "me-1")
+            const text = document.createElement('span')
+                  text.classList.add('custom-text')
+                  text.innerText = textString
+            span.appendChild(icon)
+            span.append(" ")
+            span.appendChild(text)
+            div.appendChild(span)
+
+            return div;
+        }
+
+        const customListDate = modal.querySelector('#text-list-date');
+        while (customListDate.firstChild) { customListDate.removeChild(customListDate.lastChild) }
+        const todayDate = new Date();
+        customListDate.appendChild(newItemText('bi-calendar-date', todayDate.toLocaleDateString(window.navigator.language)))
+        customListDate.appendChild(newItemText('bi-calendar-date', todayDate.toLocaleDateString(window.navigator.language , {weekday: "long", year: "numeric", month: "long", day: "numeric"})))
+
+        const customListHistory = modal.querySelector('#text-list-history')
+        while (customListHistory.firstChild) { customListHistory.removeChild(customListHistory.lastChild) }
+        (JSON.parse(localStorage.getItem('storedStrings')) || []).forEach(function (el) {
+            customListHistory.appendChild(newItemText('bi-clock-history', el))
+        })
+    })
+
+    document.querySelector('#watermark-color-picker')?.addEventListener('change', function (e) {
+        document.querySelector('input[name=watermark]').dispatchEvent(new Event("change"));
+    });
+
+    if(document.querySelector('#alert-signature-help')) {
+        document.getElementById('btn-signature-help').addEventListener('click', function(event) {
+            document.querySelector('#alert-signature-help').classList.remove('d-none');
+            event.preventDefault();
+        });
+        document.querySelector('#alert-signature-help .btn-close').addEventListener('click', function(event) {
+            document.querySelector('#alert-signature-help').classList.add('d-none');
+            event.preventDefault();
+        });
+    }
+
+    if(document.getElementById('save')) {
+        document.getElementById('save').addEventListener('click', async function(event) {
+            event.preventDefault()
+            startProcessingMode(this)
+            try {
+                if(!pdfHash) {
+                    const blob = await save(this);
+                    await download(blob, document.querySelector('#text_document_name').title.replace(/\.pdf$/, '_signe.pdf'))
+                    await storeFileInCache(blob, document.getElementById('input_pdf').files[0].name)
+                    hasModifications = false;
+                } else {
+                    await cfTransmitSignature();
+                }
+            } catch (e) {
+                console.error(e)
+            }
+            endProcessingMode(this)
+        });
+    }
+
+    if(document.getElementById('btn_download')) {
+        document.getElementById('btn_download').addEventListener('click', function(event) {
+            event.preventDefault();
+            cfDownloadShared(this);
+        });
+    }
+
+    if(document.getElementById('btn_download_signed')) {
+        document.getElementById('btn_download_signed').addEventListener('click', function(event) {
+            event.preventDefault();
+            cfDownloadShared(this);
+        });
+    }
+
+    if(document.getElementById('save_share')) {
+        document.getElementById('save_share').addEventListener('click', function(event) {
+            event.preventDefault();
+            cfStartShare(this);
+        });
+    }
+
+    document.getElementById('save_mobile').addEventListener('click', function(event) {
+        document.getElementById('save').click();
+
+        event.preventDefault();
+        return false;
+    });
+
+    if(document.getElementById('save_local')) {
+        document.getElementById('save_local').addEventListener('click', async function (event) {
+            startProcessingMode(this)
+            let newPDF = await save(this);
+            if(window.location.hash && window.location.hash.match(/^\#dav/)) {
+                let headers = new Headers();
+                let davToken = await requestDavToken();
+                headers.set('Authorization', 'Basic ' + btoa(davToken));
+                await fetch(window.location.hash.replace('#dav:', '').replace(/\.pdf$/, '_signe.pdf'), {
+                  method: 'PUT',
+                  body: newPDF,
+                  headers: headers
+                });
+            }
+
+            endProcessingMode(this)
+            setIsChanged(false)
+
+            event.preventDefault();
+            return false;
+        })
+    }
+
+    document.getElementById('btn-svg-pdf-delete').addEventListener('click', function(event) {
+        deleteActiveObject();
+    });
+
+    document.getElementById('btn_svg_selected_close').addEventListener('click', function(event) {
+        let input_selected = document.querySelector('input[name="svg_2_add"]:checked');
+
+        stateAddLock(false);
+        input_selected.checked = false;
+        input_selected.dispatchEvent(new Event("change"));
+        this.blur();
+    });
+
+    document.addEventListener('click', function(event) {
+        if(event.target.nodeName == "DIV") {
+            let input_selected = document.querySelector('input[name="svg_2_add"]:checked');
+            if(!input_selected) {
+                return;
+            }
+            stateAddLock(false);
+            input_selected.checked = false;
+            input_selected.dispatchEvent(new Event("change"));
+        }
+    });
+
+    document.addEventListener('keydown', function(event) {
+        if(event.key == 'Escape' && (event.target.tagName == "BODY" || event.target.name == "svg_2_add")) {
+            let input_selected = document.querySelector('input[name="svg_2_add"]:checked');
+            if(!input_selected) {
+                return;
+            }
+            input_selected.checked = false;
+            stateAddLock(false);
+            input_selected.dispatchEvent(new Event("change"));
+            input_selected.blur();
+            return;
+        }
+        if(event.target.tagName != "BODY") {
+            return;
+        }
+        if(event.key == 'Delete') {
+            deleteActiveObject();
+            return;
+        }
+
+        if(event.ctrlKey && event.key == 'c') {
+            if(!activeCanvas || !activeCanvas.getActiveObject()) {
+                return;
+            }
+            copiedObject = fabric.util.object.clone(activeCanvas.getActiveObject());
+
+            return;
+        }
+
+        if(event.ctrlKey && event.key == 'v') {
+            copiedObject = fabric.util.object.clone(copiedObject);
+            copiedObject.left = activeCanvasPointer.x;
+            copiedObject.top = activeCanvasPointer.y;
+            activeCanvas.add(copiedObject).renderAll();
+            return;
+        }
+
+        if(event.ctrlKey && (event.key == 'à' || event.key == '0')) {
+            autoZoom();
+            event.preventDefault() && event.stopPropagation();
+
+            return;
+        }
+        if(event.ctrlKey && (event.key == '=' || event.key == '+')) {
+            zoomChange(1);
+            event.preventDefault() && event.stopPropagation();
+
+            return;
+        }
+        if(event.ctrlKey && event.key == '-') {
+            zoomChange(-1);
+            event.preventDefault() && event.stopPropagation();
+
+            return;
+        }
+    });
+
+    window.addEventListener('resize', function(event) {
+        event.preventDefault() && event.stopPropagation();
+        if(windowWidth == window.innerWidth) {
+            return;
+        }
+        responsiveDisplay();
+        windowWidth = window.innerWidth;
+        autoZoom();
+    });
+    document.addEventListener('wheel', function(event) {
+        if(!event.ctrlKey) {
+            return;
+        }
+        event.preventDefault() && event.stopPropagation();
+
+        if(event.deltaY > 0) {
+            zoomChange(-1)
+        } else {
+            zoomChange(1)
+        }
+    }, { passive: false });
+
+    document.getElementById('btn-zoom-decrease').addEventListener('click', function() {
+        zoomChange(-1)
+    });
+    document.getElementById('btn-zoom-increase').addEventListener('click', function() {
+        zoomChange(1)
+    });
+
+    penColorPicker.addEventListener('input', function (e) {
+        e.preventDefault()
+        storePenColor(penColorPicker.value)
+        if(activeCanvas && activeCanvas.getActiveObject()) {
+            activeCanvas.getActiveObject()
+            activeCanvas.getActiveObject().set({ fill: penColorPicker.value })
+            activeCanvas.requestRenderAll()
+        }
+    })
+
+    document.getElementById('color-picker').addEventListener('click', function(event) {
+        penColorPicker.click();
+    })
+
+    window.addEventListener('beforeunload', function(event) {
+        if(!hasModifications) {
+            return;
+        }
+
+        event.preventDefault();
+        return true;
+    });
+
+    if(pdfHash) {
+        setInterval(function() {
+            updateNbLayers();
+        }, 30000);
+    }
+};
+
+function createSignaturePad() {
+    signaturePad = new SignaturePad(document.getElementById('signature-pad'), {
+        penColor: 'rgb(0, 0, 0)',
+        minWidth: 1,
+        maxWidth: 2
+    });
+    signaturePad.addEventListener('endStroke', debounce(function(){
+        const file = new File([dataURLtoBlob(signaturePad.toDataURL())], "draw.png", {
+            type: 'image/png'
+        });
+        let data = new FormData();
+        data.append('file', file);
+        uploadSVG(data);
+    }, 500));
+};
+
+function modalSharing() {
+    if(openModal == "shareinformations") {
+        let modalInformationsEl = document.getElementById('modal-share-informations');
+        let modalInformations = bootstrap.Modal.getOrCreateInstance(modalInformationsEl);
+        modalInformations.show();
+    }
+
+    if(openModal == 'signed') {
+        let modalSignedEl = document.getElementById('modal-signed');
+        let modalSigned = bootstrap.Modal.getOrCreateInstance(modalSignedEl);
+
+        document.querySelector('#modal-signed #text_nomail_notification a').addEventListener('click', function() {
+            this.href = this.href.replace(/DOCUMENT_NAME/g, document.getElementById('text_document_name').title);
+            this.href = this.href.replace('DOCUMENT_URL', document.location.href);
+        });
+
+        document.querySelector('#modal-signed #text_nomail_notification a').href = document.getElementById('link_compose_mail').href;
+
+        modalSigned.show();
+    }
+}
+
+async function save() {
+    // Version Cloudflare : le PDF signé est produit dans le navigateur (pdf-lib), sans serveur.
+    const layer = CF.buildLayer(canvasEditions);
+    const original = document.getElementById('input_pdf').files[0];
+    let bytes;
+    try {
+        if (!layer) {
+            bytes = new Uint8Array(await original.arrayBuffer());
+        } else {
+            bytes = await CF.stampPdf(new Uint8Array(await original.arrayBuffer()), [layer]);
+        }
+    } catch (e) {
+        console.error(e);
+        alert(CF.t('sign_failed'));
+        throw e;
+    }
+    const flatten = document.querySelector('input[name=flatten]');
+    if (flatten && flatten.checked) {
+        try {
+            bytes = await CF.flattenPdf(bytes);
+        } catch (e) {
+            console.error(e);
+            alert(CF.t('flatten_failed'));
+            throw e;
+        }
+    }
+
+    return new Blob([bytes], { type: 'application/pdf' });
+}
+
+async function pageUpload() {
+    document.querySelector('body').classList.remove('bg-light');
+    document.getElementById('input_pdf_upload').value = '';
+    document.getElementById('page-upload').classList.remove('d-none');
+    document.getElementById('page-signature').classList.add('d-none');
+    document.getElementById('input_pdf_upload').focus();
+    document.getElementById('input_pdf_upload').addEventListener('change', async function(event) {
+        if(await canUseCache()) {
+            const file = document.getElementById('input_pdf_upload').files[0]
+            storeFileInCache(file, file.name);
+          //history.pushState({}, '', `${REVERSE_PROXY_URL ? '/': ''}${REVERSE_PROXY_URL}/signature#${file.name}`);
+            history.pushState({}, '', `${REVERSE_PROXY_URL}/signature#${encodeURIComponent(file.name)}`);
+        }
+        pageSignature(null);
+    });
+}
+
+let cfShared = null;
+
+async function cfRefreshSharedView(reload) {
+    if (!cfShared) return;
+    const before = cfShared.count;
+    await CF.refreshShare(cfShared);
+    if (reload && cfShared.count !== before) {
+        if (cfShared.blobUrl) { URL.revokeObjectURL(cfShared.blobUrl); }
+        cfShared.blobUrl = URL.createObjectURL(new Blob([cfShared.stamped], { type: 'application/pdf' }));
+        reloadPDF(cfShared.blobUrl);
+    }
+}
+
+async function updateNbLayers() {
+    if (document.hidden || !cfShared) {
+        return;
+    }
+    try {
+        await cfRefreshSharedView(true);
+    } catch (e) {
+        console.error(e);
+        return;
+    }
+    nblayers = cfShared.count;
+    document.querySelectorAll('.nblayers').forEach(function(item) {
+        item.innerHTML = nblayers;
+    });
+    const txt = document.querySelector('#nblayers_text');
+    if (txt) {
+        txt.classList.toggle('d-none', !nblayers);
+    }
+};
+
+async function cfLoadSharedIntoInput(id) {
+    const keyStr = CF.resolveShareKey(id);
+    cfShared = CF.newShareState(id, keyStr);
+    showLoading('Download');
+    try {
+        await CF.refreshShare(cfShared);
+    } catch (e) {
+        endLoading();
+        alert(CF.t(e.message === 'key_missing' || e.message === 'key_wrong' ? e.message : 'load_failed'));
+        document.location = '/signature';
+        throw e;
+    }
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(new File([cfShared.stamped], cfShared.filename, { type: 'application/pdf' }));
+    document.getElementById('input_pdf_upload').files = dataTransfer.files;
+    endLoading();
+    nblayers = cfShared.count;
+    document.querySelectorAll('.nblayers').forEach(function(item) { item.innerHTML = nblayers; });
+    if (nblayers) { document.querySelector('#nblayers_text')?.classList.remove('d-none'); }
+}
+
+async function cfDownloadShared(btn) {
+    try {
+        await cfRefreshSharedView(true);
+        await download(new Blob([cfShared.stamped], { type: 'application/pdf' }), CF.signedFilename(cfShared.filename, cfShared.count));
+    } catch (e) {
+        console.error(e);
+        alert(CF.t('load_failed'));
+    }
+}
+
+async function cfTransmitSignature() {
+    const layer = CF.buildLayer(canvasEditions);
+    if (!layer) {
+        return;
+    }
+    try {
+        await CF.postLayer(pdfHash, cfShared.key || await CF.importKey(cfShared.keyStr), layer);
+    } catch (e) {
+        console.error(e);
+        alert(CF.t(e.message === 'too_many_layers' || e.message === 'too_big' ? e.message : 'transmit_failed'));
+        throw e;
+    }
+    hasModifications = false;
+    try { sessionStorage.setItem('openModal', 'signed'); } catch (e) {}
+    window.location.reload();
+}
+
+async function cfStartShare(btn) {
+    const fileInput = document.getElementById('input_pdf_share');
+    const file = fileInput.files[0];
+    if (!file) {
+        return;
+    }
+    const duration = document.querySelector('select[name=duration]').value;
+    const passwordInput = document.getElementById('share_password');
+    let layer = null;
+    if (!document.getElementById('save').hasAttribute('disabled')) {
+        layer = CF.buildLayer(canvasEditions);
+    }
+    btn.disabled = true;
+    try {
+        const res = await CF.createShare({
+            pdfBytes: new Uint8Array(await file.arrayBuffer()),
+            filename: file.name,
+            duration: duration,
+            password: passwordInput ? passwordInput.value : '',
+            layer: layer,
+        });
+        try {
+            localStorage.setItem(res.id + '.adminKey', res.adminKey);
+            localStorage.setItem('cfkey.' + res.id, res.key);
+            sessionStorage.setItem('openModal', 'shareinformations');
+        } catch (e) { /* ignore */ }
+        hasModifications = false;
+        window.location.href = '/signature/' + res.id + '#' + res.key;
+    } catch (e) {
+        console.error(e);
+        btn.disabled = false;
+        alert(CF.t(['share_password_wrong', 'too_big'].includes(e.message) ? e.message : 'share_failed'));
+    }
+}
+
+async function pageSignature(url) {
+
+    document.querySelector('body').classList.add('bg-light');
+    modalSharing();
+    document.getElementById('page-upload').classList.add('d-none');
+    document.getElementById('page-signature').classList.remove('d-none');
+    fabric.Textbox.prototype._wordJoiners = /[]/;
+    menu = document.getElementById('sidebarTools');
+    menuOffcanvas = new bootstrap.Offcanvas(menu);
+    forceAddLock = !is_mobile();
+    addLock = forceAddLock;
+    if(isLocalPath || isDavPath) {
+        document.getElementById('save').classList.add('d-none');
+        //document.getElementById('save_mobile').classList.add('d-none');
+        document.getElementById('save_local').classList.remove('d-none');
+        //document.getElementById('save_mobile_local').classList.remove('d-none');
+    }
+
+    if(localStorage.getItem('svgCollections')) {
+        svgCollections = JSON.parse(localStorage.getItem('svgCollections'));
+    }
+
+    if(svgCollections.length == 0 && document.querySelector('#alert-signature-help')) {
+        document.querySelector('#alert-signature-help').classList.add('auto-open');
+    }
+
+    opentype.load(url_font, function(err, font) {
+        fontCaveat = font;
+    });
+
+    if(url && url.match(/^cf-shared:\/\//)) {
+        try {
+            await cfLoadSharedIntoInput(url.replace(/^cf-shared:\/\//, ''));
+        } catch (e) {
+            return;
+        }
+    } else if(url && url.match(/^cache:\/\//) && !isDavPath) {
+        await loadFileFromCache(url.replace(/^cache:\/\//, ''));
+    } else if (url) {
+        await loadFileFromUrl(url);
+    }
+
+    if(!document.getElementById('input_pdf_upload').files.length) {
+        alert("Chargement du PDF impossible");
+        document.location = '/signature';
+        return;
+    }
+
+    if(document.getElementById('input_pdf_upload').files[0].size > maxSize) {
+
+        alert("Le PDF ne doit pas dépasser " + convertOctet2MegoOctet(maxSize) + " Mo");
+        document.getElementById('input_pdf_upload').value = "";
+        return;
+    }
+
+    storePenColor(penColor)
+    initFilenameChange()
+    createSignaturePad();
+    responsiveDisplay();
+    displaysSVG();
+    stateAddLock();
+    createEventsListener();
+    loadPDF(document.getElementById('input_pdf_upload').files[0]);
+};
+
+document.addEventListener('DOMContentLoaded', function () {
+    if(pdfHash) {
+        const k = CF.resolveShareKey(pdfHash);
+        if (k && !window.location.hash) {
+            history.replaceState(null, '', window.location.pathname + '#' + k);
+        }
+        pageSignature('cf-shared://' + pdfHash);
+    } else if(window.location.hash && window.location.hash.match(/^\#(http|\/demo\/)/)) {
+        pageSignature(window.location.hash.replace(/^\#/, ''));
+    } else if(window.location.hash && window.location.hash.match(/^\#dav:/)) {
+        isDavPath = true;
+        pageSignature(window.location.hash.replace(/^\#dav:/, ''));
+    } else if(window.location.hash) {
+        pageSignature('cache:///pdf/'+window.location.hash.replace(/^\#/, ''));
+    } else {
+        pageUpload();
+    }
+
+    CF.getConfig().then(function(cfg) {
+        const block = document.getElementById('share_password_block');
+        if (block && cfg.passwordRequired) {
+            block.classList.remove('d-none');
+            block.querySelector('[data-cf=share_password]').textContent = CF.t('share_password');
+        }
+    });
+
+    window.addEventListener('hashchange', function() {
+        window.location.reload();
+    })
+});
+
+function storePenColor(color) {
+    penColor = color
+    penColorPicker.value = color
+    localStorage.setItem('penColor', penColor)
+    document.getElementById('color-picker').style.backgroundColor = penColor;
+    if(penColor != "#000000") {
+        document.getElementById('color-picker').style.opacity = 1;
+    } else {
+        document.getElementById('color-picker').style.opacity = 0.25;
+    }
+
+}
+
+const toolBox = (function () {
+    let _elSelected
+
+    const _elToolbox = document.createElement('div')
+          _elToolbox.id = 'toolbox'
+          _elToolbox.classList.add('position-absolute', 'border', 'bg-light', 'rounded', 'shadow-sm', 'd-none', 'd-md-block', 'user-select-none')
+          _elToolbox.style['z-index'] = 1030
+          _elToolbox.style.width = 'max-content'
+
+    const _elToolboxElements = document.querySelector("#toolbox-elements-template").content.cloneNode(true)
+          _elToolbox.appendChild(_elToolboxElements)
+
+    _elToolbox.addEventListener('click', function (e) {
+        e.preventDefault()
+        target = e.target
+
+        el = target.closest("[data-action]")
+        if (el) {
+            switch (el.dataset.action) {
+                case "changeColor":
+                    _changeColor(); break;
+                case "delete":
+                    _delete(); break;
+                case "copy":
+                    _copy(); break;
+                case "duplicate":
+                    _duplicate(); break;
+            }
+        }
+    })
+
+    function _changeColor() {
+        const _colorpicker = document.createElement('input')
+              _colorpicker.setAttribute('type', 'color')
+              _colorpicker.value = _elSelected.fill;
+
+        _colorpicker.addEventListener('input', function (e) {
+            _elSelected.set({ fill: e.target.value })
+            _elSelected.canvas.requestRenderAll()
+            if(_elSelected.type != "rect") {
+                storePenColor(e.target.value)
+            }
+        })
+
+        _colorpicker.click()
+        _colorpicker.remove()
+    }
+
+    function _copy() {
+        _elSelected.clone(function (clonedItem) {
+            clonedItem.top -= 20;
+            clonedItem.left += 20;
+            addObjectInCanvas(_elSelected.canvas, clonedItem).setActiveObject(clonedItem)
+        })
+    }
+
+    function _duplicate() {
+        canvasEditions.forEach(function (canvas) {
+            if  (_elSelected.canvas === canvas) {
+                return
+            }
+
+            _elSelected.clone(function (clonedItem) {
+                addObjectInCanvas(canvas, clonedItem)
+            })
+        })
+
+    }
+
+    function _delete() {
+        deleteActiveObject()
+        reset()
+    }
+
+    function init(el) {
+        if (_elToolbox) {
+            reset()
+        }
+
+        _elSelected = el
+        const container = document.getElementById('container-pages')
+        container.appendChild(_elToolbox)
+
+        const xCoords = _elSelected.getCoords().map((c) => c.x)
+        const yCoords = _elSelected.getCoords().map((c) => c.y)
+
+        _elToolbox.style.left = (
+            Math.min(...xCoords)              // on sélectionne le coin le plus à gauche
+            + _elSelected.canvas._offset.left // décalage du canvas dans le viewport
+            + (
+                Math.max(...xCoords)      // on sélectionne le coin le plus à droite
+              - Math.min(...xCoords)      // on sélectionne le coin le plus à gauche
+            ) / 2                         // pour calculer la largeur et avoir le centre
+            - _elToolbox.offsetWidth / 2  // centre de la toolbox
+            - +window.getComputedStyle(_elToolbox).getPropertyValue("margin-left").replace('px', '')
+        ) + 'px'
+        _elToolbox.style.top = (
+            Math.min(...yCoords)             // on sélectionne le coin le plus bas
+            - _elToolbox.clientHeight - 10       // hauteur de la toolbox
+            + _elSelected.canvas._offset.top // hauteur du canvas dans le viewport
+            + container.scrollTop            // haut du container
+        ) + 'px'
+    }
+
+    function reset() {
+        _elSelected = null
+        _elToolbox.remove()
+    }
+
+    return {
+        init: init,
+        reset: reset
+    }
+})()

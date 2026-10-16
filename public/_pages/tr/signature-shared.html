@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="tr" dir="ltr" style="direction: ltr;" class="ltr">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="/vendor/bootstrap.ltr.min.css?5.3.3" rel="stylesheet">
+<link href="/vendor/bootstrap-icons.min.css?1.11.3" rel="stylesheet">
+<link href="/css/app.css?mvbicmxa" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon.png" />
+<style>
+    @font-face {
+        font-family: 'Caveat';
+        font-style: normal;
+        font-weight: 400;
+        src: url('/vendor/fonts/Caveat-Regular.ttf') format('truetype');
+    }
+
+    @font-face {
+        font-family: 'Tajawal';
+        font-style: normal;
+        font-weight: 400;
+        src: url('/vendor/fonts/Tajawal-Medium.ttf') format('truetype');
+    }
+</style>
+    <title>Signature PDF - Signer un PDF en ligne</title>
+    <meta name="description" content="Signature PDF est un logiciel libre en ligne qui permet de signer, parapher, tamponner, compléter un pdf seul ou à plusieurs.">
+</head>
+<body>
+<noscript>
+    <div class="alert alert-danger text-center" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> JavaScript etkinleştirilmeden site çalışmıyor    </div>
+</noscript>
+<div id="page-upload">
+    <div class="p-2 mb-3">
+    <nav class=" rounded pb-2 mx-auto position-relative">
+        <a class="link-dark" href="/"><img src="/logo-small.svg" alt="Logo de signature pdf" style="height: 42px; position: absolute;top: 6px;left: 8px;" />
+        <span class="d-none d-lg-inline" style="font-size: 15px; position: absolute;top: 10px;left: 56px;">Signature PDF</span>
+        <span class="opacity-50 d-none d-lg-inline" style="font-size: 12px; position: absolute;top: 30px;left: 56px;">Sign and manipulate PDFs freely</span></a>
+        <div class="dropdown position-absolute top-0 end-0 mt-2 me-2">
+            <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class='bi bi-translate'></i><span class="d-none d-lg-inline"> Dil</span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                    <li><a class="dropdown-item" href="?lang=ar">العربية</a></li>
+                                    <li><a class="dropdown-item" href="?lang=de">Deutsch</a></li>
+                                    <li><a class="dropdown-item" href="?lang=en">English</a></li>
+                                    <li><a class="dropdown-item" href="?lang=es">Español</a></li>
+                                    <li><a class="dropdown-item" href="?lang=eu">Euskara</a></li>
+                                    <li><a class="dropdown-item" href="?lang=fr">Français</a></li>
+                                    <li><a class="dropdown-item" href="?lang=it">Italiano</a></li>
+                                    <li><a class="dropdown-item" href="?lang=gl">Galego</a></li>
+                                    <li><a class="dropdown-item" href="?lang=kab">Taqbaylit</a></li>
+                                    <li><a class="dropdown-item" href="?lang=nl">Nederlands</a></li>
+                                    <li><a class="dropdown-item" href="?lang=oc">Occitan</a></li>
+                                    <li><a class="dropdown-item" href="?lang=pl">Polski</a></li>
+                                    <li><a class="dropdown-item" href="?lang=ro">Română</a></li>
+                                    <li><a class="dropdown-item" href="?lang=ta">தமிழ்</a></li>
+                                    <li><a class="dropdown-item" href="?lang=tr">Türkçe</a></li>
+                            </ul>
+        </div>
+        <ul class="nav nav-pills justify-content-center pt-2">
+                        <li class="nav-item d-none d-sm-block">
+                <a class="nav-link " href="/"><i class="bi bi-search"></i><span class="d-none d-md-inline-block"></span></a>
+            </li>
+                        <li class="nav-item ">
+                <a class="nav-link active" href="/signature"><i class="bi bi-vector-pen"></i> <span class="d-none d-md-inline-block">İmzala</span></a>
+            </li>
+                        <li class="nav-item">
+                <a class="nav-link " href="/organization"><i class="bi bi-ui-checks-grid"></i> <span class="d-none d-md-inline-block">Organize et</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link " href="/metadata"><i class="bi bi-tags"></i> <span class="d-none d-md-inline-block">Metadata</span></a>
+            </li>
+                    </ul>
+    </nav>
+</div>
+    <div class="px-3 py-3 text-center fullpage">
+        <i class="bi bi-vector-pen display-3"></i>
+        <h1 class="mb-0 h2 mt-3">PDF imzala</h1>
+        <p class="text-nowrap mt-2 pb-2" style="overflow: hidden; text-overflow: ellipsis;">Belgeyi imzalamak, paraflamak, damgalamak, tamamlamak</p>
+                <div id="upload_drag_zone" class="block-drag mt-4 col-md-8 col-lg-6 col-xl-5 col-xxl-4 mx-auto border rounded-2 rounded-bottom-0 border-dark-subtle p-4 shadow-sm position-relative" style="border-style: dashed !important; cursor: pointer;" role="Bir PDF Seç" aria="link" tabindex="0">
+        <small class="opacity-75 position-absolute" style="cursor: help; right: 8px; top: 5px;" title="PDF aşmamalıdır 20 MB ve 100 sayfalar"><i class="bi bi-question-circle"></i></small>
+        <label class="form-label" for="input_pdf_upload">Bir PDF Seç<small class="d-block">&nbsp;</small></label>
+    <div><i class="bi bi-upload fs-2"></i></div>
+    <input id="input_pdf_upload" name="pdf" placeholder="Bir PDF Seç" class="form-control d-none mt-3" type="file" accept=".pdf,application/pdf"  />
+</div>
+    <a  id="demo_link" href="#/demo/document.pdf" class="block-drag d-block col-md-8 col-lg-6 col-xl-5 col-xxl-4 mx-auto border rounded-2 rounded-top-0 border-top-0 border-dark-subtle p-1 shadow-sm position-relative text-secondary small" style="border-style: dashed !important; cursor: pointer;"><small class="opacity-75">Demo PDF ile test edin</small></a>
+<p class="mt-3 mb-3 small opacity-50"><i class="bi bi-wifi-off"></i> Your file never leave your device</p>
+
+<script>
+    const dropArea = document.querySelector("#upload_drag_zone");
+    const dropInput = dropArea.querySelector("input[type=file]");
+    dropArea.addEventListener('click', function(e) {
+        dropInput.click();
+    });
+    document.querySelector('#upload_drag_zone input[type=file]').addEventListener('change', function(e) {
+        dropArea.querySelector('.bi-upload').classList.add('d-none');
+        this.classList.remove('d-none')
+    });
+    document.body.addEventListener("dragover", (event) => {
+        event.preventDefault();
+        dropArea.classList.add("active");
+    });
+
+    document.body.addEventListener("dragleave", () => {
+      dropArea.classList.remove("active");
+    });
+
+    document.body.addEventListener("drop", (e) => {
+      e.preventDefault();
+      const target = e.dataTransfer;
+      dropArea.classList.remove("active");
+      if(target.files.length < 1) {
+            return;
+      }
+      dropInput.files = target.files
+      dropInput.dispatchEvent(new Event("change"));
+    });
+</script>
+    </div>
+    <footer class="text-center text-muted mb-2 mt-3 opacity-75 small">
+    <a href="https://github.com/24eme/signaturepdf?tab=readme-ov-file#signature-pdf-libre">Signature PDF</a> - Ücretsiz açık kaynaklı yazılım <span class="d-none d-md-inline">AGPL-3.0 lisansı altında : <a href="https://github.com/TON-COMPTE/signaturepdf-cloudflare">kaynak koda bakın</a> (<a href="https://github.com/24eme/signaturepdf/tree/9e2811a">24eme/signaturepdf 9e2811a</a>)</span>
+</footer>
+</div>
+<div id="page-signature" class="d-none decalage-pdf-div">
+            <div id="alert-signature-help" class="position-relative d-none">
+            <div class="alert alert-primary alert-dismissible position-absolute top-0 start-50 translate-middle-x text-center mt-4 pb-2 w-50 opacity-100" style="z-index: 100;" role="alert">
+                <h5 class="alert-heading">Nasıl imzalanır?</h5>
+                <strong>Doğrudan belge sayfasına tıklayarak</strong> Seçilen öğeyi sağ sütuna eklemek için <small>(imza, baş harf, metin, damga, vb.)</small>
+                <div class="mt-1 fs-3"><i class="bi bi-box-arrow-down"></i></div>
+                <button type="button" class="btn-close btn-sm" aria-label="Close"></button>
+            </div>
+        </div>
+        <div style="height: 65px;" class="d-md-none"></div>
+    <div id="container-pages" class="col-12 pt-1 pb-1 text-center vh-100 position-relative" dir="auto">
+    </div>
+    <div style="height: 55px;" class="d-md-none"></div>
+    <div class="offcanvas offcanvas-end show d-none d-md-block shadow-sm" data-bs-backdrop="false" data-bs-scroll="true" data-bs-keyboard="false" tabindex="-1" id="sidebarTools" aria-labelledby="sidebarToolsLabel">
+        <a id="btn_exit" class="btn btn-close btn-sm position-absolute d-none d-sm-none d-md-block" style="right: 16px; top: 16px;" title="Bu PDF'yi kapatın ve ana sayfaya dönün" href="/signature"></a>
+        <div class="offcanvas-header mb-0 pb-0">
+            <h5 class="mb-1 d-block w-100" id="sidebarToolsLabel"><i class="bi bi-vector-pen"></i> PDF İmzala <span class="badge rounded-pill text-bg-dark" title="Bu PDF birden fazla kişi tarafından imzalanmak üzere başkalarıyla paylaşılır"><span class="nblayers"></span> <i class="bi bi-people-fill"></i></span></h5>
+            <button type="button" class="btn-close text-reset d-md-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body pt-0">
+            <p id="text_document_name" class="text-muted" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;" title="" data-promptlabel="Change the filename">
+                <i class="bi bi-lock-fill" title="This PDF is stored encrypted on the server."></i>                <i class="bi bi-files"></i> <span></span>
+            </p>
+            <div class="form-check form-switch mb-2 small d-none">
+                <input class="form-check-input" type="checkbox" id="add-lock-checkbox" disabled="disabled">
+                <label style="cursor: pointer;" class="form-check-label" for="add-lock-checkbox"> Seçimi etkin tutun</label>
+            </div>
+            <div id="svg_list_signature" class="list-item-add"></div>
+            <div class="d-grid gap-2 mb-2 list-item-add">
+                <input type="radio" class="btn-check" id="radio_svg_signature_add" name="svg_2_add" autocomplete="off" value="signature">
+                <label data-bs-toggle="modal" data-bs-target="#modalAddSvg" data-type="signature" class="btn btn-outline-secondary text-black text-start btn-add-svg-type" for="radio_svg_signature_add" id="label_svg_signature_add"><i class="bi bi-vector-pen"></i> İmza <small class="text-muted float-end">Oluştur</small></label>
+            </div>
+            <div id="svg_list_initials" class="list-item-add"></div>
+            <div class="d-grid gap-2 mb-2 list-item-add">
+                <input type="radio" class="btn-check" id="radio_svg_initials_add" name="svg_2_add" autocomplete="off" value="intials">
+                <label data-bs-toggle="modal" data-bs-target="#modalAddSvg" data-type="initials" data-modalnav="#nav-type-tab" class="btn btn-outline-secondary text-black text-start btn-add-svg-type" for="radio_svg_initials_add" id="label_svg_initials_add"><i class="bi bi-type"></i> Paraf <small class="text-muted float-end">Oluştur</small></label>
+            </div>
+            <div id="svg_list_rubber_stamber" class="list-item-add"></div>
+            <div class="d-grid gap-2 mb-2 list-item-add">
+                <input type="radio" class="btn-check" id="radio_svg_rubber_stamber_add" name="svg_2_add" autocomplete="off" value="rubber_stamber">
+                <label data-bs-toggle="modal" data-bs-target="#modalAddSvg" data-type="rubber_stamber" data-modalnav="#nav-import-tab" class="btn btn-outline-secondary text-black text-start btn-add-svg-type" for="radio_svg_rubber_stamber_add" id="label_svg_rubber_stamber_add"><i class="bi bi-card-text"></i> Mühür <small class="text-muted float-end">Oluştur</small></label>
+            </div>
+            <div class="d-flex gap-2 mb-2 list-item-add">
+                <input type="radio" class="btn-check" id="radio_svg_text" data-svg="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iY3VycmVudENvbG9yIiBjbGFzcz0iYmkgYmktdGV4dGFyZWEtdCIgdmlld0JveD0iMCAwIDE2IDE2Ij48cGF0aCBkPSJNMS41IDIuNUExLjUgMS41IDAgMCAxIDMgMWgxMGExLjUgMS41IDAgMCAxIDEuNSAxLjV2My41NjNhMiAyIDAgMCAxIDAgMy44NzRWMTMuNUExLjUgMS41IDAgMCAxIDEzIDE1SDNhMS41IDEuNSAwIDAgMS0xLjUtMS41VjkuOTM3YTIgMiAwIDAgMSAwLTMuODc0VjIuNXptMSAzLjU2M2EyIDIgMCAwIDEgMCAzLjg3NFYxMy41YS41LjUgMCAwIDAgLjUuNWgxMGEuNS41IDAgMCAwIC41LS41VjkuOTM3YTIgMiAwIDAgMSAwLTMuODc0VjIuNUEuNS41IDAgMCAwIDEzIDJIM2EuNS41IDAgMCAwLS41LjV2My41NjN6TTIgN2ExIDEgMCAxIDAgMCAyIDEgMSAwIDAgMCAwLTJ6bTEyIDBhMSAxIDAgMSAwIDAgMiAxIDEgMCAwIDAgMC0yeiIvPjxwYXRoIGQ9Ik0xMS40MzQgNEg0LjU2Nkw0LjUgNS45OTRoLjM4NmMuMjEtMS4yNTIuNjEyLTEuNDQ2IDIuMTczLTEuNDk1bC4zNDMtLjAxMXY2LjM0M2MwIC41MzctLjExNi42NjUtMS4wNDkuNzQ4VjEyaDMuMjk0di0uNDIxYy0uOTM4LS4wODMtMS4wNTQtLjIxLTEuMDU0LS43NDhWNC40ODhsLjM0OC4wMWMxLjU2LjA1IDEuOTYzLjI0NCAyLjE3MyAxLjQ5NmguMzg2TDExLjQzNCA0eiIvPjwvc3ZnPgo=" name="svg_2_add" autocomplete="off" value="text">
+                <label draggable="true" id="label_svg_text" class="flex-grow-1 btn btn-outline-secondary text-black text-start btn-svg" for="radio_svg_text">
+                    <i class="bi bi-textarea-t"></i> Yazı                </label>
+                <span class="btn-svg-list-more-options btn btn-outline-secondary text-black" data-bs-keyboard=false data-bs-toggle="modal" data-bs-target="#modal-text-more-options"><i class="bi bi-layout-text-sidebar-reverse"></i></span>
+              </div>
+              <div class="d-grid gap-2 mb-2 list-item-add">
+                  <input type="radio" class="btn-check" id="radio_svg_strikethrough" data-svg="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iY3VycmVudENvbG9yIiBjbGFzcz0iYmkgYmktdHlwZS1zdHJpa2V0aHJvdWdoIiB2aWV3Qm94PSIwIDAgMTYgMTYiPgogIDxwYXRoIGQ9Ik02LjMzMyA1LjY4NmMwIC4zMS4wODMuNTgxLjI3LjgxNEg1LjE2NmEyLjggMi44IDAgMCAxLS4wOTktLjc2YzAtMS42MjcgMS40MzYtMi43NjggMy40OC0yLjc2OCAxLjk2OSAwIDMuMzkgMS4xNzUgMy40NDUgMi44NWgtMS4yM2MtLjExLTEuMDgtLjk2NC0xLjc0My0yLjI1LTEuNzQzLTEuMjMgMC0yLjE4LjYwMi0yLjE4IDEuNjA3em0yLjE5NCA3LjQ3OGMtMi4xNTMgMC0zLjU4OS0xLjEwNy0zLjcwNS0yLjgxaDEuMjNjLjE0NCAxLjA2IDEuMTI5IDEuNzAzIDIuNTQ0IDEuNzAzIDEuMzQgMCAyLjMxLS43MDUgMi4zMS0xLjY3NSAwLS44MjctLjU0Ny0xLjM3NC0xLjkxNC0xLjY3NUw4LjA0NiA4LjVIMXYtMWgxNHYxaC0zLjUwNGMuNDY4LjQzNy42NzUuOTk0LjY3NSAxLjY5NyAwIDEuODI2LTEuNDM2IDIuOTY3LTMuNjQ0IDIuOTY3Ij48L3BhdGg+Cjwvc3ZnPgo=" name="svg_2_add" autocomplete="off" value="strikethrough">
+                  <label draggable="true" id="label_svg_strikethrough" class="btn btn-outline-secondary text-black text-start btn-svg" for="radio_svg_strikethrough"><i class="bi bi-type-strikethrough"></i> Strikethrough</label>
+              </div>
+              <div class="d-grid gap-2 mb-2 list-item-add">
+                  <input type="radio" class="btn-check" id="radio_svg_check" data-height="18" name="svg_2_add" autocomplete="off" value="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iY3VycmVudENvbG9yIiBjbGFzcz0iYmkgYmktY2hlY2stbGciIHZpZXdCb3g9IjAgMCAxNiAxNiI+CiAgPHBhdGggZD0iTTEyLjczNiAzLjk3YS43MzMuNzMzIDAgMCAxIDEuMDQ3IDBjLjI4Ni4yODkuMjkuNzU2LjAxIDEuMDVMNy44OCAxMi4wMWEuNzMzLjczMyAwIDAgMS0xLjA2NS4wMkwzLjIxNyA4LjM4NGEuNzU3Ljc1NyAwIDAgMSAwLTEuMDYuNzMzLjczMyAwIDAgMSAxLjA0NyAwbDMuMDUyIDMuMDkzIDUuNC02LjQyNWEuMjQ3LjI0NyAwIDAgMSAuMDItLjAyMloiLz4KPC9zdmc+Cg==">
+                  <label draggable="true" id="label_svg_check" class="btn btn-outline-secondary text-black text-start btn-svg" for="radio_svg_check"><i class="bi bi-check-square"></i> Onay Kutusu Doldurma</label>
+              </div>
+              
+              <div id="svg_list" class="d-grid gap-2 mt-2 mb-2 list-item-add"></div>
+
+              <div class="d-grid gap-2 mt-2">
+                  <button type="button" id="btn-add-svg" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#modalAddSvg"><i class="bi bi-plus-circle"></i> Bir eleman oluştur</button>
+              </div>
+
+              <div id="form_block" class="position-absolute bottom-0 pb-2 ps-0 pe-4 w-100">
+                                    <div class="d-none d-sm-none d-md-block position-relative">
+                      <a id="btn-signature-help" class="position-absolute top-0 end-0 text-dark" href="" style="z-index: 5;"><i class="bi bi-question-circle"></i></a>
+                      <p id="nblayers_text" class="small d-none mb-2 opacity-75"><span class='badge rounded-pill border border-dark text-dark'><span class='nblayers'>0</span> <i class='bi bi-people-fill'></i></span> PDF'inin imzaladınız</p>
+                  </div>
+                  <div class="btn-group w-100">
+                      <a id="btn_download" class="btn btn-outline-dark w-100" href="#"><i class="bi bi-download"></i> PDF indir</a>
+                      <button class="btn btn-outline-dark" type="button" id="btn_share" data-bs-toggle="modal" data-bs-target="#modal-share-informations"><i class="bi bi-share"></i></button>
+                  </div>
+                  <form id="form_pdf" action="#" onsubmit="return false;" class="d-none d-sm-none d-md-block">
+                        <input id="input_svg" name="svg[]" type="file" class="d-none" />
+
+                        <button class="btn btn-primary w-100 mt-2" disabled="disabled" type="submit" id="save"><i class="bi bi-cloud-upload"></i> İmzamı iletin</button>
+                  </form>
+                                </div>
+            </div>
+        </div>
+        <button id="color-picker" class="shadow-sm" title="Changer la couleur de l'encre"><i class="bi bi-droplet-fill"></i></button>
+        <div class="position-fixed top-0 start-0 bg-white w-100 p-2 shadow-sm d-md-none">
+            <div class="d-grid gap-2">
+            <button id="btn_svn_select" class="btn btn-light btn-lg" data-bs-toggle="offcanvas" data-bs-target="#sidebarTools" aria-controls="sidebarTools"><i class="bi bi-hand-index"></i> Bir imza seçin</button>
+            </div>
+            <div id="svg_selected_container" class="text-center d-none position-relative">
+                <img id="svg_selected" src="" style="height: 48px;" class="img-fluid"/>
+                <button type="button" id="btn_svg_selected_close" class="btn-close text-reset position-absolute" style="top: 9px; right: 9px;"></button>
+            </div>
+            <div id="svg_object_actions" class="d-none">
+                <button id="btn-svg-pdf-delete" class="btn btn-lg btn-light"><i class="bi bi-trash"></i></button>
+            </div>
+        </div>
+        <div class="position-fixed bottom-0 start-0 bg-white w-100 p-2 shadow d-md-none">
+            <div class="btn-group position-absolute opacity-25" style="top: -46px;">
+            <button id="btn-zoom-decrease" class="btn btn-secondary"><i class="bi bi-dash"></i></button>
+            <button id="btn-zoom-increase" class="btn btn-secondary"><i class="bi bi-plus"></i></button>
+            </div>
+            <div class="d-grid gap-2">
+                                    <button class="btn btn-primary" disabled="disabled" type="submit" id="save_mobile"><i class="bi bi-cloud-upload"></i> İmzamı iletin</button>
+                            </div>
+        </div>
+
+    <div class="modal fade" id="modalAddSvg" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <nav class="nav nav-tabs" id="nav-tab" role="tablist">
+                    <button class="nav-link active ps-2 ps-md-3 pe-2 pe-md-3" id="nav-draw-tab" data-bs-toggle="tab" data-bs-target="#nav-draw" type="button" role="tab" aria-controls="nav-draw" aria-selected="true"><i class="bi bi-vector-pen"></i> Çiz<br /><small>freehand</small></button>
+                    <button class="nav-link ps-2 ps-md-3 pe-2 pe-md-3" id="nav-type-tab" data-bs-toggle="tab" data-bs-target="#nav-type" type="button" role="tab" aria-controls="nav-type" aria-selected="false"><i class="bi bi-fonts"></i> Giriş<br /><small>metin</small></button>
+                    <button class="nav-link ps-2 ps-md-3 pe-2 pe-md-3" id="nav-import-tab" data-bs-toggle="tab" data-bs-target="#nav-import" type="button" role="tab" aria-controls="nav-import" aria-selected="false"><i class="bi bi-image"></i> İçeri aktar<br /><small>resim</small></button>
+                </nav>
+                <div class="tab-content mt-3" id="nav-svg-add">
+                    <div class="tab-pane fade show active" id="nav-draw" role="tabpanel" aria-labelledby="nav-draw-tab">
+                      <small id="signature-pad-reset" class="text-muted opacity-75 position-absolute" style="right: 25px; bottom: 25px; cursor: pointer;" title="İmzayı sil"><i class="bi bi-trash"></i></small>
+                      <canvas id="signature-pad" class="border bg-light" width="462" height="200"></canvas>
+                    </div>
+                    <div class="tab-pane fade" id="nav-type" role="tabpanel" aria-labelledby="nav-type-tab">
+                        <input id="input-text-signature" type="text" class="form-control form-control-lg" placeholder="İmzam" />
+                    </div>
+                    <div class="tab-pane fade" id="nav-import" role="tabpanel" aria-labelledby="nav-import-tab">
+                        <div class="text-center">
+                        <img id="img-upload" class="d-none" src="" />
+                        </div>
+                        <form id="form-image-upload" action="/image2svg" method="POST" enctype="multipart/form-data">
+                            <input id="input-image-upload" class="form-control" name="image" type="file">
+
+                            <div class="form-check form-switch mt-2">
+                              <input class="form-check-input" type="checkbox" role="switch" id="switch-vectorized" checked>
+                              <label class="form-check-label" for="switch-vectorized">Convert the image to a vector format</label>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <input id="input-svg-type" type="hidden" />
+          </div>
+          <div class="modal-footer justify-content-between">
+            <button tabindex="-1" type="button" class="btn btn-light col-4" data-bs-dismiss="modal">İptal</button>
+            <input type="color" id="penColorPicker" class="form-control form-control-color">
+            <button id="btn_modal_ajouter" type="button" disabled="disabled" data-bs-dismiss="modal" class="btn btn-primary float-end col-4"><span id="btn_modal_ajouter_spinner" class="spinner-border spinner-border-sm d-none"></span><span id="btn_modal_ajouter_check" class="bi bi-check-circle"></span> Oluştur</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <div class="modal fade" id="modal-text-more-options" tabindex="-1" aria-labelledby="modalMoreOptionsLabel" aria-modal="true" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalMoreOptionsLabel">Date formats and preconfigured texts</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="custom-text-list" id="text-list-date">
+                    </div>
+                    <div class="custom-text-list">
+                        <div class="d-grid gap-2 mb-2 list-item-add btn-custom-text">
+                        <span class="btn btn-outline-secondary text-black text-start"><i class="bi bi-chat-square-dots me-1"></i> <span class="custom-text">Read and approved</span></span>
+                        </div>
+                    </div>
+                    <div class="custom-text-list" id="text-list-history">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+            <div id="modal-share-informations" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-people-fill"></i> Bu PDF'i birden fazla kişiyle imzalayın</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bu PDF'i aynı anda birden fazla kişi imzalayabilir.</p>
+                    <p>Bunu yapmak için, bu sayfanın bağlantısını seçtiğiniz kişilerle paylaşmanız yeterlidir:</p>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Paylaşım bağlantısı</span>
+                        <input id="input-share-link" type="text" onclick="this.select();  this.setSelectionRange(0, 99999);" readonly="readonly" class="form-control bg-light font-monospace" value="">
+                        <button onclick="navigator.clipboard.writeText(document.getElementById('input-share-link').value); this.innerText = 'Kopyalandı !';" autofocus="autofocus" class="btn btn-primary" type="button" id="btn-copy-share-link"><i class="bi bi-clipboard"></i> Kopya</button>
+                    </div>
+                    <script>document.querySelector('#input-share-link').value = document.location.href;</script>
+                    <p class="mb-0">İmzacıların her biri, imzalanan PDF'nin en son sürümünü istediği zaman indirebilir.</p>
+                </div>
+                <div class="modal-footer text-start">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+            <div id="modal-signed" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-file-earmark-check"></i> PDF imzala</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-1 text-success"><i class="bi bi-check-circle"></i> İmzanız başarıyla kaydedildi!</p>
+                    <p id="text_nomail_notification" class="mt-3 text-muted opacity-75"><i class="bi bi-info-circle"></i> This application does not automatically send emails to other signers. If you want to send one yourself, you can use <a>this pre-written email</a>.                    </p>
+                    <a id="link_compose_mail" class="d-none" href="mailto:?subject=Signing%20the%20document%20%3A%20DOCUMENT_NAME&body=Hello%2C%0A%0AI%20just%20signed%20the%20document%20%28DOCUMENT_NAME%29%20%3A%20DOCUMENT_URL"></a>
+                </div>
+                <div class="modal-footer text-center d-block">
+                    <a id="btn_download_signed" class="btn btn-outline-dark" href="#"><i class="bi bi-download"></i> PDF dosyasını indirin</a>
+                </div>
+            </div>
+        </div>
+    </div>
+        <template id="toolbox-elements-template">
+        <div class="toolbox-action" data-action="changeColor" title="Change the color of the selected element"><i class="bi bi-droplet-fill"></i></div>
+        <div class="toolbox-action" data-bs-toggle="modal" data-bs-target="#modal-text-more-options" title="Select preconfigured text"><i class="bi bi-layout-text-sidebar-reverse"></i></div>
+        <div class="toolbox-action dropdown" title="Duplicate the element">
+            <span class="text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="inside"><i class="bi bi-copy mx-1"></i></span>
+            <ul class="dropdown-menu shadow-sm bg-body-secondary">
+                <li><a class="dropdown-item" data-action="copy">Duplicate</a></li>
+                <li><a class="dropdown-item" data-action="duplicate">Duplicate on each page</a></li>
+            </ul>
+        </div>
+        <div class="toolbox-action" data-action="delete" title="Delete the element"><i class="bi bi-trash3"></i></div>
+    </template>
+
+    <div class="modal" id="modalLoading" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-body text-center my-5 text-white fs-4">
+                <p></p>
+                <div class="spinner-border" role="status"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<span id="is_mobile" class="d-md-none"></span>
+<script src="/vendor/bootstrap.bundle.min.js?5.3.3"></script>
+<script src="/vendor/pdf.min.mjs?4.6.82-legacy" type="module"></script>
+<script type="module">
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '/vendor/pdf.worker.min.mjs?4.6.82-legacy';
+</script>
+<script src="/vendor/pdf-lib.min.js?2.2.4"></script>
+<script src="/vendor/exif.min.js?2.3.0"></script>
+<script src="/js/common.js?mvbicmxa"></script>
+<script>
+var REVERSE_PROXY_URL = "";
+var trad = {"Select this page":"Bu sayfay\u0131 se\u00e7","Delete this page":"Bu sayfay\u0131 sil","Restore this page":"Bu sayfay\u0131 geri y\u00fckle","Move this page":"Bu sayfay\u0131 ta\u015f\u0131","Move here":"Buraya ta\u015f\u0131","Turn this page":"Bu sayfay\u0131 d\u00f6nd\u00fcr","Download this page":"Bu sayfay\u0131 indir","Page":"Sayfa"};
+</script>
+    <script src="/vendor/fabric.min.js?5.4.0"></script>
+    <script src="/vendor/signature_pad.umd.min.js?5.0.3"></script>
+    <script src="/vendor/opentype.min.js?1.3.4"></script>
+    <script>
+    var maxSize = 20000000;
+    var maxPage = 100;
+    var sharingMode = 1;
+    var pdfHash = null;
+    var openModal = null;
+    try { openModal = sessionStorage.getItem('openModal'); sessionStorage.removeItem('openModal'); } catch (e) {}
+    var direction = 'ltr';
+        pdfHash = (window.location.pathname.match(/^\/signature\/([a-z0-9]{10,64})\/?$/) || [])[1] || null;
+    
+    
+
+    const adminKey = localStorage.getItem(pdfHash+'.adminKey')
+    if (adminKey) {
+        const icon = document.createElement('i')
+        icon.classList.add('float-end', 'bi', 'bi-trash3', 'opacity-75')
+        icon.style.cursor = 'pointer'
+        document.getElementById('text_document_name').appendChild(icon)
+
+        icon.addEventListener('click', async function () {
+            if (confirm("Are you sure you want to delete this PDF and the associated signatures?")) {
+                try {
+                    const response = await fetch('/api/share/'+pdfHash, {method: 'DELETE', headers: {'X-Admin-Key': adminKey}});
+                    if (!response.ok) {
+                        throw new Error(`Response status: ${response.status}`);
+                    }
+
+                    localStorage.removeItem(pdfHash+'.adminKey')
+                    window.location.replace('/signature')
+                } catch (error) {
+                    console.error(error.message);
+                }
+            }
+        })
+    }
+
+    var trad = {"Text to modify":"De\u011fi\u015ftirilecek metin"};
+
+        url_font = "\/vendor\/fonts\/Caveat-Regular.ttf"        </script>
+    <script src="/js/cf-share.js?mvbicmxa"></script>
+    <script src="/js/signature.js?mvbicmxa"></script>
+  </body>
+</html>

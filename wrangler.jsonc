@@ -1,0 +1,39 @@
+{
+  "name": "signaturepdf",
+  "main": "src/worker.js",
+  "compatibility_date": "2025-09-01",
+
+  // Pages et fichiers statiques (générés par `npm run build`)
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "html_handling": "none",
+    "not_found_handling": "none",
+    "run_worker_first": ["/api/*", "/", "/signature", "/signature/*", "/organization", "/metadata"]
+  },
+
+  // Index des partages (remplace l'id après `npx wrangler d1 create signaturepdf`)
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "signaturepdf",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  // Contenu chiffré des PDF et des signatures (remplace l'id après `npx wrangler kv namespace create BLOBS`)
+  "kv_namespaces": [
+    { "binding": "BLOBS", "id": "00000000000000000000000000000000" }
+  ],
+
+  // Purge des partages expirés, toutes les heures
+  "triggers": { "crons": ["17 * * * *"] },
+
+  "vars": {
+    "MAX_BYTES": "20000000",      // taille max d'un PDF partagé (octets)
+    "MAX_LAYERS": "30",           // signatures max par document
+    "MAX_SHARES": "300",          // documents partagés actifs max
+    "TOTAL_BYTES": "800000000"    // stockage total max (KV gratuit = 1 Go)
+  }
+}

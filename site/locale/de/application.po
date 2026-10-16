@@ -1,0 +1,647 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-12-03 18:32+0100\n"
+"PO-Revision-Date: 2025-10-23 13:28+0000\n"
+"Last-Translator: Christian Eßl <indy.essl@gmail.com>\n"
+"Language-Team: German <https://hosted.weblate.org/projects/signature-pdf/"
+"application/de/>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.14.1-dev\n"
+
+msgid "en"
+msgstr "de"
+
+msgid "PDF compression failed"
+msgstr "PDF-Komprimierung fehlgeschlagen"
+
+msgid "Administration panel"
+msgstr "Administrationsbereich"
+
+msgid "Configuration"
+msgstr "Konfiguration"
+
+msgid "Server installation"
+msgstr "Server-Installation"
+
+#, php-format
+msgid "Minimal version required : %s"
+msgstr "Erforderliche Minimalversion : %s"
+
+#, php-format
+msgid "Package %s required"
+msgstr "Paket %s erforderlich"
+
+#, php-format
+msgid "Package %s missing"
+msgstr "Paket %s fehlt"
+
+msgid "File Configuration"
+msgstr "Dateikonfiguration"
+
+#, php-format
+msgid "The directory %s should exist and be writeable"
+msgstr "Das Verzeichnis %s sollte existieren und beschreibbar sein"
+
+msgid "Site not functional without JavaScript enabled"
+msgstr "Diese Website funktioniert nicht ohne aktiviertes JavaScript"
+
+#, php-format
+msgid "%s Compress a PDF"
+msgstr "%s Ein PDF komprimieren"
+
+msgid "Reduce the size of a PDF"
+msgstr "Größe eines PDFs reduzieren"
+
+msgid "Choose a PDF"
+msgstr "Wähle eine PDF"
+
+#, php-format
+msgid "The PDF must not exceed %s Mb"
+msgstr "Die PDF darf %s Mb nicht überschreiten"
+
+msgid ""
+"The PDF will be processed by the server without being retained or stored"
+msgstr ""
+"Die PDF-Datei wird vom Server verarbeitet, ohne dass sie aufbewahrt oder "
+"gespeichert wird"
+
+msgid "Compress"
+msgstr "Komprimieren"
+
+msgid "Low compression (maximum quality)"
+msgstr "Niedrige Komprimierung (maximale Qualität)"
+
+#, php-format
+msgid "%s Medium compression %s (default)"
+msgstr "%s Mittlere Kompression %s (Standard)"
+
+msgid "High compression (minimum quality)"
+msgstr "Hohe Komprimierung (minimale Qualität)"
+
+#, php-format
+msgid "%s Mb"
+msgstr "%s Mb"
+
+msgid "Compressed at %s%"
+msgstr "Komprimiert mit %s%"
+
+msgid "Download the PDF"
+msgstr "PDF herunterladen"
+
+msgid "Your pdf is already optimized"
+msgstr "Ihr PDF ist bereits optimiert"
+
+msgid "Free open-source software for signing and manipulating PDFs"
+msgstr "Kostenlose Open-Source-Software zum Signieren und Bearbeiten von PDFs"
+
+msgid "Search for a tool (e.g., sign, compress, extract, watermark...)"
+msgstr ""
+
+msgid "Sign"
+msgstr "Signieren"
+
+msgid "Add a signature"
+msgstr "Unterschrift hinzufügen"
+
+msgid "Add initials"
+msgstr "Initialen hinzufügen"
+
+msgid "Add a stamp"
+msgstr "Stempel hinzufügen"
+
+msgid "Type text"
+msgstr "Text hinzufügen"
+
+msgid "Strike through text"
+msgstr "Text durchstreichen"
+
+msgid "Allow multiple people to sign via a shared link"
+msgstr "Mehreren Personen das Signieren über geteilten Link erlauben"
+
+msgid "Sign with the server certificate"
+msgstr "Mit Server-Zertifikat signieren"
+
+msgid "Add a watermark"
+msgstr "Wasserzeichen hinzufügen"
+
+msgid "New"
+msgstr "Neu"
+
+msgid "Redact areas"
+msgstr "Bereiche schwärzen"
+
+msgid "Organize"
+msgstr "Organisieren"
+
+msgid "Combine multiple PDF files"
+msgstr "Mehrere PDFs kombinieren"
+
+msgid "Reorder pages"
+msgstr "Seiten neu anordnen"
+
+msgid "Extract pages"
+msgstr "Seiten extrahieren"
+
+msgid "Rotate pages"
+msgstr "Seiten rotieren"
+
+msgid "Change or standardize the paper size"
+msgstr "Papierformat ändern oder vereinheitlichen"
+
+msgid "Delete pages"
+msgstr "Seiten entfernen"
+
+msgid "Generate a booklet"
+msgstr "Broschüre erstellen"
+
+msgid "Convert images to PDF"
+msgstr "Bilder in PDF umwandeln"
+
+msgid "Metadata"
+msgstr "Metadaten"
+
+msgid "Add, edit, or remove metadata from a PDF"
+msgstr ""
+"Hinzufügen, Bearbeiten oder Entfernen von Metadaten aus einer PDF-Datei"
+
+msgid "Compress and reduce the size of a PDF"
+msgstr "PDF komprimieren und Dateigröße reduzieren"
+
+#, php-format
+msgid "%s Edit metadata"
+msgstr "%s Metadaten bearbeiten"
+
+msgid "Test with a demo PDF"
+msgstr "Mit Demo-PDF testen"
+
+msgid "List of PDF metadata"
+msgstr "Liste der PDF-Metadaten"
+
+msgid "Add new metadata"
+msgstr "Neue Metadaten hinzufügen"
+
+msgid "Key"
+msgstr "Schlüssel"
+
+msgid "Value"
+msgstr "Wert"
+
+#, php-format
+msgid "%s Add"
+msgstr "%s Hinzufügen"
+
+msgid "Close this PDF and return to the home page"
+msgstr "PDF schließen und zur Startseite zurückkehren"
+
+msgid "Edit metadata"
+msgstr "Metadaten bearbeiten"
+
+msgid "Save and download the PDF"
+msgstr "PDF speichern und herunterladen"
+
+msgid "Save changes"
+msgstr "Änderungen speichern"
+
+#, php-format
+msgid "%s Organize PDF"
+msgstr "%s PDF organisieren"
+
+msgid "Merge, sort, rotate, delete, extract pages"
+msgstr "Seiten zusammenführen, sortieren, drehen, löschen, extrahieren"
+
+msgid "or an image"
+msgstr "oder ein Bild"
+
+msgid "Touch a page to select it"
+msgstr "Eine Seite berühren, um sie auszuwählen"
+
+msgid "Close this PDF and return to home"
+msgstr "PDF schließen und zu Home zurückkehren"
+
+msgid "PDF organization"
+msgstr "PDF-Organisation"
+
+#, php-format
+msgid "%s Add a PDF"
+msgstr "%s PDF hinzufügen"
+
+#, php-format
+msgid "%s page(s) selected"
+msgstr "%s Seite(n) ausgewählt"
+
+#, php-format
+msgid "%s Rotate 90°"
+msgstr "%s Drehe um 90°"
+
+#, php-format
+msgid "%s Move"
+msgstr "%s Verschieben"
+
+#, php-format
+msgid "%s Delete"
+msgstr "%s Läschen"
+
+#, php-format
+msgid "%s Extract and download"
+msgstr "%s Extrahieren und herunterladen"
+
+#, php-format
+msgid "%s Cancel selection"
+msgstr "%s Auswahl aufheben"
+
+msgid "Printing options"
+msgstr "Druckoptionen"
+
+#, php-format
+msgid "%s Download the full PDF"
+msgstr "%s Vollständiges PDF herunterladen"
+
+msgid "Download the selection"
+msgstr "Auswahl herunterladen"
+
+msgid "No"
+msgstr "Nein"
+
+msgid "page"
+msgstr "Seite"
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#, php-format
+msgid "%s Turn"
+msgstr "%s Drehen"
+
+msgid "PDF documents"
+msgstr "PDF-Dokumente"
+
+msgid "Close"
+msgstr "Schließen"
+
+msgid "Original format"
+msgstr "Originalformat"
+
+msgid "Most common formats"
+msgstr "Gängigste Formate"
+
+msgid "Other formats"
+msgstr "Andere Formate"
+
+msgid "Custom"
+msgstr "Benutzerdefiniert"
+
+msgid "Paper size"
+msgstr "Papiergröße"
+
+msgid "Width"
+msgstr "Breite"
+
+msgid "Height"
+msgstr "Höhe"
+
+msgid "Unit"
+msgstr "Einheit"
+
+msgid "Normal"
+msgstr "Normal"
+
+msgid "Booklet"
+msgstr "Broschüre"
+
+msgid "Formatting"
+msgstr "Formatierung"
+
+msgid "Sign a PDF"
+msgstr "PDF signieren"
+
+msgid "Sign, initial, stamp, complete a document"
+msgstr "Dokument unterschreiben, signieren, stempeln oder abschließen"
+
+msgid "The PDF should not exceed"
+msgstr "Die PDF darf nicht größer sein als"
+
+msgid "MB and"
+msgstr "MB und"
+
+msgid "pages"
+msgstr "Seiten"
+
+msgid "How to sign?"
+msgstr "Wie signiert man?"
+
+msgid "By clicking directly on the document page"
+msgstr "Durch direktes Anklicken der Dokumentenseite"
+
+msgid "to insert the selected item in the right column"
+msgstr "um das ausgewählte Element in die rechte Spalte einzufügen"
+
+msgid "signature, initial, text, stamp, etc ..."
+msgstr "Unterschrift, Initialen, Text, Stempel usw."
+
+msgid "Close this PDF and return to the homepage"
+msgstr "PDF schließen und zur Startseite zurückkehren"
+
+msgid "PDF Signature"
+msgstr "PDF-Signatur"
+
+msgid "This PDF is shared with others to be signed by multiple people"
+msgstr ""
+"Diese PDF-Datei wird an andere weitergegeben, damit sie von mehreren "
+"Personen unterzeichnet werden kann"
+
+msgid "This PDF is stored on your computer to be signed by you only"
+msgstr ""
+"Diese PDF-Datei wird auf Ihrem Computer gespeichert und kann nur von Ihnen "
+"unterzeichnet werden"
+
+msgid "This PDF is stored encrypted on the server."
+msgstr "Dieses PDF wird verschlüsselt auf dem Server gespeichert."
+
+msgid "Keep the selection active"
+msgstr "Auswahl aktiv halten"
+
+#, php-format
+msgid "%s Signature"
+msgstr "%s Unterschrift"
+
+msgid "Create"
+msgstr "Erstellen"
+
+#, php-format
+msgid "%s Initial"
+msgstr "%s Signatur"
+
+#, php-format
+msgid "%s Stamp"
+msgstr "%s Stempel"
+
+#, php-format
+msgid "%s Text"
+msgstr "%s Text"
+
+msgid "Strikethrough"
+msgstr "Durchstreichen"
+
+#, php-format
+msgid "%s Check box"
+msgstr "%s Kontrollkästchen"
+
+msgid "Redaction area"
+msgstr "Schwärzungsbereich"
+
+msgid "Watermark"
+msgstr "Wasserzeichen"
+
+#, php-format
+msgid "%s Create an element"
+msgstr "%s Element erstellen"
+
+#, php-format
+msgid "%s Share to sign %s with multiple people"
+msgstr "%s Mit mehreren Personen %s zur Unterschrift teilen"
+
+msgid "Download the signed PDF"
+msgstr "Signierte PDF herunterladen"
+
+msgid "The PDF will be flattened"
+msgstr "Die PDF wird in ein nicht bearbeitbares Format umgewandelt"
+
+#, php-format
+msgid "You are %s to have signed this PDF"
+msgstr "Du bist %s, der/die diese PDF unterschrieben hat"
+
+#, php-format
+msgid "%s Download the PDF"
+msgstr "%s PDF herunterladen"
+
+msgid "Transmit my signature"
+msgstr "Meine Unterschrift übermitteln"
+
+#, php-format
+msgid "%s Select a signature"
+msgstr "%s Unterschrift auswählen"
+
+msgid "Draw"
+msgstr "Zeichnen"
+
+msgid "freehand"
+msgstr "freihand"
+
+msgid "Enter"
+msgstr "Eingeben"
+
+msgid "text"
+msgstr "Text"
+
+msgid "Import"
+msgstr "Importieren"
+
+msgid "an image"
+msgstr "ein Bild"
+
+msgid "Clear signature"
+msgstr "Signatur entfernen"
+
+msgid "My signature"
+msgstr "Meine Unterschrift"
+
+#, php-format
+msgid "%s Share this PDF to sign it with several people"
+msgstr "%s Diese PDF zum Unterschreiben mit mehreren Personen teilen"
+
+msgid ""
+"By enabling PDF sharing, you will be able to provide a link to the people of "
+"your choice so that they can sign this PDF."
+msgstr ""
+"Wenn Sie die PDF-Freigabe aktivieren, können Sie den Personen Ihrer Wahl "
+"einen Link zur Verfügung stellen, damit diese die PDF-Datei unterschreiben "
+"können."
+
+#, php-format
+msgid ""
+"%s This sharing requires the PDF to be transferred and stored on the server "
+"for future signers to access."
+msgstr ""
+"%s Das Teilen erfordert, dass die PDF auf den Server übertragen und "
+"gespeichert wird, damit zukünftige Unterzeichner darauf zugreifen können."
+
+#, php-format
+msgid "%s The PDF will be kept"
+msgstr "%s Die PDF wird"
+
+msgid "for one year"
+msgstr "für ein Jahr"
+
+msgid "for six months"
+msgstr "für sechs Monate"
+
+msgid "for one month"
+msgstr "für einen Monat"
+
+msgid "for one week"
+msgstr "für eine Woche"
+
+msgid "for one day"
+msgstr "für einen Tag"
+
+msgid "for one hour"
+msgstr "für eine Stunde"
+
+msgid "after the last signature."
+msgstr "nach der letzten Unterschrift behalten."
+
+msgid "The PDF will be stored encrypted on the server"
+msgstr "Die PDF wird verschlüsselt auf dem Server gespeichert"
+
+#, php-format
+msgid "%s Start sharing"
+msgstr "%s Starte Teilen"
+
+#, php-format
+msgid "%s Sign this PDF with multiple people"
+msgstr "%s Unterschreibe diese PDF mit mehreren Personen"
+
+msgid "Multiple people can sign this PDF simultaneously."
+msgstr "Mehrere Personen können dieses PDF gleichzeitig signieren."
+
+msgid ""
+"To do so, simply share the link to this page with the people of your choice:"
+msgstr ""
+"Geben Sie dazu einfach den Link zu dieser Seite an die Personen Ihrer Wahl "
+"weiter:"
+
+msgid "Sharing link"
+msgstr "Teilen-Link"
+
+msgid "Copied !"
+msgstr "Kopiert!"
+
+msgid "Copy"
+msgstr "Kopieren"
+
+msgid ""
+"Each of the signatories can download the latest version of the signed PDF at "
+"any time."
+msgstr ""
+"Jeder der Unterzeichner kann jederzeit die neueste Version der "
+"unterzeichneten PDF-Datei herunterladen."
+
+msgid "Signed PDF"
+msgstr "PDF unterschrieben"
+
+msgid "Your signature has been successfully recorded!"
+msgstr "Ihre Signatur wurde erfolgreich erfasst!"
+
+msgid "This application does not automatically send emails to other signers."
+msgstr ""
+"Diese Anwendung versendet nicht automatisch E-Mails an andere Unterzeichner."
+
+msgid ""
+"If you want to send one yourself, you can use <a>this pre-written email</a>."
+msgstr ""
+"Wenn Sie selbst eine E-Mail senden möchten, können Sie <a>diese "
+"vorgefertigte E-Mail</a> verwenden."
+
+#, php-format
+msgid "Signing the document : %s"
+msgstr "Dokument wird unterschrieben: %s"
+
+#, php-format
+msgid ""
+"Hello,\n"
+"\n"
+"I just signed the document (%s) : %s"
+msgstr ""
+"Hallo,\n"
+"\n"
+"Ich habe dieses Dokument gerade unterschrieben (%s): %s"
+
+msgid "Change the color of the selected element"
+msgstr "Farbe des ausgewählten Elements ändern"
+
+msgid "Duplicate the element"
+msgstr "Element duplizieren"
+
+msgid "Duplicate on each page"
+msgstr "Auf jeder Seite duplizieren"
+
+msgid "Duplicate"
+msgstr "Duplizieren"
+
+msgid "Delete the element"
+msgstr "Element entfernen"
+
+msgid "Are you sure you want to delete this PDF and the associated signatures?"
+msgstr ""
+"Möchten Sie diese PDF und die zugehörigen Unterschriften wirklich löschen?"
+
+msgid "Text to modify"
+msgstr "Zu ändernder Text"
+
+msgid "Select this page"
+msgstr "Diese Seite auswählen"
+
+msgid "Delete this page"
+msgstr "Diese Seite löschen"
+
+msgid "Restore this page"
+msgstr "Diese Seite wiederherstellen"
+
+msgid "Move this page"
+msgstr "Diese Seite verschieben"
+
+msgid "Move here"
+msgstr "Hierher verschieben"
+
+msgid "Turn this page"
+msgstr "Diese Seite drehen"
+
+msgid "Download this page"
+msgstr "Diese Seite herunterladen"
+
+msgid "Page"
+msgstr "Seite"
+
+msgid "Free open-source software"
+msgstr "Freie Open-Source-Software"
+
+msgid "under AGPL-3.0 license"
+msgstr "unter AGPL-3.0-Lizenz"
+
+msgid "see the source code"
+msgstr "siehe den Quellcode"
+
+msgid "Sign and manipulate PDFs freely"
+msgstr "PDFs frei signieren und bearbeiten"
+
+msgid "Language"
+msgstr "Sprache"
+
+#~ msgid "Organize PDFs"
+#~ msgstr "PDFs organisieren"
+
+#~ msgid "Edit a PDF"
+#~ msgstr "PDF bearbeiten"
+
+#~ msgid "The PDF must not exceed "
+#~ msgstr "Das PDF darf nicht überschreiten "
+
+#~ msgid "Compress PDF"
+#~ msgstr "PDF komprimieren"
+
+#~ msgid "Editing PDF metadata"
+#~ msgstr "PDF-Metadaten bearbeiten"
+
+#~ msgid "Organize PDF"
+#~ msgstr "PDF organisieren"

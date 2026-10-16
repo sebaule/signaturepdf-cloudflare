@@ -1,0 +1,643 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-12-03 18:32+0100\n"
+"PO-Revision-Date: 2026-06-08 00:01+0000\n"
+"Last-Translator: ButterflyOfFire <boffire@users.noreply.hosted.weblate.org>\n"
+"Language-Team: Kabyle <https://hosted.weblate.org/projects/signature-pdf/"
+"application/kab/>\n"
+"Language: kab\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 2026.6\n"
+
+msgid "en"
+msgstr "kab"
+
+msgid "PDF compression failed"
+msgstr "Tussda n PDF ur teddi ara"
+
+msgid "Administration panel"
+msgstr "Agalis n tedbelt"
+
+msgid "Configuration"
+msgstr "Twila"
+
+msgid "Server installation"
+msgstr "Asbeddi n uqeddac"
+
+#, php-format
+msgid "Minimal version required : %s"
+msgstr ""
+
+#, php-format
+msgid "Package %s required"
+msgstr "Akemmus %s yettwasra"
+
+#, php-format
+msgid "Package %s missing"
+msgstr "Akemmus %s ulac-it"
+
+msgid "File Configuration"
+msgstr "Twila n ikaramen"
+
+#, php-format
+msgid "The directory %s should exist and be writeable"
+msgstr "Akaram %s yessefk ad yili u ad yesɛu tisirag n tira fell-as"
+
+msgid "Site not functional without JavaScript enabled"
+msgstr "Asmel ur iteddu ara ma yella ur yermid ara JavaScript"
+
+#, php-format
+msgid "%s Compress a PDF"
+msgstr "%s Tussda n PDF"
+
+msgid "Reduce the size of a PDF"
+msgstr "Senqes teɣzi n PDF"
+
+msgid "Choose a PDF"
+msgstr "Fren PDF"
+
+#, php-format
+msgid "The PDF must not exceed %s Mb"
+msgstr "Tiddi n PDF ur ilaq ara ad tɛeddi nnig %s Maṭ"
+
+msgid ""
+"The PDF will be processed by the server without being retained or stored"
+msgstr "Afaylu PDF ad yettusesfer s uqeddac war ma yettwaḥraz neɣ yettwasekles"
+
+msgid "Compress"
+msgstr "Ssed"
+
+msgid "Low compression (maximum quality)"
+msgstr "Tussda tafessast (taɣara tafellayt)"
+
+#, php-format
+msgid "%s Medium compression %s (default)"
+msgstr "%s Tussda talemmast %s (tamezwert)"
+
+msgid "High compression (minimum quality)"
+msgstr "Tussda ɛlayen (taɣara taddayt)"
+
+#, php-format
+msgid "%s Mb"
+msgstr "%s Maṭ"
+
+msgid "Compressed at %s%"
+msgstr ""
+
+msgid "Download the PDF"
+msgstr "Sader PDF"
+
+msgid "Your pdf is already optimized"
+msgstr ""
+
+msgid "Free open-source software for signing and manipulating PDFs"
+msgstr "Aseɣẓan ilelli i usizmel d usseqerdec n ifuyla PDF"
+
+msgid "Search for a tool (e.g., sign, compress, extract, watermark...)"
+msgstr "Nadi-d kra n ufecku (md., zmel, ssed, ssef, ticreḍt n waman…)"
+
+msgid "Sign"
+msgstr "Zmel"
+
+msgid "Add a signature"
+msgstr "Rnu azmul"
+
+msgid "Add initials"
+msgstr "Rnu isekkilen imezwura"
+
+msgid "Add a stamp"
+msgstr "Rnu iziwel"
+
+msgid "Type text"
+msgstr "Sekcem aḍris"
+
+msgid "Strike through text"
+msgstr "Jerreḍ aḍris"
+
+msgid "Allow multiple people to sign via a shared link"
+msgstr "Astenyi gar waṭas n medden s wassaɣ yettwabḍan"
+
+msgid "Sign with the server certificate"
+msgstr "Zmel s uselkin n useqdac"
+
+msgid "Add a watermark"
+msgstr "Rnu ticreḍt n waman"
+
+msgid "New"
+msgstr "Amaynut"
+
+msgid "Redact areas"
+msgstr ""
+
+msgid "Organize"
+msgstr "Suddes"
+
+msgid "Combine multiple PDF files"
+msgstr "Sdukkel aṭas ifuyla PDF"
+
+msgid "Reorder pages"
+msgstr "Ales asmizwer n yisebtar"
+
+msgid "Extract pages"
+msgstr "Sefsu isebtar"
+
+msgid "Rotate pages"
+msgstr "Zzi isebtar"
+
+msgid "Change or standardize the paper size"
+msgstr "Beddel neɣ slugen tiddi n lkaɣeḍ"
+
+msgid "Delete pages"
+msgstr "Kkes isebtar"
+
+msgid "Generate a booklet"
+msgstr "Sirew azmam"
+
+msgid "Convert images to PDF"
+msgstr "Aselket n tugniwin ɣer PDF"
+
+msgid "Metadata"
+msgstr "Iɣefisefka"
+
+msgid "Add, edit, or remove metadata from a PDF"
+msgstr "Rnu, ẓreg, neɣ kkes iɣefisefka seg PDF"
+
+msgid "Compress and reduce the size of a PDF"
+msgstr "Skussem, tesneqseḍ tiddi n PDF"
+
+#, php-format
+msgid "%s Edit metadata"
+msgstr "%s Aẓrag n yiɣefisefka"
+
+msgid "Test with a demo PDF"
+msgstr "Sekyed s ufaylu PDF n uskan"
+
+msgid "List of PDF metadata"
+msgstr "Tabdart n yiɣefisefka n PDF"
+
+msgid "Add new metadata"
+msgstr "Rnu iɣefisefka imaynuten"
+
+msgid "Key"
+msgstr "Tasarut"
+
+msgid "Value"
+msgstr "Azal"
+
+#, php-format
+msgid "%s Add"
+msgstr "%s Rnu"
+
+msgid "Close this PDF and return to the home page"
+msgstr "Mdel afaylu-a n PDF syen uɣal ɣer usebter agejdan"
+
+msgid "Edit metadata"
+msgstr "Ẓreg iɣefisefka"
+
+msgid "Save and download the PDF"
+msgstr "Sekles syen sader PDF"
+
+msgid "Save changes"
+msgstr "Sekles ibeddilen"
+
+#, php-format
+msgid "%s Organize PDF"
+msgstr "%s Asuddes n PDF"
+
+msgid "Merge, sort, rotate, delete, extract pages"
+msgstr "Smezdi, smizwer, sezzi, kkes, tsuffeɣḍ-d isebtar"
+
+msgid "or an image"
+msgstr "neɣ ldi yiwet n tugna"
+
+msgid "Touch a page to select it"
+msgstr "Sit ɣef usebter i wakken ad t-tferneḍ"
+
+msgid "Close this PDF and return to home"
+msgstr "Mdel afaylu-a n PDF syen uɣal ɣer usebter"
+
+msgid "PDF organization"
+msgstr "Asuddes n yifuyla PDF"
+
+#, php-format
+msgid "%s Add a PDF"
+msgstr "%s Rnu yiwen PDF"
+
+#, php-format
+msgid "%s page(s) selected"
+msgstr "%s asebter(isebtar) i yettwafernen"
+
+#, php-format
+msgid "%s Rotate 90°"
+msgstr "%s Zzi s 90°"
+
+#, php-format
+msgid "%s Move"
+msgstr "%s Senkez"
+
+#, php-format
+msgid "%s Delete"
+msgstr "%s Kkes"
+
+#, php-format
+msgid "%s Extract and download"
+msgstr "%s Ssef, tsadreḍ"
+
+#, php-format
+msgid "%s Cancel selection"
+msgstr "%s Sefsex tafrant"
+
+msgid "Printing options"
+msgstr "Tixtiṛiyin n usiggez"
+
+#, php-format
+msgid "%s Download the full PDF"
+msgstr "%s Sader PDF ummid"
+
+msgid "Download the selection"
+msgstr "Sader tafrant"
+
+msgid "No"
+msgstr "Uhu"
+
+msgid "page"
+msgstr "asebter"
+
+msgid "Cancel"
+msgstr "Sefsex"
+
+#, php-format
+msgid "%s Turn"
+msgstr "%s Dewweṛ"
+
+msgid "PDF documents"
+msgstr "Isemliyen n PDF"
+
+msgid "Close"
+msgstr "Mdel"
+
+msgid "Original format"
+msgstr "Amasal aẓaṛan"
+
+msgid "Most common formats"
+msgstr "Imusal i yettwasnen s tuget"
+
+msgid "Other formats"
+msgstr "Imusal nniḍen"
+
+msgid "Custom"
+msgstr "Aggan"
+
+msgid "Paper size"
+msgstr "Tiddi n lkaɣeḍ"
+
+msgid "Width"
+msgstr "Tehri"
+
+msgid "Height"
+msgstr "Teɣzi"
+
+msgid "Unit"
+msgstr "Aferdis"
+
+msgid "Normal"
+msgstr "Amagnu"
+
+msgid "Booklet"
+msgstr "Tadlist"
+
+msgid "Formatting"
+msgstr "Amsal"
+
+msgid "Sign a PDF"
+msgstr "Asezmel n PDF"
+
+msgid "Sign, initial, stamp, complete a document"
+msgstr "Zmel, zmel deg yidis, err iziwel neɣ smed isemli"
+
+msgid "The PDF should not exceed"
+msgstr "PDF ur ilaq ara ad iɛeddi"
+
+msgid "MB and"
+msgstr "MB akked"
+
+msgid "pages"
+msgstr "isebtar"
+
+msgid "How to sign?"
+msgstr "Amek ara tzemleḍ?"
+
+msgid "By clicking directly on the document page"
+msgstr "S usiti srid ɣef usebter n yisemli"
+
+msgid "to insert the selected item in the right column"
+msgstr "i tririt n uferdis i yettwzfernen deg ufeggag ayeffus"
+
+msgid "signature, initial, text, stamp, etc ..."
+msgstr "azmul, azmul deg yidis, aḍris, iziwel, tgr..."
+
+msgid "Close this PDF and return to the homepage"
+msgstr "Mdel afaylu-a PDF syen uɣal ɣer usebter agejdan"
+
+msgid "PDF Signature"
+msgstr "Asezmel n PDF"
+
+msgid "This PDF is shared with others to be signed by multiple people"
+msgstr ""
+"Afaylu-a PDF yettwabḍa d yimdanen niḍen i wakken ad yetgusezmel sɣur waṭas n "
+"yimdanen"
+
+msgid "This PDF is stored on your computer to be signed by you only"
+msgstr "Afaylu-a PDF yettwaḥraz deg uselkim-ik i wakken ad t-tzemleḍ kan kečč"
+
+msgid "This PDF is stored encrypted on the server."
+msgstr "Afaylu-a PDF yettwaḥrez yettwawgelhen ɣef uqeddac."
+
+msgid "Keep the selection active"
+msgstr "Eǧǧ tafrant d turmidt"
+
+#, php-format
+msgid "%s Signature"
+msgstr "%s Azmul"
+
+msgid "Create"
+msgstr "Snulfu-d"
+
+#, php-format
+msgid "%s Initial"
+msgstr "%s Azmul s yisekkilen imezwura"
+
+#, php-format
+msgid "%s Stamp"
+msgstr "%s Iziwel"
+
+#, php-format
+msgid "%s Text"
+msgstr "%s Aḍris"
+
+msgid "Strikethrough"
+msgstr "Jerreḍ"
+
+#, php-format
+msgid "%s Check box"
+msgstr "%s Tabewwaḍt n uṛcam"
+
+msgid "Redaction area"
+msgstr ""
+
+msgid "Watermark"
+msgstr "Ticreḍt n waman"
+
+#, php-format
+msgid "%s Create an element"
+msgstr "%s Rnu aferdis"
+
+#, php-format
+msgid "%s Share to sign %s with multiple people"
+msgstr "%s Bḍu-t i wakken ad t-yezmel %s aṭas n yimdanen"
+
+msgid "Download the signed PDF"
+msgstr "Sader afaylu n PDF yettwazemlen"
+
+msgid "The PDF will be flattened"
+msgstr "Afaylu-a PDF ad yettwasbeḍ"
+
+#, php-format
+msgid "You are %s to have signed this PDF"
+msgstr "Aql-aken deg %s tzemlem afaylu-a PDF"
+
+#, php-format
+msgid "%s Download the PDF"
+msgstr "%s Sader PDF"
+
+msgid "Transmit my signature"
+msgstr "Azen azmul-iw"
+
+#, php-format
+msgid "%s Select a signature"
+msgstr "%s Fren azmul"
+
+msgid "Draw"
+msgstr "Suneɣ"
+
+msgid "freehand"
+msgstr "s ufus"
+
+msgid "Enter"
+msgstr "Sekcem"
+
+msgid "text"
+msgstr "aḍris"
+
+msgid "Import"
+msgstr "Kter"
+
+msgid "an image"
+msgstr "tugna"
+
+msgid "Clear signature"
+msgstr "Sfeḍ azmul"
+
+msgid "My signature"
+msgstr "Azmul-iw"
+
+#, php-format
+msgid "%s Share this PDF to sign it with several people"
+msgstr "%s Bḍu afaylu-a PDF i wakken ad tzemlen aṭas n yimdanen"
+
+msgid ""
+"By enabling PDF sharing, you will be able to provide a link to the people of "
+"your choice so that they can sign this PDF."
+msgstr ""
+"S urmad n beṭṭu n PDF, ad tizmireḍ ad tmuddeḍ aseɣwen i yimdanen tebɣiḍ i "
+"wakken ad izmiren ad zemlen afaylu-a PDF."
+
+#, php-format
+msgid ""
+"%s This sharing requires the PDF to be transferred and stored on the server "
+"for future signers to access."
+msgstr ""
+"%s Beṭṭu-a yesra ad yettuwelleh daɣen ad yettwaḥraz ufaylu PDF ɣef uqeddac i "
+"wakken ad t-afen wid ara tzemlen sya ɣer zdat."
+
+#, php-format
+msgid "%s The PDF will be kept"
+msgstr "%s PDF ad yettwaḥraz"
+
+msgid "for one year"
+msgstr "i yiwen useggas"
+
+msgid "for six months"
+msgstr "i seddis n wayyuren"
+
+msgid "for one month"
+msgstr "i yiwen wayyur"
+
+msgid "for one week"
+msgstr "i yiwen umalas"
+
+msgid "for one day"
+msgstr "i yiwen wass"
+
+msgid "for one hour"
+msgstr "azal n usrag"
+
+msgid "after the last signature."
+msgstr "seld azmul aneggaru."
+
+msgid "The PDF will be stored encrypted on the server"
+msgstr "Afaylu-a PDF ad yettwaḥrez yettwawgelhen ɣef uqeddac"
+
+#, php-format
+msgid "%s Start sharing"
+msgstr "%s Bdu beṭṭu"
+
+#, php-format
+msgid "%s Sign this PDF with multiple people"
+msgstr "%s Zmel afaylu-a n PDF d yimdanen niḍen"
+
+msgid "Multiple people can sign this PDF simultaneously."
+msgstr "Aṭas n yimdanen i izemren ad zemlen afaylu-a PDF ɣef tikkelt."
+
+msgid ""
+"To do so, simply share the link to this page with the people of your choice:"
+msgstr ""
+"I waya, tzemreḍ ad tebduḍ aseɣwen ɣer usebter-a akked yimdanen i tebɣiḍ:"
+
+msgid "Sharing link"
+msgstr "Aseɣwen i beṭṭu"
+
+msgid "Copied !"
+msgstr "Yettwanɣel !"
+
+msgid "Copy"
+msgstr "Nɣel"
+
+msgid ""
+"Each of the signatories can download the latest version of the signed PDF at "
+"any time."
+msgstr "Yal win izemlen afaylu ad d-isader lqem aneggaru n PDF melmi i yebɣa."
+
+msgid "Signed PDF"
+msgstr "Afaylu PDF yettwasezmel"
+
+msgid "Your signature has been successfully recorded!"
+msgstr "Azmul-ik yettwasekles akken iwata!"
+
+msgid "This application does not automatically send emails to other signers."
+msgstr "Asnas-a ur yettazen ara imaylen s wudem awurman i yizmulen-nniḍen."
+
+msgid ""
+"If you want to send one yourself, you can use <a>this pre-written email</a>."
+msgstr ""
+"Ma tebɣiḍ ad d-tazneḍ yiwen i yiman-ik, tzemreḍ ad tesqedceḍ <a>imayl-a "
+"yuran yakan</a>."
+
+#, php-format
+msgid "Signing the document : %s"
+msgstr "Azmul n zzmam: %s"
+
+#, php-format
+msgid ""
+"Hello,\n"
+"\n"
+"I just signed the document (%s) : %s"
+msgstr ""
+"Azul.\n"
+"\n"
+"Tura kan i zemleɣ zzmam (%s): %s"
+
+msgid "Change the color of the selected element"
+msgstr "Beddel ini n uferdis yettwafernen"
+
+msgid "Duplicate the element"
+msgstr "Sisleg aferdis"
+
+msgid "Duplicate on each page"
+msgstr "Sisleg ɣef yal asebter"
+
+msgid "Duplicate"
+msgstr "Sleg"
+
+msgid "Delete the element"
+msgstr "Kkes aferdis"
+
+msgid "Are you sure you want to delete this PDF and the associated signatures?"
+msgstr "S tidet, tebɣiḍ ad tekkseḍ PDF-a d izmulen icudden ɣer ɣur-s?"
+
+msgid "Text to modify"
+msgstr "Aḍris ara yettuṣeggmen"
+
+msgid "Select this page"
+msgstr "Fren asebter-a"
+
+msgid "Delete this page"
+msgstr "Kkes asebter-a"
+
+msgid "Restore this page"
+msgstr "Err-d asebter-a"
+
+msgid "Move this page"
+msgstr "Senkez asebter-a"
+
+msgid "Move here"
+msgstr "Senkez ɣer da"
+
+msgid "Turn this page"
+msgstr "Dewweṛ asebter-a"
+
+msgid "Download this page"
+msgstr "Sader asebter-a"
+
+msgid "Page"
+msgstr "Asebter"
+
+msgid "Free open-source software"
+msgstr "D aseɣẓan ilelli n uɣbalu yeldin"
+
+msgid "under AGPL-3.0 license"
+msgstr "s turagt AGPL-3.0"
+
+msgid "see the source code"
+msgstr "wali tangalt taɣbalut"
+
+msgid "Sign and manipulate PDFs freely"
+msgstr "Zmel rnu sqerdec ifuyla PDF akken i k⋅m-yehwa"
+
+msgid "Language"
+msgstr "Tutlayt"
+
+#~ msgid "Organize PDFs"
+#~ msgstr "Suddes ifuyla PDF"
+
+#~ msgid "Edit a PDF"
+#~ msgstr "Ẓreg a PDF"
+
+#~ msgid "The PDF must not exceed "
+#~ msgstr "Afaylu PDF ur ilaq ara ad iɛeddi "
+
+#~ msgid "Mb"
+#~ msgstr "Mb"
+
+#~ msgid "Compress PDF"
+#~ msgstr "Ssed PDF"
+
+#~ msgid "Editing PDF metadata"
+#~ msgstr "Aẓrag n yiɣefisefka n PDF"
+
+#~ msgid "Organize PDF"
+#~ msgstr "Asuddes n PDF"
+
+#~ msgid ""
+#~ "The PDF will be processed by the server without being stored or saved"
+#~ msgstr "Ad yettusesfer ufaylu PDF s uqeddac war aḥraz neɣ asekles"

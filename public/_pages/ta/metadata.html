@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="ta" dir="ltr" style="direction: ltr;">
+<head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="/vendor/bootstrap.ltr.min.css?5.3.3" rel="stylesheet">
+<link href="/vendor/bootstrap-icons.min.css?1.11.3" rel="stylesheet">
+<link href="/css/app.css?mvbicmxa" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon.png" />
+<style>
+    @font-face {
+        font-family: 'Caveat';
+        font-style: normal;
+        font-weight: 400;
+        src: url('/vendor/fonts/Caveat-Regular.ttf') format('truetype');
+    }
+
+    @font-face {
+        font-family: 'Tajawal';
+        font-style: normal;
+        font-weight: 400;
+        src: url('/vendor/fonts/Tajawal-Medium.ttf') format('truetype');
+    }
+</style>
+    <link href="/css/pdf_viewer.css" rel="stylesheet">
+    <title>Signature PDF - Éditer les métadonnées</title>
+    <meta name="description" content="Logiciel libre en ligne qui permet d'jouter, modifier ou supprimer les métadonnées d'un PDF">
+</head>
+<body>
+<noscript>
+    <div class="alert alert-danger text-center" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> சாவாச்கிரிப்ட் இயக்கப்படாமல் தளம் செயல்படாது    </div>
+</noscript>
+<div id="page-upload">
+    <div class="p-2 mb-3">
+    <nav class=" rounded pb-2 mx-auto position-relative">
+        <a class="link-dark" href="/"><img src="/logo-small.svg" alt="Logo de signature pdf" style="height: 42px; position: absolute;top: 6px;left: 8px;" />
+        <span class="d-none d-lg-inline" style="font-size: 15px; position: absolute;top: 10px;left: 56px;">Signature PDF</span>
+        <span class="opacity-50 d-none d-lg-inline" style="font-size: 12px; position: absolute;top: 30px;left: 56px;">PDF களை சுதந்திரமாக கையொப்பமிட்டு கையாளவும்</span></a>
+        <div class="dropdown position-absolute top-0 end-0 mt-2 me-2">
+            <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class='bi bi-translate'></i><span class="d-none d-lg-inline"> மொழி</span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                    <li><a class="dropdown-item" href="?lang=ar">العربية</a></li>
+                                    <li><a class="dropdown-item" href="?lang=de">Deutsch</a></li>
+                                    <li><a class="dropdown-item" href="?lang=en">English</a></li>
+                                    <li><a class="dropdown-item" href="?lang=es">Español</a></li>
+                                    <li><a class="dropdown-item" href="?lang=eu">Euskara</a></li>
+                                    <li><a class="dropdown-item" href="?lang=fr">Français</a></li>
+                                    <li><a class="dropdown-item" href="?lang=it">Italiano</a></li>
+                                    <li><a class="dropdown-item" href="?lang=gl">Galego</a></li>
+                                    <li><a class="dropdown-item" href="?lang=kab">Taqbaylit</a></li>
+                                    <li><a class="dropdown-item" href="?lang=nl">Nederlands</a></li>
+                                    <li><a class="dropdown-item" href="?lang=oc">Occitan</a></li>
+                                    <li><a class="dropdown-item" href="?lang=pl">Polski</a></li>
+                                    <li><a class="dropdown-item" href="?lang=ro">Română</a></li>
+                                    <li><a class="dropdown-item" href="?lang=ta">தமிழ்</a></li>
+                                    <li><a class="dropdown-item" href="?lang=tr">Türkçe</a></li>
+                            </ul>
+        </div>
+        <ul class="nav nav-pills justify-content-center pt-2">
+                        <li class="nav-item d-none d-sm-block">
+                <a class="nav-link " href="/"><i class="bi bi-search"></i><span class="d-none d-md-inline-block"></span></a>
+            </li>
+                        <li class="nav-item ">
+                <a class="nav-link " href="/signature"><i class="bi bi-vector-pen"></i> <span class="d-none d-md-inline-block">அடையாளம்</span></a>
+            </li>
+                        <li class="nav-item">
+                <a class="nav-link " href="/organization"><i class="bi bi-ui-checks-grid"></i> <span class="d-none d-md-inline-block">ஒழுங்கமைக்கவும்</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="/metadata"><i class="bi bi-tags"></i> <span class="d-none d-md-inline-block">மேனிலை தரவு</span></a>
+            </li>
+                    </ul>
+    </nav>
+</div>
+    <div class="px-3 py-3 text-center fullpage">
+        <i class="bi bi-tags display-3"></i>
+        <h1 class="mb-0 h2 mt-3"> மேனிலை தரவு</h1>
+        <p class="text-nowrap mt-2 pb-2" style="overflow: hidden; text-overflow: ellipsis;">ஒரு PDF இலிருந்து மெட்டாடேட்டாவைச் சேர்க்கவும், திருத்தவும் அல்லது அகற்றவும்</p>
+                        <div id="upload_drag_zone" class="block-drag mt-4 col-md-8 col-lg-6 col-xl-5 col-xxl-4 mx-auto border rounded-2 rounded-bottom-0 border-dark-subtle p-4 shadow-sm position-relative" style="border-style: dashed !important; cursor: pointer;" role="ஒரு PDF ஐத் தேர்வுசெய்க" aria="link" tabindex="0">
+        <label class="form-label" for="input_pdf_upload">ஒரு PDF ஐத் தேர்வுசெய்க<small class="opacity-50 d-block">அல்லது ஒரு படம்</small></label>
+    <div><i class="bi bi-upload fs-2"></i></div>
+    <input id="input_pdf_upload" name="pdf" placeholder="ஒரு PDF ஐத் தேர்வுசெய்க" class="form-control d-none mt-3" type="file" accept=".pdf,application/pdf,image/png,image/jpeg"  />
+</div>
+    <a  id="demo_link" href="#/demo/document.pdf" class="block-drag d-block col-md-8 col-lg-6 col-xl-5 col-xxl-4 mx-auto border rounded-2 rounded-top-0 border-top-0 border-dark-subtle p-1 shadow-sm position-relative text-secondary small" style="border-style: dashed !important; cursor: pointer;"><small class="opacity-75">டெமோ பி.டி.எஃப் உடன் சோதிக்கவும்</small></a>
+<p class="mt-3 mb-3 small opacity-50"><i class="bi bi-wifi-off"></i> Your file never leave your device</p>
+
+<script>
+    const dropArea = document.querySelector("#upload_drag_zone");
+    const dropInput = dropArea.querySelector("input[type=file]");
+    dropArea.addEventListener('click', function(e) {
+        dropInput.click();
+    });
+    document.querySelector('#upload_drag_zone input[type=file]').addEventListener('change', function(e) {
+        dropArea.querySelector('.bi-upload').classList.add('d-none');
+        this.classList.remove('d-none')
+    });
+    document.body.addEventListener("dragover", (event) => {
+        event.preventDefault();
+        dropArea.classList.add("active");
+    });
+
+    document.body.addEventListener("dragleave", () => {
+      dropArea.classList.remove("active");
+    });
+
+    document.body.addEventListener("drop", (e) => {
+      e.preventDefault();
+      const target = e.dataTransfer;
+      dropArea.classList.remove("active");
+      if(target.files.length < 1) {
+            return;
+      }
+      dropInput.files = target.files
+      dropInput.dispatchEvent(new Event("change"));
+    });
+</script>
+    </div>
+    <footer class="text-center text-muted mb-2 mt-3 opacity-75 small">
+    <a href="https://github.com/24eme/signaturepdf?tab=readme-ov-file#signature-pdf-libre">Signature PDF</a> - இலவச திறந்த மூல மென்பொருள் <span class="d-none d-md-inline">AGPL-3.0 உரிமத்தின் கீழ் : <a href="https://github.com/TON-COMPTE/signaturepdf-cloudflare">மூலக் குறியீட்டைக் காண்க</a> (<a href="https://github.com/24eme/signaturepdf/tree/9e2811a">24eme/signaturepdf 9e2811a</a>)</span>
+</footer>
+</div>
+<div id="page-metadata" class="d-none">
+    <div style="overflow: auto;" class="vh-100 bg-white" id="container-main">
+        <div class="bg-white sticky-top pt-2">
+        <ul class="nav nav-tabs">
+          <li class="nav-item ms-4">
+            <button type="button" id="nav-link-metadata" class="nav-link active" aria-current="page" href="#" data-bs-toggle="tab" data-bs-target="#form-metadata">மேனிலை தரவு <span class="badge rounded-pill text-bg-light border border-dark-subtle text-secondary ms-2 "><span>0</span> <i class="bi bi-tags"></i></span></button>
+          </li>
+          <li class="nav-item ms-2">
+            <button type="button" id="nav-link-text" class="nav-link " href="#" data-bs-toggle="tab" data-bs-target="#tab-text">Text <span class="badge rounded-pill text-bg-light border border-dark-subtle text-secondary ms-2" ></span></button>
+          </li>
+        </ul>
+        </div>
+        <div class="tab-content">
+            <div id="form-metadata" class="py-3 px-5 tab-pane show active">
+                <!-- <h3>PDF மெட்டாடேட்டாவின் பட்டியல்</h3> -->
+                <div id="form-metadata-container">
+                </div>
+                <form id="form_metadata_add" class="position-relative">
+                    <hr class="text-muted mt-4 mb-3" />
+                    <div class="mb-3">
+                        <label class="form-label text-muted" for="input_metadata_key">புதிய மெட்டாடேட்டாவைச் சேர்க்கவும்</label>
+                        <div class="form-floating">
+                            <input id="input_metadata_key" name="metadata_key" type="text" class="form-control" required value="" style="border-bottom-right-radius: 0;  border-bottom-left-radius: 0;">
+                            <label>விசை</label>
+                        </div>
+                        <input id="input_metadata_value" readonly="readonly" style="border-top: 0; border-top-right-radius: 0;  border-top-left-radius: 0;" name="metadata_value" type="text" class="form-control bg-light opacity-50" value="" placeholder="மதிப்பு" style="border-bottom-right-radius: 0;  border-bottom-left-radius: 0;">
+                    </div>
+                    <button type="submit" type="button" class="btn btn-outline-secondary float-end"><i class="bi bi-plus-circle"></i> சேர்</button>
+                </form>
+            </div>
+            <div id="tab-text" class="py-4 px-5 tab-pane ">
+                <div id="pdf_text_container" class="position-relative shadow-sm mt-2">
+                    <div class="card">
+                      <div class="card-header text-end py-0 pe-0">
+                        <span class="float-start text-secondary mt-2">Texte intégré dans le PDF</span>
+                        <button id="btn_copy_text" type="button" class="btn btn-light btn-sm m-1 ms-0" title="நகலெடு"><i class="bi bi-copy"></i> நகலெடு</button>
+                      </div>
+                      <p id="pdf_text" class="card-body small font-monospace mb-0"></p>
+                  </div>
+                </div>
+                <div id="pdf_notext" class="text-center d-none">
+                    <p class="text-muted">Ce PDF ne contient pas de texte</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="div-margin-bottom" style="height: 55px;" class="d-md-none"></div>
+    <div class="offcanvas offcanvas-end show d-none d-md-block shadow-sm" data-bs-backdrop="false" data-bs-scroll="true" data-bs-keyboard="false" tabindex="-1" id="sidebarTools" aria-labelledby="sidebarToolsLabel">
+        <a id="btn_exit" class="btn btn-close btn-sm position-absolute d-none d-sm-none d-md-block" style="right: 16px; top: 16px;" title="இந்த PDF ஐ மூடி, முகப்பு பக்கத்திற்குத் திரும்புக" href="/metadata"></a>
+        <div class="offcanvas-header d-block mb-0 pb-0 border-bottom">
+            <h5 class="mb-1 d-block w-100" id="sidebarToolsLabel"><i class="bi bi-tags"></i> மெட்டாடேட்டாவைத் திருத்து</h5>
+            <button type="button" class="btn-close text-reset d-md-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            <p id="text_document_name" class="text-muted mb-2" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;" title=""><i class="bi bi-files"></i> <span></span></p>
+        </div>
+        <div class="offcanvas-body bg-light" style="padding-bottom: 60px;">
+            <div id="container-pages" dir="auto">
+            </div>
+        </div>
+        <div class="position-absolute bg-white bottom-0 pb-2 ps-2 pe-2 w-100 border-top shadow-lg">
+            <div id="btn_container" class="d-grid gap-2 mt-2">
+                <button class="btn btn-primary" type="button" id="save" data-loading-text="Save in progress"><i class="bi bi-download"></i> PDF ஐ சேமித்து பதிவிறக்கவும்</button>
+                <button class="btn btn-outline-primary d-none" type="button" id="save_local" disabled="disabled"><i class="bi bi-floppy"></i> மாற்றங்களைச் சேமிக்கவும்</button>
+            </div>
+        </div>
+    </div>
+    <div id="bottom_bar" class="position-fixed bottom-0 start-0 bg-white w-100 p-2 shadow-sm d-md-none">
+        <div id="bottom_bar_action" class="d-grid gap-2">
+            <button class="btn btn-primary" id="save_mobile"><i class="bi bi-download"></i> PDF ஐ சேமித்து பதிவிறக்கவும்</button>
+            <button class="btn btn-outline-primary d-none" type="button" id="save_mobile_local" disabled="disabled"><i class="bi bi-floppy"></i> மாற்றங்களைச் சேமிக்கவும்</button>
+        </div>
+    </div>
+</div>
+<div class="modal" id="modalLoading" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-body text-center my-5 text-white fs-4">
+                <p></p>
+                <div class="spinner-border" role="status"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<span id="is_mobile" class="d-md-none"></span>
+<script src="/vendor/bootstrap.bundle.min.js?5.3.3"></script>
+<script src="/vendor/pdf.min.mjs?4.6.82-legacy" type="module"></script>
+<script type="module">
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '/vendor/pdf.worker.min.mjs?4.6.82-legacy';
+</script>
+<script src="/vendor/pdf-lib.min.js?2.2.4"></script>
+<script src="/vendor/exif.min.js?2.3.0"></script>
+<script src="/js/common.js?mvbicmxa"></script>
+<script>
+var REVERSE_PROXY_URL = "";
+var trad = {"Select this page":"\u0b87\u0ba8\u0bcd\u0ba4 \u0baa\u0b95\u0bcd\u0b95\u0ba4\u0bcd\u0ba4\u0bc8\u0ba4\u0bcd \u0ba4\u0bc7\u0bb0\u0bcd\u0ba8\u0bcd\u0ba4\u0bc6\u0b9f\u0bc1\u0b95\u0bcd\u0b95\u0bb5\u0bc1\u0bae\u0bcd","Delete this page":"\u0b87\u0ba8\u0bcd\u0ba4 \u0baa\u0b95\u0bcd\u0b95\u0ba4\u0bcd\u0ba4\u0bc8 \u0ba8\u0bc0\u0b95\u0bcd\u0b95\u0bc1","Restore this page":"\u0b87\u0ba8\u0bcd\u0ba4 \u0baa\u0b95\u0bcd\u0b95\u0ba4\u0bcd\u0ba4\u0bc8 \u0bae\u0bc0\u0b9f\u0bcd\u0b9f\u0bc6\u0b9f\u0bc1\u0b95\u0bcd\u0b95\u0bb5\u0bc1\u0bae\u0bcd","Move this page":"\u0b87\u0ba8\u0bcd\u0ba4 \u0baa\u0b95\u0bcd\u0b95\u0ba4\u0bcd\u0ba4\u0bc8 \u0ba8\u0b95\u0bb0\u0bcd\u0ba4\u0bcd\u0ba4\u0bb5\u0bc1\u0bae\u0bcd","Move here":"\u0b87\u0b99\u0bcd\u0b95\u0bc7 \u0b9a\u0bc6\u0bb2\u0bcd\u0bb2\u0bc1\u0b99\u0bcd\u0b95\u0bb3\u0bcd","Turn this page":"\u0b87\u0ba8\u0bcd\u0ba4 \u0baa\u0b95\u0bcd\u0b95\u0ba4\u0bcd\u0ba4\u0bc8\u0ba4\u0bcd \u0ba4\u0bbf\u0bb0\u0bc1\u0baa\u0bcd\u0baa\u0bc1\u0b99\u0bcd\u0b95\u0bb3\u0bcd","Download this page":"\u0b87\u0ba8\u0bcd\u0ba4 \u0baa\u0b95\u0bcd\u0b95\u0ba4\u0bcd\u0ba4\u0bc8\u0baa\u0bcd \u0baa\u0ba4\u0bbf\u0bb5\u0bbf\u0bb1\u0b95\u0bcd\u0b95\u0bb5\u0bc1\u0bae\u0bcd","Page":"\u0baa\u0b95\u0bcd\u0b95\u0bae\u0bcd"};
+</script>
+<script>
+    var defaultFields = [];
+</script>
+<script src="/js/metadata.js?mvbicmxa"></script>
+</body>
+</html>

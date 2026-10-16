@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="<?php echo $TRANSLATION_LANGUAGE ?>" dir="<?php echo $DIRECTION_LANGUAGE ?>" style="direction: <?php echo $DIRECTION_LANGUAGE ?>;">
+<head>
+    <?php include('components/header.html.php'); ?>
+    <title>Signature PDF - Compresser un PDF en ligne</title>
+    <meta name="description" content="Logiciel libre en ligne qui permet réduire la taille d'un pdf par compression.">
+</head>
+<body>
+<noscript>
+    <div class="alert alert-danger text-center" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> <?php echo _("Site not functional without JavaScript enabled");  ?>
+    </div>
+</noscript>
+<div id="page-upload">
+    <?php include('components/navtab.html.php'); ?>
+    <div class="px-3 py-3 text-center fullpage">
+        <a id="btn_exit" class="btn btn-close btn-sm position-absolute d-none" style="right: 16px;" title="<?php echo _("Close this PDF and return to the homepage"); ?>" href="<?php echo $REVERSE_PROXY_URL; ?>/signature"></a>
+        <form id="form_compress" method="post" action="<?php echo $REVERSE_PROXY_URL; ?>/compress" enctype="multipart/form-data">
+            <i class="bi bi-chevron-bar-contract display-3"></i>
+            <h1 class="mb-0 h2 mt-3"><?php echo sprintf(_("%s Compress a PDF"), ""); ?></h1>
+            <p class="text-nowrap mt-2 pb-2" style="overflow: hidden; text-overflow: ellipsis;"><?php echo _("Reduce the size of a PDF"); ?></p>
+            <?php $uploadHelp = sprintf(_("The PDF must not exceed %s Mb"), round($maxSize / 1000 / 1000)); ?>
+            <?php $uploadNoDemo = true; ?>
+            <?php include "components/upload.html.php"; ?>
+            <div class="col-md-6 col-lg-5 col-xl-4 col-xxl-3 mx-auto">
+                <div class="btn-group mt-4 mb-2 opacity-25">
+                    <button type="submit" name="compressionType" value="medium" id="compressBtn" class="btn btn-primary" disabled data-loading-text="<?php echo _("Compressing") ?>"><i class="bi bi-chevron-bar-contract"></i> <?php echo _("Compress"); ?></button>
+                    <button type="button" id="dropdownMenuReference" class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent" disabled>
+                        <span class="visually-hidden">Toggle Dropdown</span>
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuReference">
+                        <button type="submit" name="compressionType" value="low" id="lowCompressBtn" class="dropdown-item"><i class="bi bi-reception-0"></i> <?php echo _("Low compression (maximum quality)"); ?></button>
+                        <button type="submit" name="compressionType" value="medium" id="mediumCompressBtn" class="dropdown-item"><i class="bi bi-reception-2"></i> <?php echo sprintf(_("%s Medium compression %s (default)"), "<strong>", "</strong>"); ?></button>
+                        <button type="submit" name="compressionType" value="high" id="highCompressBtn" class="dropdown-item"><i class="bi bi-reception-4"></i> <?php echo _("High compression (minimum quality)"); ?></button>
+                        <?php if(OCR::isInstalled()): ?>
+                        <li><hr class="dropdown-divider"></li>
+                        <button type="submit" data-action="<?php echo $REVERSE_PROXY_URL; ?>/ocr" name="ocr" value="ocr" id="ocrButton" class="dropdown-item" data-loading-text="<?php echo _("Running OCR") ?>"><i class="bi bi-upc-scan"></i> <?php echo _("OCR"); ?> <small class="text-muted">Experimental</small></button>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <div id="error_message" class="alert alert-warning mt-5 d-none"></div>
+                <div id="card_resultat" class="card text-bg-light shadow mt-5 d-none">
+                  <div class="card-body">
+                    <h6 class="card-title mt-2"><i class="bi bi-file-earmark"></i> <span id="uploaded_size" data-template-text="<?php echo _("%s Mb"); ?>"></span> <i class="bi bi-caret-right-fill"></i> <strong><i class="bi bi-file-earmark-zip"></i> <span id="size_compressed" data-template-text="<?php echo _("%s Mb"); ?>"></span></strong></h6>
+                    <h6 id="pourcentage_compressed" class="card-subtitle mt-2 small text-muted" data-template-text="<?php echo _("Compressed at %s%"); ?>"></h6>
+                    <input id="input_pdf_compressed" class="form-control form-control-lg d-none" type="file" />
+                    <button type="button" id="downloadBtn" class="btn btn-primary mt-4 mb-2"><i class="bi bi-download"></i> <?php echo _("Download the PDF"); ?></button>
+                    <button class="btn btn-primary mt-4 mb-2 d-none" type="button" id="save_local"><i class="bi bi-floppy"></i> <?php echo _("Save changes"); ?></button>
+                  </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <?php include('components/footer.html.php'); ?>
+</div>
+
+<?php include('components/common.html.php'); ?>
+<script>
+    var maxSize = <?php echo $maxSize ?>;
+    var trad = <?php echo json_encode([
+        'Your pdf is already optimized' => _("Your pdf is already optimized")
+    ]); ?>;
+</script>
+<script src="<?php echo $REVERSE_PROXY_URL; ?>/js/compress.js?<?php echo ($COMMIT) ? $COMMIT : filemtime($ROOT."/public/js/compress.js") ?>"></script>
+</body>
+</html>

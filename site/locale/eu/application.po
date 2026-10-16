@@ -1,0 +1,646 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-12-03 18:32+0100\n"
+"PO-Revision-Date: 2025-10-05 23:02+0000\n"
+"Last-Translator: xabirequejo <xabi.rn@gmail.com>\n"
+"Language-Team: Basque <https://hosted.weblate.org/projects/signature-pdf/"
+"application/eu/>\n"
+"Language: eu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.14-dev\n"
+
+msgid "en"
+msgstr "eu"
+
+msgid "PDF compression failed"
+msgstr "PDFa konprimatzeak huts egin du"
+
+msgid "Administration panel"
+msgstr "Administrazio-panela"
+
+msgid "Configuration"
+msgstr "Konfigurazioa"
+
+msgid "Server installation"
+msgstr "Zerbitzariko instalazioa"
+
+#, php-format
+msgid "Minimal version required : %s"
+msgstr "Behar den gutxieneko bertsioa: %s"
+
+#, php-format
+msgid "Package %s required"
+msgstr "%s paketea beharrezkoa da"
+
+#, php-format
+msgid "Package %s missing"
+msgstr "%s paketea falta da"
+
+msgid "File Configuration"
+msgstr "Fitxategiaren konfigurazioa"
+
+#, php-format
+msgid "The directory %s should exist and be writeable"
+msgstr ""
+"%s direktorioa lehendik egon behar da, eta bertan idazteko baimena izan "
+"behar da"
+
+msgid "Site not functional without JavaScript enabled"
+msgstr "Webgunea ezin da erabili JavaScript aktibatu arte"
+
+#, php-format
+msgid "%s Compress a PDF"
+msgstr "%s Konprimatu PDFa"
+
+msgid "Reduce the size of a PDF"
+msgstr "Murriztu PDF baten tamaina"
+
+msgid "Choose a PDF"
+msgstr "Aukeratu PDFa"
+
+#, php-format
+msgid "The PDF must not exceed %s Mb"
+msgstr "PDFak ezin ditu %s Mb baino gehiago izan"
+
+msgid ""
+"The PDF will be processed by the server without being retained or stored"
+msgstr ""
+"Zerbitzariak PDFa prozesatuko du, baina ez du mantenduko edo biltegiratuko"
+
+msgid "Compress"
+msgstr "Konprimatu"
+
+msgid "Low compression (maximum quality)"
+msgstr "Konpresio baxua (kalitate handiena)"
+
+#, php-format
+msgid "%s Medium compression %s (default)"
+msgstr "%s Konpresio ertaina %s (lehenetsia)"
+
+msgid "High compression (minimum quality)"
+msgstr "Konpresio altua (kalitate txikiena)"
+
+#, php-format
+msgid "%s Mb"
+msgstr "%s Mb"
+
+msgid "Compressed at %s%"
+msgstr "%s%(e)an konprimatuta"
+
+msgid "Download the PDF"
+msgstr "Deskargatu PDFa"
+
+msgid "Your pdf is already optimized"
+msgstr "PDFa lehendik optimizatuta dago"
+
+msgid "Free open-source software for signing and manipulating PDFs"
+msgstr "PDFak maneiatzeko eta sinatzeko kode irekiko software askea"
+
+msgid "Search for a tool (e.g., sign, compress, extract, watermark...)"
+msgstr ""
+
+msgid "Sign"
+msgstr "Sinatu"
+
+msgid "Add a signature"
+msgstr "Gehitu sinadura"
+
+msgid "Add initials"
+msgstr "Gehitu inizialak"
+
+msgid "Add a stamp"
+msgstr "Gehitu zigilua"
+
+msgid "Type text"
+msgstr "Idatzi testua"
+
+msgid "Strike through text"
+msgstr "Zirrimarratu testua"
+
+msgid "Allow multiple people to sign via a shared link"
+msgstr ""
+"Baimendu pertsona batek baino gehiagok sinatzea partekatutako esteka bat "
+"erabiliz"
+
+msgid "Sign with the server certificate"
+msgstr "Sinatu zerbitzariko ziurtagiriarekin"
+
+msgid "Add a watermark"
+msgstr "Gehitu filigrana"
+
+msgid "New"
+msgstr "Berria"
+
+msgid "Redact areas"
+msgstr "Ezabatu eremuak"
+
+msgid "Organize"
+msgstr "Antolatu"
+
+msgid "Combine multiple PDF files"
+msgstr "Batu PDF fitxategiak"
+
+msgid "Reorder pages"
+msgstr "Berrantolatu orriak"
+
+msgid "Extract pages"
+msgstr "Erauzi orriak"
+
+msgid "Rotate pages"
+msgstr "Biratu orriak"
+
+msgid "Change or standardize the paper size"
+msgstr "Aldatu edo estandarizatu paperaren neurria"
+
+msgid "Delete pages"
+msgstr "Ezabatu orriak"
+
+msgid "Generate a booklet"
+msgstr "Sortu liburuxka"
+
+msgid "Convert images to PDF"
+msgstr "Bihurtu irudiak PDFra"
+
+msgid "Metadata"
+msgstr "Metadatuak"
+
+msgid "Add, edit, or remove metadata from a PDF"
+msgstr "Gehitu, editatu, edo kendu PDFaren metadatuak"
+
+msgid "Compress and reduce the size of a PDF"
+msgstr "Konprimatu eta murriztu PDFaren tamaina"
+
+#, php-format
+msgid "%s Edit metadata"
+msgstr "%s Editatu metadatuak"
+
+msgid "Test with a demo PDF"
+msgstr "Probatu demozko PDF batekin"
+
+msgid "List of PDF metadata"
+msgstr "PDFaren metadatuen zerrenda"
+
+msgid "Add new metadata"
+msgstr "Gehitu metadatu berriak"
+
+msgid "Key"
+msgstr "Gakoa"
+
+msgid "Value"
+msgstr "Balioa"
+
+#, php-format
+msgid "%s Add"
+msgstr "%s Gehitu"
+
+msgid "Close this PDF and return to the home page"
+msgstr "Itxi PDFa eta itzuli hasierako orrira"
+
+msgid "Edit metadata"
+msgstr "Editatu metadatuak"
+
+msgid "Save and download the PDF"
+msgstr "Gorde eta deskargatu PDFa"
+
+msgid "Save changes"
+msgstr "Gorde aldaketak"
+
+#, php-format
+msgid "%s Organize PDF"
+msgstr "%s Antolatu PDFa"
+
+msgid "Merge, sort, rotate, delete, extract pages"
+msgstr "Bateratu, sailkatu, biratu, ezabatu, erauzi orriak"
+
+msgid "or an image"
+msgstr "edo irudi bat"
+
+msgid "Touch a page to select it"
+msgstr "Ukitu orria hautatzeko"
+
+msgid "Close this PDF and return to home"
+msgstr "Itxi PDFa eta itzuli hasierara"
+
+msgid "PDF organization"
+msgstr "PDFaren antolaketa"
+
+#, php-format
+msgid "%s Add a PDF"
+msgstr "%s Gehitu PDFa"
+
+#, php-format
+msgid "%s page(s) selected"
+msgstr "%s orrialde hautatu dira"
+
+#, php-format
+msgid "%s Rotate 90°"
+msgstr "%s Biratu 90º"
+
+#, php-format
+msgid "%s Move"
+msgstr "%s Mugitu"
+
+#, php-format
+msgid "%s Delete"
+msgstr "%s Ezabatu"
+
+#, php-format
+msgid "%s Extract and download"
+msgstr "%s Erauzi eta deskargatu"
+
+#, php-format
+msgid "%s Cancel selection"
+msgstr "%s Utzi hautaketa"
+
+msgid "Printing options"
+msgstr "Inprimatzeko aukerak"
+
+#, php-format
+msgid "%s Download the full PDF"
+msgstr "%s Deskargatu PDF osoa"
+
+msgid "Download the selection"
+msgstr "Deskargatu hautaketa"
+
+msgid "No"
+msgstr "Ez"
+
+msgid "page"
+msgstr "orri"
+
+msgid "Cancel"
+msgstr "Utzi"
+
+#, php-format
+msgid "%s Turn"
+msgstr "%s Biratu"
+
+msgid "PDF documents"
+msgstr "PDF dokumentuak"
+
+msgid "Close"
+msgstr "Itxi"
+
+msgid "Original format"
+msgstr "Jatorrizko formatua"
+
+msgid "Most common formats"
+msgstr "Formatu erabilienak"
+
+msgid "Other formats"
+msgstr "Beste formatu batzuk"
+
+msgid "Custom"
+msgstr "Pertsonalizatua"
+
+msgid "Paper size"
+msgstr "Paperaren neurria"
+
+msgid "Width"
+msgstr "Zabalera"
+
+msgid "Height"
+msgstr "Altuera"
+
+msgid "Unit"
+msgstr "Unitatea"
+
+msgid "Normal"
+msgstr "Arrunta"
+
+msgid "Booklet"
+msgstr "Liburuxka"
+
+msgid "Formatting"
+msgstr "Formatua"
+
+msgid "Sign a PDF"
+msgstr "Sinatu PDFa"
+
+msgid "Sign, initial, stamp, complete a document"
+msgstr "Sinatu, idatzi inizialak, zigilatu, osatu dokumentua"
+
+msgid "The PDF should not exceed"
+msgstr "PDFak ezin ditu gainditu"
+
+msgid "MB and"
+msgstr "MB eta"
+
+msgid "pages"
+msgstr "orrialde"
+
+msgid "How to sign?"
+msgstr "Nola sinatu?"
+
+msgid "By clicking directly on the document page"
+msgstr "Dokumentuko orrialdean zuzenean klik eginez"
+
+msgid "to insert the selected item in the right column"
+msgstr "hautatutako elementua eskuineko zutabean sartzeko"
+
+msgid "signature, initial, text, stamp, etc ..."
+msgstr "sinadura, inizialak, testua, zigilua, etab..."
+
+msgid "Close this PDF and return to the homepage"
+msgstr "Itxi PDFa eta itzuli hasierako orrira"
+
+msgid "PDF Signature"
+msgstr "PDFaren sinadura"
+
+msgid "This PDF is shared with others to be signed by multiple people"
+msgstr "PDF hau partekatua da, pertsona batek baino gehiagok sinatzeko"
+
+msgid "This PDF is stored on your computer to be signed by you only"
+msgstr "PDFa ordenagailuan gordeta dago zuk bakarrik sinatu ahal izateko"
+
+msgid "This PDF is stored encrypted on the server."
+msgstr "PDFa zifratuta gorde da zerbitzarian."
+
+msgid "Keep the selection active"
+msgstr "Mantendu hautaketa aktibo"
+
+#, php-format
+msgid "%s Signature"
+msgstr "%s Sinadura"
+
+msgid "Create"
+msgstr "Sortu"
+
+#, php-format
+msgid "%s Initial"
+msgstr "%s Inizialak"
+
+#, php-format
+msgid "%s Stamp"
+msgstr "%s Zigilua"
+
+#, php-format
+msgid "%s Text"
+msgstr "%s Testua"
+
+msgid "Strikethrough"
+msgstr "Zirrimarra"
+
+#, php-format
+msgid "%s Check box"
+msgstr "%s Kontrol-laukia"
+
+msgid "Redaction area"
+msgstr "Ezabatzeko eremua"
+
+msgid "Watermark"
+msgstr "Filigrana"
+
+#, php-format
+msgid "%s Create an element"
+msgstr "%s Sortu elementua"
+
+#, php-format
+msgid "%s Share to sign %s with multiple people"
+msgstr "%s Partekatu %s pertsona batek baino gehiagok sinatzeko"
+
+msgid "Download the signed PDF"
+msgstr "Deskargatu sinatutako PDFa"
+
+msgid "The PDF will be flattened"
+msgstr "PDFa lautuko da"
+
+#, php-format
+msgid "You are %s to have signed this PDF"
+msgstr "PDFa %s pertsonek sinatu duzue"
+
+#, php-format
+msgid "%s Download the PDF"
+msgstr "%s Deskargatu PDFa"
+
+msgid "Transmit my signature"
+msgstr "Transmititu nire sinadura"
+
+#, php-format
+msgid "%s Select a signature"
+msgstr "%s Hautatu sinadura"
+
+msgid "Draw"
+msgstr "Marraztu"
+
+msgid "freehand"
+msgstr "esku hutsez"
+
+msgid "Enter"
+msgstr "Sartu"
+
+msgid "text"
+msgstr "testua"
+
+msgid "Import"
+msgstr "Inportatu"
+
+msgid "an image"
+msgstr "irudi bat"
+
+msgid "Clear signature"
+msgstr "Garbitu sinadura"
+
+msgid "My signature"
+msgstr "Nire sinadura"
+
+#, php-format
+msgid "%s Share this PDF to sign it with several people"
+msgstr "%s Partekatu PDFa pertsona batek baino gehiagok sinatzeko"
+
+msgid ""
+"By enabling PDF sharing, you will be able to provide a link to the people of "
+"your choice so that they can sign this PDF."
+msgstr ""
+"PDFa partekatzeko aukera gaituz gero, zuk aukeratutako pertsonei esteka bat "
+"emango zaie PDFa sinatu ahal izateko."
+
+#, php-format
+msgid ""
+"%s This sharing requires the PDF to be transferred and stored on the server "
+"for future signers to access."
+msgstr ""
+"%s Partekatzeak PDFa zerbitzarira transferitzea eta gordetzea eskatzen du, "
+"etorkizuneko sinatzaileek sarbidea izan dezaten."
+
+#, php-format
+msgid "%s The PDF will be kept"
+msgstr "%s PDFa mantenduko da"
+
+msgid "for one year"
+msgstr "urtebetez"
+
+msgid "for six months"
+msgstr "sei hilabetez"
+
+msgid "for one month"
+msgstr "hilabetez"
+
+msgid "for one week"
+msgstr "astebetez"
+
+msgid "for one day"
+msgstr "egun batez"
+
+msgid "for one hour"
+msgstr "ordu betez"
+
+msgid "after the last signature."
+msgstr "azken sinadura eta gero."
+
+msgid "The PDF will be stored encrypted on the server"
+msgstr "PDFa zifratuta gordeko da zerbitzarian"
+
+#, php-format
+msgid "%s Start sharing"
+msgstr "%s Hasi partekatzen"
+
+#, php-format
+msgid "%s Sign this PDF with multiple people"
+msgstr "%s Sinatu PDFa jende gehiagorekin"
+
+msgid "Multiple people can sign this PDF simultaneously."
+msgstr "Pertsona batek baino gehiagok sinatu dezake PDFa aldi berean."
+
+msgid ""
+"To do so, simply share the link to this page with the people of your choice:"
+msgstr ""
+"Egin ahal izateko, partekatu orri honen esteka nahi duzun pertson(ar)ekin:"
+
+msgid "Sharing link"
+msgstr "Esteka partekatzen"
+
+msgid "Copied !"
+msgstr "Kopiatuta!"
+
+msgid "Copy"
+msgstr "Kopiatu"
+
+msgid ""
+"Each of the signatories can download the latest version of the signed PDF at "
+"any time."
+msgstr ""
+"Sinatzaile bakoitzak sinatutako PDFaren azken bertsioa deskargatu dezake "
+"edozein unetan."
+
+msgid "Signed PDF"
+msgstr "Sinatutako PDFa"
+
+msgid "Your signature has been successfully recorded!"
+msgstr "Zure sinadura ondo grabatu da!"
+
+msgid "This application does not automatically send emails to other signers."
+msgstr ""
+"Aplikazio honek ez die automatikoki mezu elektronikorik bidaltzen beste "
+"sinatzaileei."
+
+msgid ""
+"If you want to send one yourself, you can use <a>this pre-written email</a>."
+msgstr ""
+"Zuk zeuk bidali nahi baduzu, <a>aurrez idatzitako mezu elektroniko hau</a> "
+"erabil dezakezu."
+
+#, php-format
+msgid "Signing the document : %s"
+msgstr "Dokumentua sinatzen: %s"
+
+#, php-format
+msgid ""
+"Hello,\n"
+"\n"
+"I just signed the document (%s) : %s"
+msgstr ""
+"Kaixo,\n"
+"\n"
+"Dokumentua (%s) sinatu berri dut: %s"
+
+msgid "Change the color of the selected element"
+msgstr "Aldatu hautatutako elementuaren kolorea"
+
+msgid "Duplicate the element"
+msgstr "Bikoiztu elementua"
+
+msgid "Duplicate on each page"
+msgstr "Bikoiztu orri bakoitzean"
+
+msgid "Duplicate"
+msgstr "Bikoiztu"
+
+msgid "Delete the element"
+msgstr "Ezabatu elementua"
+
+msgid "Are you sure you want to delete this PDF and the associated signatures?"
+msgstr "Ziur PDF hau eta erlazionatutako sinadurak ezabatu nahi dituzula?"
+
+msgid "Text to modify"
+msgstr "Moldatzeko testua"
+
+msgid "Select this page"
+msgstr "Hautatu orri hau"
+
+msgid "Delete this page"
+msgstr "Ezabatu orri hau"
+
+msgid "Restore this page"
+msgstr "Berrezarri orri hau"
+
+msgid "Move this page"
+msgstr "Mugitu orri hau"
+
+msgid "Move here"
+msgstr "Mugitu hona"
+
+msgid "Turn this page"
+msgstr "Biratu orri hau"
+
+msgid "Download this page"
+msgstr "Deskargatu orri hau"
+
+msgid "Page"
+msgstr "Orri"
+
+msgid "Free open-source software"
+msgstr "Kode irekiko software librea"
+
+msgid "under AGPL-3.0 license"
+msgstr "AGPL-3.0 lizentziapean"
+
+msgid "see the source code"
+msgstr "ikusi iturburu-kodea"
+
+msgid "Sign and manipulate PDFs freely"
+msgstr "Sinatu eta maneiatu PDFak nahieran"
+
+msgid "Language"
+msgstr "Hizkuntza"
+
+#~ msgid "Organize PDFs"
+#~ msgstr "Antolatu PDFak"
+
+#~ msgid "Edit a PDF"
+#~ msgstr "Editatu PDFa"
+
+#~ msgid "The PDF must not exceed "
+#~ msgstr "PDFak ezin ditu izan "
+
+#~ msgid "Mb"
+#~ msgstr "Mb"
+
+#~ msgid "Compress PDF"
+#~ msgstr "Konprimatu PDFa"
+
+#~ msgid "Editing PDF metadata"
+#~ msgstr "PDFaren metadatuak editatzen"
+
+#~ msgid "Organize PDF"
+#~ msgstr "Antolatu PDFa"
