@@ -84,6 +84,63 @@ function safeEqual(a, b) {
   return r === 0;
 }
 
+// ---------------------------------------------------------------- verrouillage par mot de passe (SHARE_PASSWORD)
+// Si SHARE_PASSWORD est défini : les pages d'outils et la création de partage exigent d'abord /login.
+// Les liens de partage (/signature/<id>) restent ouverts à qui possède le lien complet (id + clé dans le #).
+const AUTH_COOKIE = 'spauth';
+
+async function authToken(env) {
+  return sha256Hex('signaturepdf-gate:' + env.SHARE_PASSWORD);
+}
+
+async function isAuthed(request, env) {
+  if (!env.SHARE_PASSWORD) return true;
+  const c = parseCookies(request.headers.get('Cookie'))[AUTH_COOKIE];
+  return !!c && safeEqual(c, await authToken(env));
+}
+
+function loginPage(request, message, next, status = 200) {
+  const fr = !/^en/i.test(request.headers.get('Accept-Language') || 'fr');
+  const t = fr
+    ? { title: 'Accès protégé', label: 'Mot de passe', btn: 'Entrer' }
+    : { title: 'Protected access', label: 'Password', btn: 'Enter' };
+  const esc = (v) => String(v).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+  const html = `<!doctype html><html lang="${fr ? 'fr' : 'en'}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>${t.title}</title>
+<style>body{font-family:system-ui,sans-serif;background:#f4f5f7;margin:0;display:flex;min-height:100vh;align-items:center;justify-content:center}form{background:#fff;padding:2rem;border-radius:12px;box-shadow:0 2px 12px #0002;width:min(92vw,340px)}h1{font-size:1.2rem;margin:0 0 1rem}label{display:block;font-size:.85rem;margin-bottom:.3rem}input{width:100%;box-sizing:border-box;padding:.6rem;font-size:1rem;border:1px solid #bbb;border-radius:6px}button{margin-top:1rem;width:100%;padding:.6rem;font-size:1rem;border:0;border-radius:6px;background:#212529;color:#fff;cursor:pointer}.err{color:#b00020;font-size:.85rem;margin-top:.6rem}</style></head>
+<body><form method="post" action="/login"><h1>${t.title}</h1><label for="p">${t.label}</label><input id="p" name="password" type="password" autocomplete="current-password" autofocus required><input type="hidden" name="next" value="${esc(next || '/')}"><button type="submit">${t.btn}</button>${message ? `<div class="err">${esc(message)}</div>` : ''}</form></body></html>`;
+  const h = secure(new Headers({ 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' }));
+  return new Response(html, { status, headers: h });
+}
+
+function safeNext(v) {
+  return typeof v === 'string' && /^\/(?!\/)[^\s\\]*$/.test(v) && !v.startsWith('/login') ? v : '/';
+}
+
+async function handleLogin(request, env, url) {
+  if (!env.SHARE_PASSWORD) return Response.redirect(new URL('/', url), 302);
+  if (request.method === 'POST') {
+    let given = '', next = '/';
+    try {
+      const form = await request.formData();
+      given = String(form.get('password') || '');
+      next = safeNext(String(form.get('next') || '/'));
+    } catch (e) { /* formulaire invalide */ }
+    if (safeEqual(await sha256Hex(given), await sha256Hex(env.SHARE_PASSWORD))) {
+      const h = secure(new Headers({ Location: next, 'Cache-Control': 'no-store' }));
+      h.append('Set-Cookie', `${AUTH_COOKIE}=${await authToken(env)}; Path=/; Max-Age=2592000; HttpOnly; Secure; SameSite=Lax`);
+      return new Response(null, { status: 303, headers: h });
+    }
+    return loginPage(request, /^en/i.test(request.headers.get('Accept-Language') || '') ? 'Incorrect password' : 'Mot de passe incorrect', next, 401);
+  }
+  return loginPage(request, '', safeNext(url.searchParams.get('next') || '/'));
+}
+
+function handleLogout(url) {
+  const h = secure(new Headers({ Location: '/login', 'Cache-Control': 'no-store' }));
+  h.append('Set-Cookie', `${AUTH_COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax`);
+  return new Response(null, { status: 303, headers: h });
+}
+
 // ---------------------------------------------------------------- pages (HTML statique par langue)
 function parseCookies(header) {
   const out = {};
@@ -155,14 +212,14 @@ async function handleApi(request, env, url) {
 
   // GET /api/config
   if (parts[0] === 'config' && method === 'GET') {
-    return json({ passwordRequired: !!env.SHARE_PASSWORD, maxBytes: maxBytes - 64, maxLayers });
+    return json({ passwordRequired: !!env.SHARE_PASSWORD && !(await isAuthed(request, env)), maxBytes: maxBytes - 64, maxLayers });
   }
 
   if (parts[0] !== 'share') return json({ message: 'Introuvable' }, 404);
 
   // POST /api/share  (création)
   if (parts.length === 1 && method === 'POST') {
-    if (env.SHARE_PASSWORD) {
+    if (env.SHARE_PASSWORD && !(await isAuthed(request, env))) {
       const given = request.headers.get('X-Share-Password') || '';
       if (!safeEqual(await sha256Hex(given), await sha256Hex(env.SHARE_PASSWORD))) {
         return json({ message: 'Mot de passe de partage incorrect' }, 401);
@@ -301,12 +358,22 @@ export default {
         return await handleApi(request, env, url);
       }
 
+      if (path === '/login') return await handleLogin(request, env, url);
+      if (path === '/logout') return handleLogout(url);
+      // Les pages sources ne sont jamais servies directement : uniquement via servePage()
+      if (path.startsWith('/_pages/')) return new Response('Introuvable', { status: 404 });
+
       if (request.method === 'GET' || request.method === 'HEAD') {
-        if (path === '/' || path === '/index.html') return servePage(request, env, url, 'index');
-        if (path === '/signature' || path === '/signature/') return servePage(request, env, url, 'signature');
+        // Lien de partage : ouvert à qui possède le lien complet (id + clé dans le #)
         if (/^\/signature\/[a-z0-9]{10,64}\/?$/.test(path)) return servePage(request, env, url, 'signature-shared');
-        if (path === '/organization') return servePage(request, env, url, 'organization');
-        if (path === '/metadata') return servePage(request, env, url, 'metadata');
+
+        const toolPages = { '/': 'index', '/index.html': 'index', '/signature': 'signature', '/signature/': 'signature', '/organization': 'organization', '/metadata': 'metadata' };
+        if (toolPages[path]) {
+          if (!(await isAuthed(request, env))) {
+            return Response.redirect(new URL('/login?next=' + encodeURIComponent(path === '/index.html' ? '/' : path), url), 303);
+          }
+          return servePage(request, env, url, toolPages[path]);
+        }
       }
 
       // Tout le reste : fichiers statiques
