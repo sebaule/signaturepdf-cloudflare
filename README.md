@@ -67,7 +67,7 @@ Sans `SHARE_PASSWORD`, le site est ouvert à tous. Vérification : `/api/config`
 ### Limitation des essais de mot de passe
 
 - **Dans le Worker** : le binding `ratelimits` (`LOGIN_LIMITER` dans `wrangler.jsonc`) limite à 5 essais par minute et par adresse IP sur `/login` et sur la création de partage par mot de passe (réponse 429).
-- **En plus, côté Cloudflare** (recommandé, gratuit) : *Sécurité → WAF → Règles de limitation de débit* → URI path = `/login` (méthode POST), 10 requêtes / 1 min par IP → Bloquer. Cette règle s'applique avant même que le Worker ne s'exécute.
+- **En plus, côté Cloudflare, uniquement avec ton propre nom de domaine** (les règles WAF ne s'appliquent pas à une adresse `workers.dev`) : *Sécurité → WAF → Règles de limitation de débit* → URI path = `/login` (méthode POST), 10 requêtes / 1 min par IP → Bloquer. Cette règle s'applique avant même que le Worker ne s'exécute. Sur `workers.dev`, la limitation du Worker (ci-dessus) est la protection en place.
 - Choisis un mot de passe long (≥ 16 caractères) : il ne se change que dans Cloudflare.
 
 ### Sécurité : à faire en plus (gratuit)
