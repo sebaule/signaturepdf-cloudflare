@@ -267,9 +267,8 @@
                     <p class="small text-muted mb-3" data-cfx="perms_hint"></p>
                     <div id="share_notify_block" class="d-none mb-3">
                         <p class="fw-semibold mb-1"><i class="bi bi-bell"></i> <span data-cfx="notify_title"></span></p>
-                        <div class="form-check"><input class="form-check-input" type="radio" name="share_notify" id="share_notify_none" value="none" checked="checked"><label class="form-check-label" for="share_notify_none" data-cfx="notify_none"></label></div>
-                        <div class="form-check"><input class="form-check-input" type="radio" name="share_notify" id="share_notify_each" value="each"><label class="form-check-label" for="share_notify_each" data-cfx="notify_each"></label></div>
-                        <div class="form-check d-flex align-items-center gap-2"><input class="form-check-input mt-0" type="radio" name="share_notify" id="share_notify_count" value="count"><label class="form-check-label" for="share_notify_count" data-cfx="notify_count"></label> <input type="number" min="1" max="999" value="2" id="share_notify_n" class="form-control form-control-sm" style="width: 4.5rem;" onfocus="document.getElementById('share_notify_count').checked = true;"> <span data-cfx="notify_count_suffix"></span></div>
+                        <div class="form-check"><input class="form-check-input" type="checkbox" id="share_notify_each" checked="checked"><label class="form-check-label" for="share_notify_each" data-cfx="notify_each"></label></div>
+                        <div class="form-check d-flex align-items-center gap-2 flex-wrap"><input class="form-check-input mt-0" type="checkbox" id="share_notify_final"><label class="form-check-label" for="share_notify_final" data-cfx="notify_final"></label> <input type="number" min="1" max="999" value="2" id="share_notify_n" class="form-control form-control-sm" style="width: 4.5rem;" onfocus="document.getElementById('share_notify_final').checked = true;"> <span data-cfx="notify_count_suffix"></span></div>
                     </div>
                     <div id="share_password_block" class="d-none mb-2">
                         <label for="share_password" class="form-label small mb-1"><i class="bi bi-key"></i> <span data-cf="share_password"></span></label>

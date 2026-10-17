@@ -21,7 +21,7 @@
             perm_dl: 'Télécharger le PDF', perm_sig: 'Signature', perm_ini: 'Paraphe', perm_stamp: 'Tampon', perm_text: 'Texte', perm_strike: 'Rayer', perm_check: 'Case à cocher', perm_create: 'Créer un élément',
             notify_diag_title: 'Notifications', notify_test: 'Envoyer une notification de test', notify_testing: 'Envoi…', notify_none_yet: "Aucun envoi enregistré pour l'instant.",
             notify_out_sent: 'envoyée', notify_out_failed: 'échec', notify_out_no_config: "aucune notification n'était demandée pour ce partage", notify_out_below: 'seuil pas encore atteint', notify_out_test_sent: 'test envoyé', notify_out_test_failed: 'test en échec', notify_last: 'Dernier événement : %s', notify_ok: 'Notification envoyée : vérifie ton appareil.', notify_ko: 'Échec',
-            notify_title: 'Me prévenir (Gotify)', notify_none: 'Pas de notification', notify_each: 'À chaque signature', notify_count: 'À partir de', notify_count_suffix: 'signature(s)',
+            notify_title: 'Me prévenir (Gotify)', notify_each: 'À chaque signature', notify_final: 'Message final quand on atteint', notify_count_suffix: 'signature(s)',
             shares_title: 'Mes partages',
             shares_help: "Les documents que vous avez partagés (ou ouverts) depuis ce navigateur. Cette liste est propre à cet appareil : elle n'est pas stockée sur le serveur.",
             shares_empty: "Aucun partage pour l'instant. Ouvrez un PDF dans « Signer » puis utilisez « Partager pour signer à plusieurs ».",
@@ -47,7 +47,7 @@
             perm_dl: 'Download the PDF', perm_sig: 'Signature', perm_ini: 'Initials', perm_stamp: 'Stamp', perm_text: 'Text', perm_strike: 'Strikethrough', perm_check: 'Check box', perm_create: 'Create an element',
             notify_diag_title: 'Notifications', notify_test: 'Send a test notification', notify_testing: 'Sending…', notify_none_yet: 'No delivery recorded yet.',
             notify_out_sent: 'sent', notify_out_failed: 'failed', notify_out_no_config: 'no notification was requested for this share', notify_out_below: 'threshold not reached yet', notify_out_test_sent: 'test sent', notify_out_test_failed: 'test failed', notify_last: 'Last event: %s', notify_ok: 'Notification sent: check your device.', notify_ko: 'Failed',
-            notify_title: 'Notify me (Gotify)', notify_none: 'No notification', notify_each: 'On every signature', notify_count: 'Starting at', notify_count_suffix: 'signature(s)',
+            notify_title: 'Notify me (Gotify)', notify_each: 'On every signature', notify_final: 'Final message when reaching', notify_count_suffix: 'signature(s)',
             shares_title: 'My shares',
             shares_help: 'Documents you shared (or opened) from this browser. This list is specific to this device: it is not stored on the server.',
             shares_empty: 'No shares yet. Open a PDF in "Sign", then use "Share to sign with multiple people".',
@@ -215,8 +215,6 @@
             const r = await fetch('/api/config', { cache: 'no-store' });
             if (r.ok && (await r.json()).notify) {
                 block.classList.remove('d-none');
-                const each = root.document.getElementById('share_notify_each');
-                if (each) each.checked = true; // le serveur de notifications est configuré : on le propose par défaut
             }
         } catch (e) { /* hors ligne : option masquée */ }
     }

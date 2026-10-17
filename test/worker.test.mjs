@@ -124,7 +124,7 @@ try {
     assert.equal((await get('/api/share/' + id)).status, 404);
   });
 
-  await test('notifications Gotify : à chaque signature, à partir de N, option invalide refusée', async () => {
+  await test('notifications Gotify : à chaque signature, message final à N, les deux, option invalide refusée', async () => {
     assert.equal((await (await get('/api/config')).json()).notify, true);
     const create = (notify) => fetch(BASE + '/api/share', { method: 'POST', headers: { Cookie: cookie, 'X-Meta': 'bWV0YQ', 'X-Duration': '3600', 'X-Notify': notify }, body: new Uint8Array(50) });
     const sign = (id) => fetch(BASE + '/api/share/' + id + '/layers', { method: 'POST', body: new Uint8Array(30).fill(3) });
@@ -149,11 +149,17 @@ try {
     await waitFor(3);
     assert.equal(gotifyMessages.length, 3);
 
+    const d = await (await create('each+count:3')).json();
+    await sign(d.id); await sign(d.id); await sign(d.id);
+    await waitFor(6);
+    assert.equal(gotifyMessages.length, 6, 'chaque signature + un seul message final (pas de doublon à la 3e)');
+    assert.ok(gotifyMessages.slice(3).some((m) => /Terminé/.test(m.body.message)), 'message final envoyé');
+
     const c = await (await create('none')).json();
     await sign(c.id);
     await new Promise((r) => setTimeout(r, 400));
-    assert.equal(gotifyMessages.length, 3, 'aucune notification demandée');
-    for (const x of [a, b, c]) await fetch(BASE + '/api/share/' + x.id, { method: 'DELETE', headers: { 'X-Admin-Key': x.adminKey } });
+    assert.equal(gotifyMessages.length, 6, 'aucune notification demandée');
+    for (const x of [a, b, c, d]) await fetch(BASE + '/api/share/' + x.id, { method: 'DELETE', headers: { 'X-Admin-Key': x.adminKey } });
   });
 
   await test('diagnostic des notifications : statut, test d’envoi, accès réservé aux sessions connectées', async () => {

@@ -1506,10 +1506,13 @@ function cfReadPerms() {
 function cfReadNotify() {
     const block = document.getElementById('share_notify_block');
     if (!block || block.classList.contains('d-none')) return 'none';
-    const mode = (document.querySelector('input[name=share_notify]:checked') || {}).value || 'none';
-    if (mode !== 'count') return mode;
+    const each = document.getElementById('share_notify_each').checked;
+    const fin = document.getElementById('share_notify_final').checked;
     const n = parseInt(document.getElementById('share_notify_n').value, 10);
-    return Number.isFinite(n) && n >= 1 ? 'count:' + Math.min(n, 999) : 'each';
+    const parts = [];
+    if (each) parts.push('each');
+    if (fin && Number.isFinite(n) && n >= 1) parts.push('count:' + Math.min(n, 999));
+    return parts.length ? parts.join('+') : 'none';
 }
 
 async function cfStartShare(btn) {

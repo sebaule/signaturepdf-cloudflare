@@ -221,7 +221,8 @@ async function readBody(request, max) {
 
 // Notifications Gotify (facultatives) : l'adresse et le jeton sont des secrets du Worker (GOTIFY_URL, GOTIFY_TOKEN).
 // Le message ne contient jamais le nom du fichier (il est chiffré) : seulement le nombre de signatures.
-const NOTIFY_RE = /^(none|each|count:[1-9][0-9]{0,2})$/;
+// none | each | count:N (message final seul) | each+count:N (chaque signature + message final)
+const NOTIFY_RE = /^(none|each|count:[1-9][0-9]{0,2}|each\+count:[1-9][0-9]{0,2})$/;
 function notifyAvailable(env) { return /^https?:\/\//i.test(env.GOTIFY_URL || '') && !!env.GOTIFY_TOKEN; }
 // Envoie un message au serveur Gotify. Ne lève jamais d'exception : retourne { ok, status, detail }.
 async function sendGotify(env, message) {
@@ -257,12 +258,15 @@ async function notifySignature(env, id, total) {
     if (!notifyAvailable(env)) return;
     const cfg = await env.BLOBS.get(`n:${id}`, 'json');
     if (!cfg) return rememberNotify(env, { outcome: 'no-config', total });
+    // Anciens réglages : { mode:'each' } ou { mode:'count', n }. Nouveaux : { each, n }.
+    const each = cfg.each === true || cfg.mode === 'each';
+    const n = Number.isInteger(cfg.n) && cfg.n > 0 ? cfg.n : 0;
     let message = null;
-    if (cfg.mode === 'each') message = total === 1 ? 'Nouvelle signature reçue (1 au total).' : `Nouvelle signature reçue (${total} au total).`;
-    else if (cfg.mode === 'count' && total === cfg.n) message = `${total} signature(s) reçue(s) : le seuil que vous aviez fixé est atteint.`;
-    if (!message) return rememberNotify(env, { outcome: 'below-threshold', total, mode: cfg.mode, n: cfg.n });
+    if (n && total === n) message = `Terminé : ${total} signature(s) reçue(s), le nombre que vous aviez fixé est atteint.`;
+    else if (each) message = total === 1 ? 'Nouvelle signature reçue (1 au total).' : `Nouvelle signature reçue (${total} au total).`;
+    if (!message) return rememberNotify(env, { outcome: 'below-threshold', total, each, n });
     const r = await sendGotify(env, message);
-    await rememberNotify(env, { outcome: r.ok ? 'sent' : 'failed', total, mode: cfg.mode, status: r.status, detail: r.detail, via: r.via });
+    await rememberNotify(env, { outcome: r.ok ? 'sent' : 'failed', total, each, n, status: r.status, detail: r.detail, via: r.via });
   } catch (e) { console.error('gotify', String(e)); }
 }
 
@@ -337,7 +341,8 @@ async function handleApi(request, env, url, ctx) {
       return json({ message: 'Écriture impossible (quota Cloudflare atteint ?)' }, 503);
     }
     if (notify !== 'none' && notifyAvailable(env)) {
-      const cfg = notify === 'each' ? { mode: 'each' } : { mode: 'count', n: parseInt(notify.slice(6), 10) };
+      const m = /count:([0-9]+)$/.exec(notify);
+      const cfg = { each: notify.startsWith('each'), n: m ? parseInt(m[1], 10) : 0 };
       try { await env.BLOBS.put(`n:${id}`, JSON.stringify(cfg)); } catch (_) { /* ignore */ }
     }
     return json({ id, adminKey }, 201);
