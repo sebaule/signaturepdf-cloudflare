@@ -219,7 +219,30 @@ async function readBody(request, max) {
   return { buf };
 }
 
-async function handleApi(request, env, url) {
+// Notifications Gotify (facultatives) : l'adresse et le jeton sont des secrets du Worker (GOTIFY_URL, GOTIFY_TOKEN).
+// Le message ne contient jamais le nom du fichier (il est chiffré) : seulement le nombre de signatures.
+const NOTIFY_RE = /^(none|each|count:[1-9][0-9]{0,2})$/;
+function notifyAvailable(env) { return /^https?:\/\//i.test(env.GOTIFY_URL || '') && !!env.GOTIFY_TOKEN; }
+async function notifySignature(env, origin, id, total) {
+  try {
+    if (!notifyAvailable(env)) return;
+    const cfg = await env.BLOBS.get(`n:${id}`, 'json');
+    if (!cfg) return;
+    let message = null;
+    if (cfg.mode === 'each') message = total === 1 ? 'Nouvelle signature reçue (1 au total).' : `Nouvelle signature reçue (${total} au total).`;
+    else if (cfg.mode === 'count' && total === cfg.n) message = `${total} signature(s) reçue(s) : le seuil que vous aviez fixé est atteint.`;
+    if (!message) return;
+    const r = await fetch(env.GOTIFY_URL.replace(/\/+$/, '') + '/message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Gotify-Key': env.GOTIFY_TOKEN },
+      body: JSON.stringify({ title: 'Signature PDF', message, priority: 5, extras: { 'client::notification': { click: { url: origin + '/shares' } } } }),
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!r.ok) console.error('gotify', r.status);
+  } catch (e) { console.error('gotify', String(e)); }
+}
+
+async function handleApi(request, env, url, ctx) {
   const method = request.method;
   const parts = url.pathname.replace(/^\/api\/?/, '').split('/').filter(Boolean);
   const maxBytes = num(env, 'MAX_BYTES', 20 * 1000 * 1000) + 64; // + IV et tag AES-GCM
@@ -231,7 +254,7 @@ async function handleApi(request, env, url) {
   if (parts[0] === 'config' && method === 'GET') {
     const gated = !!env.SHARE_PASSWORD;
     const authed = gated && (await isAuthed(request, env));
-    return json({ passwordRequired: gated && !authed, gated, authed, maxBytes: maxBytes - 64, maxLayers });
+    return json({ passwordRequired: gated && !authed, gated, authed, maxBytes: maxBytes - 64, maxLayers, notify: notifyAvailable(env) });
   }
 
   if (parts[0] !== 'share') return json({ message: 'Introuvable' }, 404);
@@ -247,6 +270,8 @@ async function handleApi(request, env, url) {
     }
     const meta = request.headers.get('X-Meta') || '';
     if (!META_RE.test(meta)) return json({ message: 'Métadonnées invalides' }, 400);
+    const notify = request.headers.get('X-Notify') || 'none';
+    if (!NOTIFY_RE.test(notify)) return json({ message: 'Option de notification invalide' }, 400);
     let duration = parseInt(request.headers.get('X-Duration') || '', 10);
     if (!Number.isFinite(duration)) duration = 30 * 86400;
     duration = Math.min(Math.max(duration, 3600), 365 * 86400);
@@ -270,6 +295,10 @@ async function handleApi(request, env, url) {
     } catch (e) {
       try { await env.BLOBS.delete(`o:${id}`); } catch (_) { /* ignore */ }
       return json({ message: 'Écriture impossible (quota Cloudflare atteint ?)' }, 503);
+    }
+    if (notify !== 'none' && notifyAvailable(env)) {
+      const cfg = notify === 'each' ? { mode: 'each' } : { mode: 'count', n: parseInt(notify.slice(6), 10) };
+      try { await env.BLOBS.put(`n:${id}`, JSON.stringify(cfg)); } catch (_) { /* ignore */ }
     }
     return json({ id, adminKey }, 201);
   }
@@ -322,7 +351,9 @@ async function handleApi(request, env, url) {
       env.DB.prepare('UPDATE shares SET layers = layers + 1, expires_at = ?2 + duration WHERE id = ?1').bind(id, now),
       env.DB.prepare('SELECT layers AS n FROM shares WHERE id = ?1').bind(id),
     ]);
-    return json({ n: res[2].results[0].n }, 201);
+    const total = res[2].results[0].n;
+    if (ctx) ctx.waitUntil(notifySignature(env, url.origin, id, total));
+    return json({ n: total }, 201);
   }
 
   // GET /api/share/:id/layers/:seq
@@ -344,6 +375,7 @@ async function deleteShare(env, id) {
     try { await env.BLOBS.delete(l.kv_key); } catch (_) { /* ignore */ }
   }
   try { await env.BLOBS.delete(`o:${id}`); } catch (_) { /* ignore */ }
+  try { await env.BLOBS.delete(`n:${id}`); } catch (_) { /* ignore */ }
   await env.DB.batch([
     env.DB.prepare('DELETE FROM layers WHERE share_id = ?1').bind(id),
     env.DB.prepare('DELETE FROM shares WHERE id = ?1').bind(id),
@@ -369,13 +401,13 @@ export async function purgeExpired(env) {
 
 // ---------------------------------------------------------------- point d'entrée
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const path = url.pathname;
 
     try {
       if (path.startsWith('/api/')) {
-        return await handleApi(request, env, url);
+        return await handleApi(request, env, url, ctx);
       }
 
       if (path === '/login') return await handleLogin(request, env, url);

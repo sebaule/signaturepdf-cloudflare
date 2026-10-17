@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="/vendor/bootstrap.ltr.min.css?5.3.3" rel="stylesheet">
 <link href="/vendor/bootstrap-icons.min.css?1.11.3" rel="stylesheet">
-<link href="/css/app.css?mvckak7u" rel="stylesheet">
+<link href="/css/app.css?mvcp6txu" rel="stylesheet">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png" />
 <style>
@@ -126,9 +126,9 @@
 </script>
     </div>
     <footer class="text-center text-muted mb-2 mt-3 opacity-75 small">
-    <a href="https://github.com/24eme/signaturepdf?tab=readme-ov-file#signature-pdf-libre">Signature PDF</a> - Logicial liure <span class="d-none d-md-inline">jos licéncia AGPL-3.0 : <a href="https://github.com/sebaule/signaturepdf-cloudflare">veire lo còdi font</a> (<a href="https://github.com/24eme/signaturepdf/tree/9e2811a">24eme/signaturepdf 9e2811a</a>)</span>
+    <a href="https://github.com/24eme/signaturepdf?tab=readme-ov-file#signature-pdf-libre">Signature PDF</a> - Logicial liure <span class="d-none d-md-inline">jos licéncia AGPL-3.0 : <a href="https://github.com/TON-COMPTE/signaturepdf-cloudflare">veire lo còdi font</a> (<a href="https://github.com/24eme/signaturepdf/tree/9e2811a">24eme/signaturepdf 9e2811a</a>)</span>
 </footer>
-<script src="/js/cf-extras.js?mvckak7u"></script>
+<script src="/js/cf-extras.js?mvcp6txu"></script>
 </div>
 <div id="page-signature" class="d-none decalage-pdf-div">
         <div style="height: 65px;" class="d-md-none"></div>
@@ -307,9 +307,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>En activant lo partiment d’aqueste PDF poiretz prepausar un ligam a las personas que volètz per que pòscan signar aqueste PDF.</p>
-                    <p><i class="bi bi-hdd-network"></i> Aqueste partiment requerís que lo PDF siá transferit e gardat sul servidor per èsser accessible als futurs signataris.</p>
-                    <p><i class="bi bi-hourglass-split"></i> Lo PDF serà conservat                                                    <select name='duration' form='form_sharing'>
+                    <p class="mb-2"><i class="bi bi-lock-fill"></i> <span data-cfx="share_intro"></span></p>
+                    <p class="mb-3"><i class="bi bi-hourglass-split"></i> Lo PDF serà conservat                                                    <select name='duration' form='form_sharing'>
                                 <option value='+1 year'>pendent un an</option>
                                 <option value='+6 month'>pendent sièis meses</option>
                                 <option value='+1 month' selected='selected'>pendent un mes</option>
@@ -318,17 +317,53 @@
                                 <option value='+1 hour'>pendent una ora</option>
                             </select>
                          fins a la darrièra signatura.</p>
-                                            <p><i class="bi bi-lock-fill"></i> <input type="checkbox" id="checkbox_encryption" name="encryption" value="true" checked="checked" disabled="disabled" form='form_sharing'/>
-                                <label for="checkbox_encryption">Lo PDF serà gardat chifrat sul servidor</label>
-                            </p>
-                    <p class="mb-1"><i class="bi bi-download"></i> <input type="checkbox" id="share_nodownload" class="form-check-input">
-                        <label for="share_nodownload" data-cfx="nodl_label"></label></p>
-                    <p class="small text-muted ms-4 mb-2" data-cfx="nodl_hint"></p>
+                    <p class="fw-semibold mb-1" data-cfx="perms_title"></p>
+                    <div class="row row-cols-2 g-1 mb-1" id="share_perms">
+                                                <div class="col"><div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="perm_dl">
+                            <label class="form-check-label" for="perm_dl"><i class="bi bi-download"></i> <span data-cfx="perm_dl"></span></label>
+                        </div></div>
+                                                <div class="col"><div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="perm_sig" checked="checked">
+                            <label class="form-check-label" for="perm_sig"><i class="bi bi-vector-pen"></i> <span data-cfx="perm_sig"></span></label>
+                        </div></div>
+                                                <div class="col"><div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="perm_ini" checked="checked">
+                            <label class="form-check-label" for="perm_ini"><i class="bi bi-type"></i> <span data-cfx="perm_ini"></span></label>
+                        </div></div>
+                                                <div class="col"><div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="perm_stamp" checked="checked">
+                            <label class="form-check-label" for="perm_stamp"><i class="bi bi-card-text"></i> <span data-cfx="perm_stamp"></span></label>
+                        </div></div>
+                                                <div class="col"><div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="perm_text" checked="checked">
+                            <label class="form-check-label" for="perm_text"><i class="bi bi-textarea-t"></i> <span data-cfx="perm_text"></span></label>
+                        </div></div>
+                                                <div class="col"><div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="perm_strike" checked="checked">
+                            <label class="form-check-label" for="perm_strike"><i class="bi bi-type-strikethrough"></i> <span data-cfx="perm_strike"></span></label>
+                        </div></div>
+                                                <div class="col"><div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="perm_check" checked="checked">
+                            <label class="form-check-label" for="perm_check"><i class="bi bi-check-square"></i> <span data-cfx="perm_check"></span></label>
+                        </div></div>
+                                                <div class="col"><div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="perm_create" checked="checked">
+                            <label class="form-check-label" for="perm_create"><i class="bi bi-plus-circle"></i> <span data-cfx="perm_create"></span></label>
+                        </div></div>
+                                            </div>
+                    <p class="small text-muted mb-3" data-cfx="perms_hint"></p>
+                    <div id="share_notify_block" class="d-none mb-3">
+                        <p class="fw-semibold mb-1"><i class="bi bi-bell"></i> <span data-cfx="notify_title"></span></p>
+                        <div class="form-check"><input class="form-check-input" type="radio" name="share_notify" id="share_notify_none" value="none" checked="checked"><label class="form-check-label" for="share_notify_none" data-cfx="notify_none"></label></div>
+                        <div class="form-check"><input class="form-check-input" type="radio" name="share_notify" id="share_notify_each" value="each"><label class="form-check-label" for="share_notify_each" data-cfx="notify_each"></label></div>
+                        <div class="form-check d-flex align-items-center gap-2"><input class="form-check-input mt-0" type="radio" name="share_notify" id="share_notify_count" value="count"><label class="form-check-label" for="share_notify_count" data-cfx="notify_count"></label> <input type="number" min="1" max="999" value="2" id="share_notify_n" class="form-control form-control-sm" style="width: 4.5rem;" onfocus="document.getElementById('share_notify_count').checked = true;"> <span data-cfx="notify_count_suffix"></span></div>
+                    </div>
                     <div id="share_password_block" class="d-none mb-2">
                         <label for="share_password" class="form-label small mb-1"><i class="bi bi-key"></i> <span data-cf="share_password"></span></label>
                         <input id="share_password" type="password" class="form-control form-control-sm" autocomplete="off">
                     </div>
-                                    </div>
+                </div>
                 <div class="modal-footer text-center d-block">
                     <form id="form_sharing" action="#" onsubmit="return false;">
                           <input id="input_pdf_share" name="pdf" type="file" class="d-none" />
@@ -371,7 +406,7 @@
 </script>
 <script src="/vendor/pdf-lib.min.js?2.2.4"></script>
 <script src="/vendor/exif.min.js?2.3.0"></script>
-<script src="/js/common.js?mvckak7u"></script>
+<script src="/js/common.js?mvcp6txu"></script>
 <script>
 var REVERSE_PROXY_URL = "";
 var trad = {"Select this page":"Seleccionar aquesta pagina","Delete this page":"Suprimir aquesta pagina","Restore this page":"Restaurar aquesta pagina","Move this page":"Despla\u00e7ar aquesta pagina","Move here":"Despla\u00e7ar aic\u00ed","Turn this page":"Virar aquesta pagina","Download this page":"Telecargar aquesta pagina","Page":"Pagina"};
@@ -417,7 +452,7 @@ var trad = {"Select this page":"Seleccionar aquesta pagina","Delete this page":"
     var trad = {"Text to modify":"T\u00e8xt de modificar"};
 
         url_font = "\/vendor\/fonts\/Caveat-Regular.ttf"        </script>
-    <script src="/js/cf-share.js?mvckak7u"></script>
-    <script src="/js/signature.js?mvckak7u"></script>
+    <script src="/js/cf-share.js?mvcp6txu"></script>
+    <script src="/js/signature.js?mvcp6txu"></script>
   </body>
 </html>

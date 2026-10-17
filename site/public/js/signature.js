@@ -1429,21 +1429,41 @@ async function cfLoadSharedIntoInput(id) {
     nblayers = cfShared.count;
     document.querySelectorAll('.nblayers').forEach(function(item) { item.innerHTML = nblayers; });
     if (nblayers) { document.querySelector('#nblayers_text')?.classList.remove('d-none'); }
-    cfApplyDownloadPolicy();
+    cfApplyPolicy();
 }
 
-// Option « téléchargement réservé » : masque les boutons de téléchargement pour les signataires.
+// Droits des signataires (cases cochées au moment du partage) : masque ce qui n'est pas autorisé.
 // Propriétaire = navigateur qui a créé le partage (clé d'administration) ou personne connectée au site protégé.
 // C'est une restriction d'interface : qui voit le document peut toujours en faire une copie d'écran.
-async function cfApplyDownloadPolicy() {
-    if (!cfShared || !cfShared.noDownload) return;
+const CF_PERM_TARGETS = {
+    sig: ['#label_svg_signature_add', '#svg_list_signature'],
+    ini: ['#label_svg_initials_add', '#svg_list_initials'],
+    stamp: ['#label_svg_rubber_stamber_add', '#svg_list_rubber_stamber'],
+    text: ['#radio_svg_text'],
+    strike: ['#radio_svg_strikethrough'],
+    check: ['#radio_svg_check'],
+    create: ['#btn-add-svg'],
+};
+async function cfApplyPolicy() {
+    if (!cfShared || !cfShared.perms) return;
     let owner = false;
     try { owner = !!localStorage.getItem(cfShared.id + '.adminKey'); } catch (e) { /* ignore */ }
     if (!owner) { try { owner = !!(await CF.getConfig()).authed; } catch (e) { /* ignore */ } }
     if (owner) return;
-    ['btn_download', 'btn_download_signed'].forEach(function(id) {
-        const b = document.getElementById(id);
-        if (b) b.classList.add('d-none');
+    const perms = cfShared.perms;
+    if (perms.dl === false) {
+        ['btn_download', 'btn_download_signed'].forEach(function(id) {
+            const b = document.getElementById(id);
+            if (b) b.classList.add('d-none');
+        });
+    }
+    Object.keys(CF_PERM_TARGETS).forEach(function(k) {
+        if (perms[k] !== false) return;
+        CF_PERM_TARGETS[k].forEach(function(sel) {
+            document.querySelectorAll(sel).forEach(function(e) {
+                (e.closest('.list-item-add, .d-grid') || e).classList.add('d-none');
+            });
+        });
     });
 }
 
@@ -1474,6 +1494,24 @@ async function cfTransmitSignature() {
     window.location.reload();
 }
 
+function cfReadPerms() {
+    const perms = {};
+    ['dl', 'sig', 'ini', 'stamp', 'text', 'strike', 'check', 'create'].forEach(function(k) {
+        const c = document.getElementById('perm_' + k);
+        perms[k] = c ? c.checked : true;
+    });
+    return perms;
+}
+
+function cfReadNotify() {
+    const block = document.getElementById('share_notify_block');
+    if (!block || block.classList.contains('d-none')) return 'none';
+    const mode = (document.querySelector('input[name=share_notify]:checked') || {}).value || 'none';
+    if (mode !== 'count') return mode;
+    const n = parseInt(document.getElementById('share_notify_n').value, 10);
+    return Number.isFinite(n) && n >= 1 ? 'count:' + Math.min(n, 999) : 'each';
+}
+
 async function cfStartShare(btn) {
     const fileInput = document.getElementById('input_pdf_share');
     const file = fileInput.files[0];
@@ -1494,7 +1532,8 @@ async function cfStartShare(btn) {
             duration: duration,
             password: passwordInput ? passwordInput.value : '',
             layer: layer,
-            noDownload: !!(document.getElementById('share_nodownload') && document.getElementById('share_nodownload').checked),
+            perms: cfReadPerms(),
+            notify: cfReadNotify(),
         });
         try {
             localStorage.setItem(res.id + '.adminKey', res.adminKey);

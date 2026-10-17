@@ -112,6 +112,9 @@
                 try { await root.navigator.clipboard.writeText(link); copy.lastChild.textContent = ' ' + CFX.t('copied'); } catch (e) { /* ignore */ }
             });
             actions.appendChild(copy);
+            const wa = linkButton('bi-whatsapp', 'WhatsApp', CFX.waHref(link, info.filename || ''));
+            wa.target = '_blank'; wa.rel = 'noopener';
+            actions.appendChild(wa);
             actions.appendChild(linkButton('bi-envelope', CFX.t('send_email'), CFX.mailtoHref(link, info.filename || '')));
             actions.appendChild(linkButton('bi-chat-dots', CFX.t('send_sms'), CFX.smsHref(link)));
             const qr = button('bi-qr-code', CFX.t('show_qr'));

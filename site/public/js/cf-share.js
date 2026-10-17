@@ -117,17 +117,18 @@
     function durationToSeconds(v) { return DURATIONS[v] || 2592000; }
 
     /** Crée un partage. Retourne { id, adminKey, key }. */
-    async function createShare({ pdfBytes, filename, duration, password, layer, noDownload }) {
+    async function createShare({ pdfBytes, filename, duration, password, layer, perms, notify }) {
         const cfg = await getConfig();
         if (pdfBytes.length + 64 > cfg.maxBytes) throw new Error('too_big');
         const keyStr = generateKey();
         const key = await importKey(keyStr);
         const encPdf = await encrypt(key, pdfBytes);
-        const encMeta = await encrypt(key, enc.encode(JSON.stringify({ filename, v: 1, nodl: !!noDownload })));
+        const encMeta = await encrypt(key, enc.encode(JSON.stringify({ filename, v: 2, perms: perms || {}, nodl: !!(perms && perms.dl === false) })));
         const headers = {
             'Content-Type': 'application/octet-stream',
             'X-Duration': String(durationToSeconds(duration)),
             'X-Meta': b64uEncode(encMeta),
+            'X-Notify': notify || 'none',
         };
         if (password) headers['X-Share-Password'] = password;
         const r = await api('/share', { method: 'POST', headers, body: encPdf });
@@ -183,7 +184,8 @@
         if (!state.original) {
             const meta = JSON.parse(dec.decode(await decrypt(state.key, b64uDecode(info.meta))));
             state.filename = meta.filename || state.filename;
-            state.noDownload = !!meta.nodl;
+            state.perms = meta.perms || { dl: !meta.nodl };
+            state.noDownload = state.perms.dl === false;
             state.original = await decrypt(state.key, await getBytesRetry('/share/' + state.id + '/original'));
         }
         let changed = state.stamped === null;

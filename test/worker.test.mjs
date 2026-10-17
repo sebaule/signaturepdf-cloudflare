@@ -5,12 +5,24 @@ import { spawn, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import assert from 'node:assert/strict';
+import { createServer } from 'node:http';
+import { rmSync } from 'node:fs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const wrangler = join(root, 'node_modules', 'wrangler', 'bin', 'wrangler.js');
 const PORT = process.env.PORT || '8798';
 const BASE = `http://127.0.0.1:${PORT}`;
 const PW = 'mot-de-passe-de-test';
+
+// Faux serveur Gotify : enregistre les messages reçus
+const gotifyMessages = [];
+const gotify = createServer((req, res) => {
+  let body = '';
+  req.on('data', (c) => { body += c; });
+  req.on('end', () => { gotifyMessages.push({ url: req.url, key: req.headers['x-gotify-key'], body: JSON.parse(body || '{}') }); res.end('{}'); });
+});
+await new Promise((r) => gotify.listen(0, '127.0.0.1', r));
+const GOTIFY_PORT = gotify.address().port;
 
 let failed = 0, passed = 0;
 async function test(name, fn) {
@@ -19,9 +31,11 @@ async function test(name, fn) {
 const get = (path, headers = {}) => fetch(BASE + path, { redirect: 'manual', headers });
 const cookieFrom = (res) => (res.headers.get('set-cookie') || '').split(';')[0];
 
+// Le compteur de limitation est conservé sur disque : on le remet à zéro pour que deux exécutions rapprochées ne se gênent pas
+rmSync(join(root, '.wrangler', 'state', 'v3', 'ratelimit'), { recursive: true, force: true });
 execFileSync(process.execPath, [wrangler, 'd1', 'migrations', 'apply', 'signaturepdf', '--local'], { cwd: root, stdio: 'ignore' });
-const dev = spawn(process.execPath, [wrangler, 'dev', '--local', '--port', PORT, '--ip', '127.0.0.1', '--var', `SHARE_PASSWORD:${PW}`], { cwd: root, stdio: 'ignore' });
-const stop = () => { try { dev.kill('SIGTERM'); } catch (e) { /* déjà arrêté */ } };
+const dev = spawn(process.execPath, [wrangler, 'dev', '--local', '--port', PORT, '--ip', '127.0.0.1', '--var', `SHARE_PASSWORD:${PW}`, '--var', `GOTIFY_URL:http://127.0.0.1:${GOTIFY_PORT}`, '--var', 'GOTIFY_TOKEN:jeton-test'], { cwd: root, stdio: process.env.TEST_DEBUG ? 'inherit' : 'ignore' });
+const stop = () => { try { dev.kill('SIGTERM'); } catch (e) { /* déjà arrêté */ } try { gotify.close(); } catch (e) { /* ignore */ } };
 process.on('exit', stop);
 
 async function waitReady() {
@@ -108,6 +122,38 @@ try {
     const del = await fetch(BASE + '/api/share/' + id, { method: 'DELETE', headers: { 'X-Admin-Key': adminKey } });
     assert.ok(del.ok);
     assert.equal((await get('/api/share/' + id)).status, 404);
+  });
+
+  await test('notifications Gotify : à chaque signature, à partir de N, option invalide refusée', async () => {
+    assert.equal((await (await get('/api/config')).json()).notify, true);
+    const create = (notify) => fetch(BASE + '/api/share', { method: 'POST', headers: { Cookie: cookie, 'X-Meta': 'bWV0YQ', 'X-Duration': '3600', 'X-Notify': notify }, body: new Uint8Array(50) });
+    const sign = (id) => fetch(BASE + '/api/share/' + id + '/layers', { method: 'POST', body: new Uint8Array(30).fill(3) });
+    const waitFor = async (n) => { for (let i = 0; i < 30 && gotifyMessages.length < n; i++) await new Promise((r) => setTimeout(r, 100)); };
+
+    assert.equal((await create('invalide')).status, 400);
+
+    const a = await (await create('count:2')).json();
+    await sign(a.id);
+    await new Promise((r) => setTimeout(r, 400));
+    assert.equal(gotifyMessages.length, 0, 'pas de message avant le seuil');
+    await sign(a.id);
+    await waitFor(1);
+    assert.equal(gotifyMessages.length, 1);
+    assert.equal(gotifyMessages[0].url, '/message');
+    assert.equal(gotifyMessages[0].key, 'jeton-test');
+    assert.match(gotifyMessages[0].body.message, /2 signature/);
+    assert.ok(!JSON.stringify(gotifyMessages[0].body).includes(a.id), 'le message ne contient pas l’identifiant du partage');
+
+    const b = await (await create('each')).json();
+    await sign(b.id); await sign(b.id);
+    await waitFor(3);
+    assert.equal(gotifyMessages.length, 3);
+
+    const c = await (await create('none')).json();
+    await sign(c.id);
+    await new Promise((r) => setTimeout(r, 400));
+    assert.equal(gotifyMessages.length, 3, 'aucune notification demandée');
+    for (const x of [a, b, c]) await fetch(BASE + '/api/share/' + x.id, { method: 'DELETE', headers: { 'X-Admin-Key': x.adminKey } });
   });
 
   await test('la déconnexion efface le cookie', async () => {

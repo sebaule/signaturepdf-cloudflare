@@ -237,9 +237,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p><?php echo _("By enabling PDF sharing, you will be able to provide a link to the people of your choice so that they can sign this PDF."); ?></p>
-                    <p><?php echo sprintf(_("%s This sharing requires the PDF to be transferred and stored on the server for future signers to access."), '<i class="bi bi-hdd-network"></i>'); ?></p>
-                    <p><?php echo sprintf(_("%s The PDF will be kept"), '<i class="bi bi-hourglass-split"></i>'); ?>
+                    <p class="mb-2"><i class="bi bi-lock-fill"></i> <span data-cfx="share_intro"></span></p>
+                    <p class="mb-3"><?php echo sprintf(_("%s The PDF will be kept"), '<i class="bi bi-hourglass-split"></i>'); ?>
                         <?php if (isset($signatureRetention)): ?>
                             <select name='duration' form='form_sharing'>
                                 <?php foreach ($signatureRetention as $value => $text): ?>
@@ -256,18 +255,26 @@
                                 <option value='+1 hour'><?php echo _("for one hour"); ?></option>
                             </select>
                         <?php endif ?> <?php echo _("after the last signature."); ?></p>
-                    <?php if ($PDF_STORAGE_ENCRYPTION): ?>
-                        <p><i class="bi bi-lock-fill"></i> <input type="checkbox" id="checkbox_encryption" name="encryption" value="true" checked="checked" disabled="disabled" form='form_sharing'/>
-                                <label for="checkbox_encryption"><?php echo _("The PDF will be stored encrypted on the server"); ?></label>
-                            </p>
-                    <p class="mb-1"><i class="bi bi-download"></i> <input type="checkbox" id="share_nodownload" class="form-check-input">
-                        <label for="share_nodownload" data-cfx="nodl_label"></label></p>
-                    <p class="small text-muted ms-4 mb-2" data-cfx="nodl_hint"></p>
+                    <p class="fw-semibold mb-1" data-cfx="perms_title"></p>
+                    <div class="row row-cols-2 g-1 mb-1" id="share_perms">
+                        <?php foreach (['dl' => 'bi-download', 'sig' => 'bi-vector-pen', 'ini' => 'bi-type', 'stamp' => 'bi-card-text', 'text' => 'bi-textarea-t', 'strike' => 'bi-type-strikethrough', 'check' => 'bi-check-square', 'create' => 'bi-plus-circle'] as $k => $icon): ?>
+                        <div class="col"><div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="perm_<?php echo $k; ?>"<?php echo $k === 'dl' ? '' : ' checked="checked"'; ?>>
+                            <label class="form-check-label" for="perm_<?php echo $k; ?>"><i class="bi <?php echo $icon; ?>"></i> <span data-cfx="perm_<?php echo $k; ?>"></span></label>
+                        </div></div>
+                        <?php endforeach; ?>
+                    </div>
+                    <p class="small text-muted mb-3" data-cfx="perms_hint"></p>
+                    <div id="share_notify_block" class="d-none mb-3">
+                        <p class="fw-semibold mb-1"><i class="bi bi-bell"></i> <span data-cfx="notify_title"></span></p>
+                        <div class="form-check"><input class="form-check-input" type="radio" name="share_notify" id="share_notify_none" value="none" checked="checked"><label class="form-check-label" for="share_notify_none" data-cfx="notify_none"></label></div>
+                        <div class="form-check"><input class="form-check-input" type="radio" name="share_notify" id="share_notify_each" value="each"><label class="form-check-label" for="share_notify_each" data-cfx="notify_each"></label></div>
+                        <div class="form-check d-flex align-items-center gap-2"><input class="form-check-input mt-0" type="radio" name="share_notify" id="share_notify_count" value="count"><label class="form-check-label" for="share_notify_count" data-cfx="notify_count"></label> <input type="number" min="1" max="999" value="2" id="share_notify_n" class="form-control form-control-sm" style="width: 4.5rem;" onfocus="document.getElementById('share_notify_count').checked = true;"> <span data-cfx="notify_count_suffix"></span></div>
+                    </div>
                     <div id="share_password_block" class="d-none mb-2">
                         <label for="share_password" class="form-label small mb-1"><i class="bi bi-key"></i> <span data-cf="share_password"></span></label>
                         <input id="share_password" type="password" class="form-control form-control-sm" autocomplete="off">
                     </div>
-                    <?php endif; ?>
                 </div>
                 <div class="modal-footer text-center d-block">
                     <form id="form_sharing" action="#" onsubmit="return false;">
@@ -290,21 +297,23 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p><?php echo _("Multiple people can sign this PDF simultaneously."); ?></p>
-                    <p><?php echo _("To do so, simply share the link to this page with the people of your choice:"); ?></p>
                     <div class="input-group mb-3">
                         <span class="input-group-text"><?php echo _("Sharing link"); ?></span>
                         <input id="input-share-link" type="text" onclick="this.select();  this.setSelectionRange(0, 99999);" readonly="readonly" class="form-control bg-light font-monospace" value="">
                         <button onclick="navigator.clipboard.writeText(document.getElementById('input-share-link').value); this.innerText = '<?php echo _('Copied !'); ?>';" autofocus="autofocus" class="btn btn-primary" type="button" id="btn-copy-share-link"><i class="bi bi-clipboard"></i> <?php echo _('Copy'); ?></button>
                     </div>
                     <script>document.querySelector('#input-share-link').value = document.location.href;</script>
+                    <label for="share-message" class="form-label small mb-1" data-cfx="message_label"></label>
+                    <textarea id="share-message" class="form-control form-control-sm mb-2" rows="5"></textarea>
                     <div class="d-flex flex-wrap gap-2 justify-content-center mb-3">
+                        <button id="share-copy-msg" type="button" class="btn btn-outline-dark btn-sm"><i class="bi bi-clipboard"></i> <span data-cfx="copy_message"></span></button>
+                        <a id="share-wa" class="btn btn-outline-success btn-sm" target="_blank" rel="noopener" href="#"><i class="bi bi-whatsapp"></i> WhatsApp</a>
                         <a id="share-mail" class="btn btn-outline-dark btn-sm" href="#"><i class="bi bi-envelope"></i> <span data-cfx="send_email"></span></a>
                         <a id="share-sms" class="btn btn-outline-dark btn-sm" href="#"><i class="bi bi-chat-dots"></i> <span data-cfx="send_sms"></span></a>
                     </div>
-                    <div id="share-qr" class="mx-auto mb-2" style="max-width: 200px;"></div>
-                    <p class="small text-muted text-center" data-cfx="qr_hint"></p>
-                    <p class="mb-0"><?php echo _("Each of the signatories can download the latest version of the signed PDF at any time."); ?></p>
+                    <div id="share-qr" class="mx-auto mb-2" style="max-width: 180px;"></div>
+                    <div class="text-center mb-1"><button id="share-qr-dl" type="button" class="btn btn-outline-dark btn-sm"><i class="bi bi-download"></i> <span data-cfx="download_qr"></span></button></div>
+                    <p class="small text-muted text-center mb-0" data-cfx="qr_hint"></p>
                 </div>
                 <div class="modal-footer text-start">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal"><?php echo _("Close"); ?></button>

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="/vendor/bootstrap.ltr.min.css?5.3.3" rel="stylesheet">
 <link href="/vendor/bootstrap-icons.min.css?1.11.3" rel="stylesheet">
-<link href="/css/app.css?mvckak7u" rel="stylesheet">
+<link href="/css/app.css?mvcp6txu" rel="stylesheet">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png" />
 <style>
@@ -126,9 +126,9 @@
 </script>
     </div>
     <footer class="text-center text-muted mb-2 mt-3 opacity-75 small">
-    <a href="https://github.com/24eme/signaturepdf?tab=readme-ov-file#signature-pdf-libre">Signature PDF</a> - Software libero <span class="d-none d-md-inline">sotto licenza AGPL-3.0 : <a href="https://github.com/sebaule/signaturepdf-cloudflare">vedi il codice sorgente</a> (<a href="https://github.com/24eme/signaturepdf/tree/9e2811a">24eme/signaturepdf 9e2811a</a>)</span>
+    <a href="https://github.com/24eme/signaturepdf?tab=readme-ov-file#signature-pdf-libre">Signature PDF</a> - Software libero <span class="d-none d-md-inline">sotto licenza AGPL-3.0 : <a href="https://github.com/TON-COMPTE/signaturepdf-cloudflare">vedi il codice sorgente</a> (<a href="https://github.com/24eme/signaturepdf/tree/9e2811a">24eme/signaturepdf 9e2811a</a>)</span>
 </footer>
-<script src="/js/cf-extras.js?mvckak7u"></script>
+<script src="/js/cf-extras.js?mvcp6txu"></script>
 </div>
 <div id="page-signature" class="d-none decalage-pdf-div">
             <div id="alert-signature-help" class="position-relative d-none">
@@ -309,21 +309,23 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Più persone possono firmare questo PDF contemporaneamente.</p>
-                    <p>Per farlo condividi il link a questa pagina con le persone che hai scelto:</p>
                     <div class="input-group mb-3">
                         <span class="input-group-text">Link di condivisione</span>
                         <input id="input-share-link" type="text" onclick="this.select();  this.setSelectionRange(0, 99999);" readonly="readonly" class="form-control bg-light font-monospace" value="">
                         <button onclick="navigator.clipboard.writeText(document.getElementById('input-share-link').value); this.innerText = 'Copiato !';" autofocus="autofocus" class="btn btn-primary" type="button" id="btn-copy-share-link"><i class="bi bi-clipboard"></i> Copia</button>
                     </div>
                     <script>document.querySelector('#input-share-link').value = document.location.href;</script>
+                    <label for="share-message" class="form-label small mb-1" data-cfx="message_label"></label>
+                    <textarea id="share-message" class="form-control form-control-sm mb-2" rows="5"></textarea>
                     <div class="d-flex flex-wrap gap-2 justify-content-center mb-3">
+                        <button id="share-copy-msg" type="button" class="btn btn-outline-dark btn-sm"><i class="bi bi-clipboard"></i> <span data-cfx="copy_message"></span></button>
+                        <a id="share-wa" class="btn btn-outline-success btn-sm" target="_blank" rel="noopener" href="#"><i class="bi bi-whatsapp"></i> WhatsApp</a>
                         <a id="share-mail" class="btn btn-outline-dark btn-sm" href="#"><i class="bi bi-envelope"></i> <span data-cfx="send_email"></span></a>
                         <a id="share-sms" class="btn btn-outline-dark btn-sm" href="#"><i class="bi bi-chat-dots"></i> <span data-cfx="send_sms"></span></a>
                     </div>
-                    <div id="share-qr" class="mx-auto mb-2" style="max-width: 200px;"></div>
-                    <p class="small text-muted text-center" data-cfx="qr_hint"></p>
-                    <p class="mb-0">Ogni firmatario può scaricare l'ultima versione del PDF firmato in qualsiasi momento.</p>
+                    <div id="share-qr" class="mx-auto mb-2" style="max-width: 180px;"></div>
+                    <div class="text-center mb-1"><button id="share-qr-dl" type="button" class="btn btn-outline-dark btn-sm"><i class="bi bi-download"></i> <span data-cfx="download_qr"></span></button></div>
+                    <p class="small text-muted text-center mb-0" data-cfx="qr_hint"></p>
                 </div>
                 <div class="modal-footer text-start">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Chiudi</button>
@@ -380,7 +382,7 @@
 </script>
 <script src="/vendor/pdf-lib.min.js?2.2.4"></script>
 <script src="/vendor/exif.min.js?2.3.0"></script>
-<script src="/js/common.js?mvckak7u"></script>
+<script src="/js/common.js?mvcp6txu"></script>
 <script>
 var REVERSE_PROXY_URL = "";
 var trad = {"Select this page":"Seleziona questa pagina","Delete this page":"Elimina questa pagina","Restore this page":"Ripristina questa pagina","Move this page":"Sposta questa pagina","Move here":"Sposta qui","Turn this page":"Ruota questa pagina","Download this page":"Scarica questa pagina","Page":"Pagina"};
@@ -427,7 +429,7 @@ var trad = {"Select this page":"Seleziona questa pagina","Delete this page":"Eli
     var trad = {"Text to modify":"Testo da modificare"};
 
         url_font = "\/vendor\/fonts\/Caveat-Regular.ttf"        </script>
-    <script src="/js/cf-share.js?mvckak7u"></script>
-    <script src="/js/signature.js?mvckak7u"></script>
+    <script src="/js/cf-share.js?mvcp6txu"></script>
+    <script src="/js/signature.js?mvcp6txu"></script>
   </body>
 </html>
