@@ -93,6 +93,7 @@ Ajustables dans `wrangler.jsonc` (`vars`).
 - **Mes partages** (`/shares`) : liste des documents partagés ou ouverts depuis ce navigateur (nom déchiffré sur place, nombre de signatures, expiration), avec copie du lien, e-mail, SMS, QR code et suppression. La liste est propre à l'appareil : les clés ne quittent jamais le navigateur.
 - **QR code, e-mail, SMS** dans la fenêtre de partage : le QR code est généré dans le navigateur (bibliothèque `qrcode-generator`, MIT, livrée dans `site/public/vendor`).
 - **Se déconnecter** : dans le menu, visible quand le site est protégé.
+- **Téléchargement réservé** : à la création d'un partage, case « Les signataires ne peuvent pas télécharger le PDF ». Les boutons de téléchargement sont alors masqués pour les signataires ; ils restent visibles pour le navigateur qui a créé le partage et pour une session connectée au site. C'est une restriction d'interface, pas une protection cryptographique : quiconque peut lire un document peut en faire une copie.
 
 ## Développer en local
 

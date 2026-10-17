@@ -25,6 +25,9 @@
             confirm_delete: 'Supprimer ce partage pour tout le monde ? Le PDF et les signatures seront effacés du serveur.',
             delete_failed: 'Suppression impossible, réessayez.', load_error: 'Impossible de contacter le serveur.',
             link_hint: 'Lien de partage',
+            nodl_label: 'Les signataires ne peuvent pas télécharger le PDF (réservé à moi)',
+            nodl_hint: "Restriction d'interface : quelqu'un qui voit le document peut toujours en faire une copie. Le téléchargement reste disponible pour vous (navigateur de création ou session connectée).",
+            expired_on: 'Expiré le %s', last_seen: 'dernier état connu : %s signature(s)',
         },
         en: {
             nav_shares: 'My shares', nav_logout: 'Log out',
@@ -43,6 +46,9 @@
             confirm_delete: 'Delete this share for everyone? The PDF and the signatures will be erased from the server.',
             delete_failed: 'Unable to delete, please try again.', load_error: 'Unable to reach the server.',
             link_hint: 'Sharing link',
+            nodl_label: 'Signers cannot download the PDF (reserved for me)',
+            nodl_hint: 'Interface restriction: anyone who can see the document can still copy it. Download stays available to you (creating browser or logged-in session).',
+            expired_on: 'Expired on %s', last_seen: 'last known state: %s signature(s)',
         },
     };
     function lang() {

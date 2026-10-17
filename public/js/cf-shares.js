@@ -20,7 +20,13 @@
         return out;
     }
     function forget(id) {
-        try { root.localStorage.removeItem('cfkey.' + id); root.localStorage.removeItem(id + '.adminKey'); } catch (e) { /* ignore */ }
+        try { root.localStorage.removeItem('cfkey.' + id); root.localStorage.removeItem(id + '.adminKey'); root.localStorage.removeItem('cfinfo.' + id); } catch (e) { /* ignore */ }
+    }
+    function cachedInfo(id) {
+        try { return JSON.parse(root.localStorage.getItem('cfinfo.' + id) || '{}') || {}; } catch (e) { return {}; }
+    }
+    function cacheInfo(id, info) {
+        try { root.localStorage.setItem('cfinfo.' + id, JSON.stringify(info)); } catch (e) { /* ignore */ }
     }
 
     function el(tag, cls, text) {
@@ -47,7 +53,7 @@
 
     async function readInfo(share) {
         const r = await fetch('/api/share/' + share.id, { cache: 'no-store' });
-        if (r.status === 404) return { gone: true };
+        if (r.status === 404) return { gone: true, cached: cachedInfo(share.id) };
         if (!r.ok) throw new Error('load_error');
         const info = await r.json();
         let filename = '';
@@ -56,6 +62,9 @@
             const meta = JSON.parse(dec.decode(await CF.decrypt(key, CF.b64uDecode(info.meta))));
             filename = String(meta.filename || '');
         } catch (e) { /* clé incorrecte : on affiche un nom générique */ }
+        const known = cachedInfo(share.id);
+        filename = filename || known.filename || '';
+        cacheInfo(share.id, { filename, layers: info.layers, expires: info.expires });
         return { gone: false, layers: info.layers, expires: info.expires, filename };
     }
 
@@ -74,7 +83,8 @@
         col.appendChild(c); c.appendChild(body);
 
         const head = el('div', 'd-flex justify-content-between align-items-start gap-2');
-        const title = el('h2', 'h6 mb-1 text-break', info.gone ? CFX.t('expired') : (info.filename || CFX.t('unnamed')));
+        const known = info.gone ? (info.cached || {}) : null;
+        const title = el('h2', 'h6 mb-1 text-break', info.gone ? (known.filename || CFX.t('expired')) : (info.filename || CFX.t('unnamed')));
         head.appendChild(title);
         head.appendChild(el('span', 'badge text-bg-' + (share.admin ? 'dark' : 'secondary') + ' flex-shrink-0', share.admin ? CFX.t('role_owner') : CFX.t('role_guest')));
         body.appendChild(head);
@@ -84,7 +94,9 @@
         qrBox.style.maxWidth = '200px';
 
         if (info.gone) {
-            body.appendChild(el('p', 'text-muted small mb-0', share.id));
+            const parts = [CFX.t('expired')];
+            if (typeof known.layers === 'number') parts.push(CFX.t('last_seen', String(known.layers)));
+            body.appendChild(el('p', 'text-muted small mb-0', parts.join(' · ')));
             const rm = button('bi-x-circle', CFX.t('forget'));
             rm.addEventListener('click', function () { forget(share.id); onRemoved(col); });
             actions.appendChild(rm);

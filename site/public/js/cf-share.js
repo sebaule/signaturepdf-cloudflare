@@ -117,13 +117,13 @@
     function durationToSeconds(v) { return DURATIONS[v] || 2592000; }
 
     /** Crée un partage. Retourne { id, adminKey, key }. */
-    async function createShare({ pdfBytes, filename, duration, password, layer }) {
+    async function createShare({ pdfBytes, filename, duration, password, layer, noDownload }) {
         const cfg = await getConfig();
         if (pdfBytes.length + 64 > cfg.maxBytes) throw new Error('too_big');
         const keyStr = generateKey();
         const key = await importKey(keyStr);
         const encPdf = await encrypt(key, pdfBytes);
-        const encMeta = await encrypt(key, enc.encode(JSON.stringify({ filename, v: 1 })));
+        const encMeta = await encrypt(key, enc.encode(JSON.stringify({ filename, v: 1, nodl: !!noDownload })));
         const headers = {
             'Content-Type': 'application/octet-stream',
             'X-Duration': String(durationToSeconds(duration)),
@@ -183,6 +183,7 @@
         if (!state.original) {
             const meta = JSON.parse(dec.decode(await decrypt(state.key, b64uDecode(info.meta))));
             state.filename = meta.filename || state.filename;
+            state.noDownload = !!meta.nodl;
             state.original = await decrypt(state.key, await getBytesRetry('/share/' + state.id + '/original'));
         }
         let changed = state.stamped === null;

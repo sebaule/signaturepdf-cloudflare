@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="/vendor/bootstrap.ltr.min.css?5.3.3" rel="stylesheet">
 <link href="/vendor/bootstrap-icons.min.css?1.11.3" rel="stylesheet">
-<link href="/css/app.css?mvc8rxl8" rel="stylesheet">
+<link href="/css/app.css?mvckak7u" rel="stylesheet">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png" />
 <style>
@@ -128,6 +128,7 @@
     <footer class="text-center text-muted mb-2 mt-3 opacity-75 small">
     <a href="https://github.com/24eme/signaturepdf?tab=readme-ov-file#signature-pdf-libre">Signature PDF</a> - Logiciel libre <span class="d-none d-md-inline">sous licence AGPL-3.0 : <a href="https://github.com/sebaule/signaturepdf-cloudflare">voir le code source</a> (<a href="https://github.com/24eme/signaturepdf/tree/9e2811a">24eme/signaturepdf 9e2811a</a>)</span>
 </footer>
+<script src="/js/cf-extras.js?mvckak7u"></script>
 </div>
 <div id="page-signature" class="d-none decalage-pdf-div">
         <div style="height: 65px;" class="d-md-none"></div>
@@ -320,6 +321,9 @@
                                             <p><i class="bi bi-lock-fill"></i> <input type="checkbox" id="checkbox_encryption" name="encryption" value="true" checked="checked" disabled="disabled" form='form_sharing'/>
                                 <label for="checkbox_encryption">Le PDF sera stocké chiffré sur le serveur</label>
                             </p>
+                    <p class="mb-1"><i class="bi bi-download"></i> <input type="checkbox" id="share_nodownload" class="form-check-input">
+                        <label for="share_nodownload" data-cfx="nodl_label"></label></p>
+                    <p class="small text-muted ms-4 mb-2" data-cfx="nodl_hint"></p>
                     <div id="share_password_block" class="d-none mb-2">
                         <label for="share_password" class="form-label small mb-1"><i class="bi bi-key"></i> <span data-cf="share_password"></span></label>
                         <input id="share_password" type="password" class="form-control form-control-sm" autocomplete="off">
@@ -367,8 +371,7 @@
 </script>
 <script src="/vendor/pdf-lib.min.js?2.2.4"></script>
 <script src="/vendor/exif.min.js?2.3.0"></script>
-<script src="/js/common.js?mvc8rxl8"></script>
-<script src="/js/cf-extras.js?mvc8rxl8"></script>
+<script src="/js/common.js?mvckak7u"></script>
 <script>
 var REVERSE_PROXY_URL = "";
 var trad = {"Select this page":"S\u00e9lectionner cette page","Delete this page":"Supprimer cette page","Restore this page":"Restaurer cette page","Move this page":"D\u00e9placer cette page","Move here":"D\u00e9placer ici","Turn this page":"Tourner cette page","Download this page":"T\u00e9l\u00e9charger cette page","Page":"Page"};
@@ -414,7 +417,7 @@ var trad = {"Select this page":"S\u00e9lectionner cette page","Delete this page"
     var trad = {"Text to modify":"Texte \u00e0 modifier"};
 
         url_font = "\/vendor\/fonts\/Caveat-Regular.ttf"        </script>
-    <script src="/js/cf-share.js?mvc8rxl8"></script>
-    <script src="/js/signature.js?mvc8rxl8"></script>
+    <script src="/js/cf-share.js?mvckak7u"></script>
+    <script src="/js/signature.js?mvckak7u"></script>
   </body>
 </html>

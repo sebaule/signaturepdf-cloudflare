@@ -260,6 +260,9 @@
                         <p><i class="bi bi-lock-fill"></i> <input type="checkbox" id="checkbox_encryption" name="encryption" value="true" checked="checked" disabled="disabled" form='form_sharing'/>
                                 <label for="checkbox_encryption"><?php echo _("The PDF will be stored encrypted on the server"); ?></label>
                             </p>
+                    <p class="mb-1"><i class="bi bi-download"></i> <input type="checkbox" id="share_nodownload" class="form-check-input">
+                        <label for="share_nodownload" data-cfx="nodl_label"></label></p>
+                    <p class="small text-muted ms-4 mb-2" data-cfx="nodl_hint"></p>
                     <div id="share_password_block" class="d-none mb-2">
                         <label for="share_password" class="form-label small mb-1"><i class="bi bi-key"></i> <span data-cf="share_password"></span></label>
                         <input id="share_password" type="password" class="form-control form-control-sm" autocomplete="off">

@@ -1429,6 +1429,22 @@ async function cfLoadSharedIntoInput(id) {
     nblayers = cfShared.count;
     document.querySelectorAll('.nblayers').forEach(function(item) { item.innerHTML = nblayers; });
     if (nblayers) { document.querySelector('#nblayers_text')?.classList.remove('d-none'); }
+    cfApplyDownloadPolicy();
+}
+
+// Option « téléchargement réservé » : masque les boutons de téléchargement pour les signataires.
+// Propriétaire = navigateur qui a créé le partage (clé d'administration) ou personne connectée au site protégé.
+// C'est une restriction d'interface : qui voit le document peut toujours en faire une copie d'écran.
+async function cfApplyDownloadPolicy() {
+    if (!cfShared || !cfShared.noDownload) return;
+    let owner = false;
+    try { owner = !!localStorage.getItem(cfShared.id + '.adminKey'); } catch (e) { /* ignore */ }
+    if (!owner) { try { owner = !!(await CF.getConfig()).authed; } catch (e) { /* ignore */ } }
+    if (owner) return;
+    ['btn_download', 'btn_download_signed'].forEach(function(id) {
+        const b = document.getElementById(id);
+        if (b) b.classList.add('d-none');
+    });
 }
 
 async function cfDownloadShared(btn) {
@@ -1478,10 +1494,12 @@ async function cfStartShare(btn) {
             duration: duration,
             password: passwordInput ? passwordInput.value : '',
             layer: layer,
+            noDownload: !!(document.getElementById('share_nodownload') && document.getElementById('share_nodownload').checked),
         });
         try {
             localStorage.setItem(res.id + '.adminKey', res.adminKey);
             localStorage.setItem('cfkey.' + res.id, res.key);
+            localStorage.setItem('cfinfo.' + res.id, JSON.stringify({ filename: file.name }));
             sessionStorage.setItem('openModal', 'shareinformations');
         } catch (e) { /* ignore */ }
         hasModifications = false;
