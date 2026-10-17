@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="/vendor/bootstrap.ltr.min.css?5.3.3" rel="stylesheet">
 <link href="/vendor/bootstrap-icons.min.css?1.11.3" rel="stylesheet">
-<link href="/css/app.css?mvbicmxa" rel="stylesheet">
+<link href="/css/app.css?mvc8rxl8" rel="stylesheet">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png" />
 <style>
@@ -72,7 +72,13 @@
             <li class="nav-item">
                 <a class="nav-link " href="/metadata"><i class="bi bi-tags"></i> <span class="d-none d-md-inline-block">Metadata</span></a>
             </li>
-                    </ul>
+                        <li class="nav-item d-none" id="nav-shares">
+                <a class="nav-link " href="/shares" data-cfx-title="nav_shares"><i class="bi bi-people-fill"></i> <span class="d-none d-md-inline-block" data-cfx="nav_shares"></span></a>
+            </li>
+            <li class="nav-item d-none" id="nav-logout">
+                <a class="nav-link" href="/logout" data-cfx-title="nav_logout"><i class="bi bi-box-arrow-right"></i> <span class="d-none d-md-inline-block" data-cfx="nav_logout"></span></a>
+            </li>
+        </ul>
     </nav>
 </div>
     <div class="px-3 py-3 text-center fullpage">
@@ -310,6 +316,12 @@
                         <button onclick="navigator.clipboard.writeText(document.getElementById('input-share-link').value); this.innerText = 'Copied !';" autofocus="autofocus" class="btn btn-primary" type="button" id="btn-copy-share-link"><i class="bi bi-clipboard"></i> Copy</button>
                     </div>
                     <script>document.querySelector('#input-share-link').value = document.location.href;</script>
+                    <div class="d-flex flex-wrap gap-2 justify-content-center mb-3">
+                        <a id="share-mail" class="btn btn-outline-dark btn-sm" href="#"><i class="bi bi-envelope"></i> <span data-cfx="send_email"></span></a>
+                        <a id="share-sms" class="btn btn-outline-dark btn-sm" href="#"><i class="bi bi-chat-dots"></i> <span data-cfx="send_sms"></span></a>
+                    </div>
+                    <div id="share-qr" class="mx-auto mb-2" style="max-width: 200px;"></div>
+                    <p class="small text-muted text-center" data-cfx="qr_hint"></p>
                     <p class="mb-0">Each of the signatories can download the latest version of the signed PDF at any time.</p>
                 </div>
                 <div class="modal-footer text-start">
@@ -367,7 +379,8 @@
 </script>
 <script src="/vendor/pdf-lib.min.js?2.2.4"></script>
 <script src="/vendor/exif.min.js?2.3.0"></script>
-<script src="/js/common.js?mvbicmxa"></script>
+<script src="/js/common.js?mvc8rxl8"></script>
+<script src="/js/cf-extras.js?mvc8rxl8"></script>
 <script>
 var REVERSE_PROXY_URL = "";
 var trad = {"Select this page":"Select this page","Delete this page":"Delete this page","Restore this page":"Restore this page","Move this page":"Move this page","Move here":"Move here","Turn this page":"Turn this page","Download this page":"Download this page","Page":"Page"};
@@ -414,7 +427,7 @@ var trad = {"Select this page":"Select this page","Delete this page":"Delete thi
     var trad = {"Text to modify":"Text to modify"};
 
         url_font = "\/vendor\/fonts\/Caveat-Regular.ttf"        </script>
-    <script src="/js/cf-share.js?mvbicmxa"></script>
-    <script src="/js/signature.js?mvbicmxa"></script>
+    <script src="/js/cf-share.js?mvc8rxl8"></script>
+    <script src="/js/signature.js?mvc8rxl8"></script>
   </body>
 </html>

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="/vendor/bootstrap.ltr.min.css?5.3.3" rel="stylesheet">
 <link href="/vendor/bootstrap-icons.min.css?1.11.3" rel="stylesheet">
-<link href="/css/app.css?mvbicmxa" rel="stylesheet">
+<link href="/css/app.css?mvc8rxl8" rel="stylesheet">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png" />
 <style>
@@ -72,7 +72,13 @@
             <li class="nav-item">
                 <a class="nav-link " href="/metadata"><i class="bi bi-tags"></i> <span class="d-none d-md-inline-block">Metadata</span></a>
             </li>
-                    </ul>
+                        <li class="nav-item d-none" id="nav-shares">
+                <a class="nav-link " href="/shares" data-cfx-title="nav_shares"><i class="bi bi-people-fill"></i> <span class="d-none d-md-inline-block" data-cfx="nav_shares"></span></a>
+            </li>
+            <li class="nav-item d-none" id="nav-logout">
+                <a class="nav-link" href="/logout" data-cfx-title="nav_logout"><i class="bi bi-box-arrow-right"></i> <span class="d-none d-md-inline-block" data-cfx="nav_logout"></span></a>
+            </li>
+        </ul>
     </nav>
 </div>
         <div class="px-3 py-3 text-center fullpage">
@@ -312,11 +318,12 @@
 </script>
 <script src="/vendor/pdf-lib.min.js?2.2.4"></script>
 <script src="/vendor/exif.min.js?2.3.0"></script>
-<script src="/js/common.js?mvbicmxa"></script>
+<script src="/js/common.js?mvc8rxl8"></script>
+<script src="/js/cf-extras.js?mvc8rxl8"></script>
 <script>
 var REVERSE_PROXY_URL = "";
 var trad = {"Select this page":"Seleziona questa pagina","Delete this page":"Elimina questa pagina","Restore this page":"Ripristina questa pagina","Move this page":"Sposta questa pagina","Move here":"Sposta qui","Turn this page":"Ruota questa pagina","Download this page":"Scarica questa pagina","Page":"Pagina"};
 </script>
-    <script src="/js/organization.js?mvbicmxa"></script>
+    <script src="/js/organization.js?mvc8rxl8"></script>
   </body>
 </html>

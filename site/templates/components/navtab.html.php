@@ -30,6 +30,12 @@
                 <a class="nav-link <?php if ($activeTab === "metadata"): ?>active<?php endif; ?>" href="<?php echo $REVERSE_PROXY_URL; ?>/metadata"><i class="bi bi-tags"></i> <span class="d-none d-md-inline-block"><?php echo _("Metadata"); ?></span></a>
             </li>
             <?php endif; ?>
+            <li class="nav-item d-none" id="nav-shares">
+                <a class="nav-link <?php if ($activeTab === "shares"): ?>active<?php endif; ?>" href="<?php echo $REVERSE_PROXY_URL; ?>/shares" data-cfx-title="nav_shares"><i class="bi bi-people-fill"></i> <span class="d-none d-md-inline-block" data-cfx="nav_shares"></span></a>
+            </li>
+            <li class="nav-item d-none" id="nav-logout">
+                <a class="nav-link" href="<?php echo $REVERSE_PROXY_URL; ?>/logout" data-cfx-title="nav_logout"><i class="bi bi-box-arrow-right"></i> <span class="d-none d-md-inline-block" data-cfx="nav_logout"></span></a>
+            </li>
         </ul>
     </nav>
 </div>

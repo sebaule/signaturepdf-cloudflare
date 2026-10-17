@@ -1,0 +1,131 @@
+// Tests d'intégration du Worker : verrouillage par mot de passe, cycle de vie d'un partage, limitation des essais.
+// Démarre `wrangler dev --local` tout seul (base D1 et KV simulées en local, rien n'est envoyé à Cloudflare).
+// Usage : node test/worker.test.mjs
+import { spawn, execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+import assert from 'node:assert/strict';
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const wrangler = join(root, 'node_modules', 'wrangler', 'bin', 'wrangler.js');
+const PORT = process.env.PORT || '8798';
+const BASE = `http://127.0.0.1:${PORT}`;
+const PW = 'mot-de-passe-de-test';
+
+let failed = 0, passed = 0;
+async function test(name, fn) {
+  try { await fn(); passed++; console.log('  ✓', name); } catch (e) { failed++; console.error('  ✗', name, '\n   ', e.message); }
+}
+const get = (path, headers = {}) => fetch(BASE + path, { redirect: 'manual', headers });
+const cookieFrom = (res) => (res.headers.get('set-cookie') || '').split(';')[0];
+
+execFileSync(process.execPath, [wrangler, 'd1', 'migrations', 'apply', 'signaturepdf', '--local'], { cwd: root, stdio: 'ignore' });
+const dev = spawn(process.execPath, [wrangler, 'dev', '--local', '--port', PORT, '--ip', '127.0.0.1', '--var', `SHARE_PASSWORD:${PW}`], { cwd: root, stdio: 'ignore' });
+const stop = () => { try { dev.kill('SIGTERM'); } catch (e) { /* déjà arrêté */ } };
+process.on('exit', stop);
+
+async function waitReady() {
+  for (let i = 0; i < 90; i++) {
+    try { if ((await get('/api/config')).ok) return; } catch (e) { /* pas encore prêt */ }
+    await new Promise((r) => setTimeout(r, 1000));
+  }
+  throw new Error('Le Worker local ne démarre pas');
+}
+
+try {
+  await waitReady();
+  console.log('Worker local prêt, mot de passe actif');
+
+  await test('les pages d’outils redirigent vers /login sans connexion', async () => {
+    for (const p of ['/', '/signature', '/organization', '/metadata', '/shares']) {
+      const r = await get(p);
+      assert.equal(r.status, 303, p);
+      assert.match(r.headers.get('location'), /\/login\?next=/, p);
+    }
+  });
+  await test('les pages sources /_pages/ ne sont pas accessibles directement', async () => {
+    assert.equal((await get('/_pages/fr/index.html')).status, 404);
+  });
+  await test('/api/config annonce un site verrouillé et non connecté', async () => {
+    const c = await (await get('/api/config')).json();
+    assert.equal(c.gated, true); assert.equal(c.authed, false); assert.equal(c.passwordRequired, true);
+  });
+  await test('créer un partage sans connexion ni mot de passe est refusé', async () => {
+    const r = await fetch(BASE + '/api/share', { method: 'POST', headers: { 'X-Meta': 'abc', 'X-Duration': '3600' }, body: new Uint8Array(40) });
+    assert.equal(r.status, 401);
+  });
+
+  let cookie = '';
+  await test('mauvais mot de passe refusé, bon mot de passe accepté avec cookie HttpOnly/Secure', async () => {
+    const bad = await fetch(BASE + '/login', { method: 'POST', redirect: 'manual', body: new URLSearchParams({ password: 'non', next: '/' }) });
+    assert.equal(bad.status, 401);
+    const good = await fetch(BASE + '/login', { method: 'POST', redirect: 'manual', body: new URLSearchParams({ password: PW, next: '/signature' }) });
+    assert.equal(good.status, 303);
+    assert.equal(good.headers.get('location'), '/signature');
+    const sc = good.headers.get('set-cookie');
+    assert.match(sc, /HttpOnly/); assert.match(sc, /Secure/); assert.match(sc, /SameSite=Lax/);
+    cookie = cookieFrom(good);
+    assert.ok(cookie.startsWith('spauth='));
+  });
+  await test('redirection ouverte refusée (next=//evil.example)', async () => {
+    const r = await fetch(BASE + '/login', { method: 'POST', redirect: 'manual', body: new URLSearchParams({ password: PW, next: '//evil.example' }) });
+    if (r.status === 303) assert.equal(r.headers.get('location'), '/');
+  });
+  await test('connecté : toutes les pages d’outils s’ouvrent, y compris Mes partages', async () => {
+    for (const p of ['/', '/signature', '/organization', '/metadata', '/shares']) {
+      const r = await get(p, { Cookie: cookie });
+      assert.equal(r.status, 200, p);
+      assert.match(await r.text(), /<html/, p);
+    }
+  });
+  await test('connecté : /api/config n’exige plus le mot de passe dans la fenêtre de partage', async () => {
+    const c = await (await get('/api/config', { Cookie: cookie })).json();
+    assert.equal(c.authed, true); assert.equal(c.passwordRequired, false);
+  });
+
+  let id, adminKey;
+  await test('cycle de partage : créer, lire, signer, supprimer', async () => {
+    const pdf = new Uint8Array(100).fill(7);
+    const created = await fetch(BASE + '/api/share', { method: 'POST', headers: { Cookie: cookie, 'X-Meta': 'bWV0YQ', 'X-Duration': '3600' }, body: pdf });
+    assert.equal(created.status, 201);
+    ({ id, adminKey } = await created.json());
+    assert.match(id, /^[a-z0-9]{24}$/);
+
+    // un signataire sans cookie ouvre le lien de partage et lit le contenu chiffré
+    assert.equal((await get('/signature/' + id)).status, 200);
+    const info = await (await get('/api/share/' + id)).json();
+    assert.equal(info.layers, 0);
+    const orig = new Uint8Array(await (await get('/api/share/' + id + '/original')).arrayBuffer());
+    assert.deepEqual([...orig], [...pdf]);
+
+    const layer = await fetch(BASE + '/api/share/' + id + '/layers', { method: 'POST', body: new Uint8Array(30).fill(9) });
+    assert.equal(layer.status, 201);
+    assert.equal((await layer.json()).n, 1);
+    assert.equal((await (await get('/api/share/' + id)).json()).layers, 1);
+
+    const wrong = await fetch(BASE + '/api/share/' + id, { method: 'DELETE', headers: { 'X-Admin-Key': 'x'.repeat(32) } });
+    assert.equal(wrong.status, 403);
+    const del = await fetch(BASE + '/api/share/' + id, { method: 'DELETE', headers: { 'X-Admin-Key': adminKey } });
+    assert.ok(del.ok);
+    assert.equal((await get('/api/share/' + id)).status, 404);
+  });
+
+  await test('la déconnexion efface le cookie', async () => {
+    const r = await get('/logout', { Cookie: cookie });
+    assert.equal(r.status, 303);
+    assert.match(r.headers.get('set-cookie'), /Max-Age=0/);
+  });
+
+  await test('limitation : les essais répétés de mot de passe finissent en 429', async () => {
+    const codes = [];
+    for (let i = 0; i < 8; i++) {
+      const r = await fetch(BASE + '/login', { method: 'POST', redirect: 'manual', body: new URLSearchParams({ password: 'faux' + i, next: '/' }) });
+      codes.push(r.status);
+    }
+    assert.ok(codes.includes(429), 'aucun 429 dans ' + codes.join(','));
+  });
+} finally {
+  stop();
+}
+console.log(`\n${passed} réussi(s), ${failed} échec(s)`);
+process.exit(failed ? 1 : 0);

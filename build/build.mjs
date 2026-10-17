@@ -12,7 +12,7 @@ const site = join(root, 'site');
 const out = join(root, 'public');
 
 const LANGS = ['ar', 'de', 'en', 'es', 'eu', 'fr', 'it', 'gl', 'kab', 'nl', 'oc', 'pl', 'ro', 'ta', 'tr'];
-const PAGES = ['index', 'signature', 'signature-shared', 'organization', 'metadata'];
+const PAGES = ['index', 'signature', 'signature-shared', 'organization', 'metadata', 'shares'];
 const SOURCE_URL = process.env.SOURCE_URL || 'https://github.com/TON-COMPTE/signaturepdf-cloudflare';
 const BUILD_ID = process.env.BUILD_ID || Date.now().toString(36);
 

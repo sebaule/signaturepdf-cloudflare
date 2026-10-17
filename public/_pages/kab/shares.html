@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="kab" dir="ltr" style="direction: ltr;">
+<head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="/vendor/bootstrap.ltr.min.css?5.3.3" rel="stylesheet">
+<link href="/vendor/bootstrap-icons.min.css?1.11.3" rel="stylesheet">
+<link href="/css/app.css?mvc8rxl8" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon.png" />
+<style>
+    @font-face {
+        font-family: 'Caveat';
+        font-style: normal;
+        font-weight: 400;
+        src: url('/vendor/fonts/Caveat-Regular.ttf') format('truetype');
+    }
+
+    @font-face {
+        font-family: 'Tajawal';
+        font-style: normal;
+        font-weight: 400;
+        src: url('/vendor/fonts/Tajawal-Medium.ttf') format('truetype');
+    }
+</style>
+    <title>Signature PDF - Mes partages</title>
+    <meta name="robots" content="noindex">
+</head>
+<body>
+<noscript>
+    <div class="alert alert-danger text-center" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> Asmel ur iteddu ara ma yella ur yermid ara JavaScript    </div>
+</noscript>
+<div class="p-2 mb-3">
+    <nav class=" rounded pb-2 mx-auto position-relative">
+        <a class="link-dark" href="/"><img src="/logo-small.svg" alt="Logo de signature pdf" style="height: 42px; position: absolute;top: 6px;left: 8px;" />
+        <span class="d-none d-lg-inline" style="font-size: 15px; position: absolute;top: 10px;left: 56px;">Signature PDF</span>
+        <span class="opacity-50 d-none d-lg-inline" style="font-size: 12px; position: absolute;top: 30px;left: 56px;">Zmel rnu sqerdec ifuyla PDF akken i k⋅m-yehwa</span></a>
+        <div class="dropdown position-absolute top-0 end-0 mt-2 me-2">
+            <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class='bi bi-translate'></i><span class="d-none d-lg-inline"> Tutlayt</span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                    <li><a class="dropdown-item" href="?lang=ar">العربية</a></li>
+                                    <li><a class="dropdown-item" href="?lang=de">Deutsch</a></li>
+                                    <li><a class="dropdown-item" href="?lang=en">English</a></li>
+                                    <li><a class="dropdown-item" href="?lang=es">Español</a></li>
+                                    <li><a class="dropdown-item" href="?lang=eu">Euskara</a></li>
+                                    <li><a class="dropdown-item" href="?lang=fr">Français</a></li>
+                                    <li><a class="dropdown-item" href="?lang=it">Italiano</a></li>
+                                    <li><a class="dropdown-item" href="?lang=gl">Galego</a></li>
+                                    <li><a class="dropdown-item" href="?lang=kab">Taqbaylit</a></li>
+                                    <li><a class="dropdown-item" href="?lang=nl">Nederlands</a></li>
+                                    <li><a class="dropdown-item" href="?lang=oc">Occitan</a></li>
+                                    <li><a class="dropdown-item" href="?lang=pl">Polski</a></li>
+                                    <li><a class="dropdown-item" href="?lang=ro">Română</a></li>
+                                    <li><a class="dropdown-item" href="?lang=ta">தமிழ்</a></li>
+                                    <li><a class="dropdown-item" href="?lang=tr">Türkçe</a></li>
+                            </ul>
+        </div>
+        <ul class="nav nav-pills justify-content-center pt-2">
+                        <li class="nav-item d-none d-sm-block">
+                <a class="nav-link " href="/"><i class="bi bi-search"></i><span class="d-none d-md-inline-block"></span></a>
+            </li>
+                        <li class="nav-item ">
+                <a class="nav-link " href="/signature"><i class="bi bi-vector-pen"></i> <span class="d-none d-md-inline-block">Zmel</span></a>
+            </li>
+                        <li class="nav-item">
+                <a class="nav-link " href="/organization"><i class="bi bi-ui-checks-grid"></i> <span class="d-none d-md-inline-block">Suddes</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link " href="/metadata"><i class="bi bi-tags"></i> <span class="d-none d-md-inline-block">Iɣefisefka</span></a>
+            </li>
+                        <li class="nav-item d-none" id="nav-shares">
+                <a class="nav-link active" href="/shares" data-cfx-title="nav_shares"><i class="bi bi-people-fill"></i> <span class="d-none d-md-inline-block" data-cfx="nav_shares"></span></a>
+            </li>
+            <li class="nav-item d-none" id="nav-logout">
+                <a class="nav-link" href="/logout" data-cfx-title="nav_logout"><i class="bi bi-box-arrow-right"></i> <span class="d-none d-md-inline-block" data-cfx="nav_logout"></span></a>
+            </li>
+        </ul>
+    </nav>
+</div>
+<div class="container pt-3 fullpage" style="max-width: 1000px;">
+    <h1 class="h4"><i class="bi bi-people-fill"></i> <span data-cfx="shares_title"></span></h1>
+    <p class="text-muted small" data-cfx="shares_help"></p>
+    <div id="shares-error" class="alert alert-warning d-none"></div>
+    <div id="shares-empty" class="alert alert-light border d-none" data-cfx="shares_empty"></div>
+    <div id="shares-list" class="row g-3"></div>
+</div>
+<footer class="text-center text-muted mb-2 mt-3 opacity-75 small">
+    <a href="https://github.com/24eme/signaturepdf?tab=readme-ov-file#signature-pdf-libre">Signature PDF</a> - D aseɣẓan ilelli n uɣbalu yeldin <span class="d-none d-md-inline">s turagt AGPL-3.0 : <a href="https://github.com/sebaule/signaturepdf-cloudflare">wali tangalt taɣbalut</a> (<a href="https://github.com/24eme/signaturepdf/tree/9e2811a">24eme/signaturepdf 9e2811a</a>)</span>
+</footer>
+<div class="modal" id="modalLoading" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-body text-center my-5 text-white fs-4">
+                <p></p>
+                <div class="spinner-border" role="status"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<span id="is_mobile" class="d-md-none"></span>
+<script src="/vendor/bootstrap.bundle.min.js?5.3.3"></script>
+<script src="/js/common.js?mvc8rxl8"></script>
+<script src="/js/cf-extras.js?mvc8rxl8"></script>
+<script>
+var REVERSE_PROXY_URL = "";
+var trad = {"Select this page":"Fren asebter-a","Delete this page":"Kkes asebter-a","Restore this page":"Err-d asebter-a","Move this page":"Senkez asebter-a","Move here":"Senkez \u0263er da","Turn this page":"Dewwe\u1e5b asebter-a","Download this page":"Sader asebter-a","Page":"Asebter"};
+</script>
+<script src="/js/cf-share.js?mvc8rxl8"></script>
+<script src="/js/cf-shares.js?mvc8rxl8"></script>
+</body>
+</html>

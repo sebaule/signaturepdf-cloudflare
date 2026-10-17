@@ -99,6 +99,19 @@ async function isAuthed(request, env) {
   return !!c && safeEqual(c, await authToken(env));
 }
 
+// Limitation des essais de mot de passe : binding « ratelimits » de Workers (LOGIN_LIMITER, voir wrangler.jsonc).
+// Absent (tests, ancien déploiement) = pas de limitation côté Worker ; la règle WAF Cloudflare du README reste utile.
+async function tooManyAttempts(env, request, scope) {
+  if (!env.LOGIN_LIMITER) return false;
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  try {
+    const { success } = await env.LOGIN_LIMITER.limit({ key: scope + ':' + ip });
+    return !success;
+  } catch (e) {
+    return false; // en cas d'erreur du limiteur, on ne bloque pas un utilisateur légitime
+  }
+}
+
 function loginPage(request, message, next, status = 200) {
   const fr = !/^en/i.test(request.headers.get('Accept-Language') || 'fr');
   const t = fr
@@ -120,6 +133,10 @@ async function handleLogin(request, env, url) {
   if (!env.SHARE_PASSWORD) return Response.redirect(new URL('/', url), 302);
   if (request.method === 'POST') {
     let given = '', next = '/';
+    if (await tooManyAttempts(env, request, 'login')) {
+      const en = /^en/i.test(request.headers.get('Accept-Language') || '');
+      return loginPage(request, en ? 'Too many attempts, try again in a minute' : 'Trop de tentatives, réessaie dans une minute', '/', 429);
+    }
     try {
       const form = await request.formData();
       given = String(form.get('password') || '');
@@ -212,7 +229,9 @@ async function handleApi(request, env, url) {
 
   // GET /api/config
   if (parts[0] === 'config' && method === 'GET') {
-    return json({ passwordRequired: !!env.SHARE_PASSWORD && !(await isAuthed(request, env)), maxBytes: maxBytes - 64, maxLayers });
+    const gated = !!env.SHARE_PASSWORD;
+    const authed = gated && (await isAuthed(request, env));
+    return json({ passwordRequired: gated && !authed, gated, authed, maxBytes: maxBytes - 64, maxLayers });
   }
 
   if (parts[0] !== 'share') return json({ message: 'Introuvable' }, 404);
@@ -220,6 +239,7 @@ async function handleApi(request, env, url) {
   // POST /api/share  (création)
   if (parts.length === 1 && method === 'POST') {
     if (env.SHARE_PASSWORD && !(await isAuthed(request, env))) {
+      if (await tooManyAttempts(env, request, 'share')) return json({ message: 'Trop de tentatives' }, 429);
       const given = request.headers.get('X-Share-Password') || '';
       if (!safeEqual(await sha256Hex(given), await sha256Hex(env.SHARE_PASSWORD))) {
         return json({ message: 'Mot de passe de partage incorrect' }, 401);
@@ -367,7 +387,7 @@ export default {
         // Lien de partage : ouvert à qui possède le lien complet (id + clé dans le #)
         if (/^\/signature\/[a-z0-9]{10,64}\/?$/.test(path)) return servePage(request, env, url, 'signature-shared');
 
-        const toolPages = { '/': 'index', '/index.html': 'index', '/signature': 'signature', '/signature/': 'signature', '/organization': 'organization', '/metadata': 'metadata' };
+        const toolPages = { '/': 'index', '/index.html': 'index', '/signature': 'signature', '/signature/': 'signature', '/organization': 'organization', '/metadata': 'metadata', '/shares': 'shares' };
         if (toolPages[path]) {
           if (!(await isAuthed(request, env))) {
             return Response.redirect(new URL('/login?next=' + encodeURIComponent(path === '/index.html' ? '/' : path), url), 303);

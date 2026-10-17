@@ -36,7 +36,7 @@ npx wrangler kv namespace create BLOBS
 # 3) Création des tables
 npm run db:migrate
 
-# 4) (recommandé) mot de passe pour CRÉER un partage : les signataires n'en ont pas besoin
+# 4) (recommandé) mot de passe d'accès au site : sans lui, tout le monde peut utiliser le site
 npx wrangler secret put SHARE_PASSWORD
 
 # 5) Lien « code source » du pied de page = ton dépôt GitHub (obligation de la licence AGPL)
@@ -50,11 +50,30 @@ Le site est alors disponible sur `https://signaturepdf.<ton-sous-domaine>.worker
 Pour ton propre domaine : *Workers & Pages → signaturepdf → Settings → Domains & Routes → Add → Custom domain*
 (le domaine doit être géré par Cloudflare), par exemple `signature.ton-domaine.fr`.
 
+### Accès protégé par mot de passe
+
+Quand le secret `SHARE_PASSWORD` est défini (dans Cloudflare : *Workers & Pages → ton Worker → Settings → Variables and Secrets*, **zone Runtime**, type **Secret**) :
+
+| | Mot de passe demandé ? |
+|---|---|
+| Pages Signer / Organiser / Métadonnées / Mes partages | **oui** (page `/login`, session de 30 jours, lien « Se déconnecter » dans le menu) |
+| Création d'un partage | **oui** (la session suffit) |
+| Lien de partage `/signature/<id>#<clé>` : ouverture, signature, téléchargement | non : il faut le lien complet (identifiant + clé de chiffrement) |
+| Suppression d'un partage | clé d'administration, conservée dans le navigateur du créateur |
+| Fichiers statiques (scripts, styles) | non (c'est du code public) |
+
+Sans `SHARE_PASSWORD`, le site est ouvert à tous. Vérification : `/api/config` doit répondre `"gated":true`.
+
+### Limitation des essais de mot de passe
+
+- **Dans le Worker** : le binding `ratelimits` (`LOGIN_LIMITER` dans `wrangler.jsonc`) limite à 5 essais par minute et par adresse IP sur `/login` et sur la création de partage par mot de passe (réponse 429).
+- **En plus, côté Cloudflare** (recommandé, gratuit) : *Sécurité → WAF → Règles de limitation de débit* → URI path = `/login` (méthode POST), 10 requêtes / 1 min par IP → Bloquer. Cette règle s'applique avant même que le Worker ne s'exécute.
+- Choisis un mot de passe long (≥ 16 caractères) : il ne se change que dans Cloudflare.
+
 ### Sécurité : à faire en plus (gratuit)
 
-1. **`SHARE_PASSWORD`** (étape 4) : sans lui, n'importe qui connaissant l'URL peut déposer des PDF chez toi (jusqu'aux limites ci-dessous).
-2. **Règle de limitation de débit** : *Sécurité → WAF → Règles de limitation de débit* → URI path = `/api/share`, méthode POST, 5 requêtes / 10 s par IP → Bloquer.
-3. Garde ton dépôt **public** si tu modifies le code (AGPL) et ne commite jamais de secret : `SHARE_PASSWORD` vit dans Cloudflare, pas dans les fichiers.
+1. **`SHARE_PASSWORD`** (étape 4) : sans lui, n'importe qui connaissant l'URL peut utiliser le site et déposer des PDF chez toi (jusqu'aux limites ci-dessous).
+2. Garde ton dépôt **public** si tu modifies le code (AGPL) et ne commite jamais de secret : `SHARE_PASSWORD` vit dans Cloudflare, pas dans les fichiers.
 
 ### Limites du plan gratuit (largement suffisantes pour un usage perso / associatif)
 
@@ -69,17 +88,24 @@ Pour ton propre domaine : *Workers & Pages → signaturepdf → Settings → Dom
 
 Ajustables dans `wrangler.jsonc` (`vars`).
 
+## Fonctions pratiques
+
+- **Mes partages** (`/shares`) : liste des documents partagés ou ouverts depuis ce navigateur (nom déchiffré sur place, nombre de signatures, expiration), avec copie du lien, e-mail, SMS, QR code et suppression. La liste est propre à l'appareil : les clés ne quittent jamais le navigateur.
+- **QR code, e-mail, SMS** dans la fenêtre de partage : le QR code est généré dans le navigateur (bibliothèque `qrcode-generator`, MIT, livrée dans `site/public/vendor`).
+- **Se déconnecter** : dans le menu, visible quand le site est protégé.
+
 ## Développer en local
 
 ```bash
 npm install
 npm run db:migrate:local
 npm run dev            # http://127.0.0.1:8787
-npm test               # tests unitaires (chiffrement, fusion de calques avec rotation de page)
-BASE=http://127.0.0.1:8787 npm test   # + aller-retour complet avec le Worker (ajoute PW=... si SHARE_PASSWORD est défini)
+npm test               # chiffrement + placement des signatures, puis tests d'intégration du Worker (lance wrangler dev tout seul)
 ```
 
-Les pages HTML (15 langues × 5 pages) sont générées à partir des gabarits PHP d'origine (`site/templates`) par `npm run build`
+Les tests tournent aussi sur GitHub à chaque envoi (`.github/workflows/tests.yml`) : génération des pages dans les 15 langues, tests de `cf-share.js` et du Worker (verrouillage, cycle de partage, limitation des essais).
+
+Les pages HTML (15 langues × 6 pages) sont générées à partir des gabarits PHP d'origine (`site/templates`) par `npm run build`
 (nécessite `php-cli`, uniquement pour ce build). Le dossier `public/` généré est versionné : **tu n'as pas besoin de PHP pour déployer**.
 
 ## Différences avec Signature PDF d'origine

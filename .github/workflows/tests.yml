@@ -1,0 +1,35 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Outils nécessaires aux tests (PHP pour générer les pages, poppler et Pillow pour vérifier le placement des signatures)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends php-cli poppler-utils python3-pil
+
+      - run: npm ci
+
+      - name: Les gabarits se génèrent dans les 15 langues
+        run: node build/build.mjs
+
+      - name: Tests de cf-share.js (chiffrement, placement des signatures sur pages pivotées)
+        run: node test/cf-share.test.mjs
+
+      - name: Tests du Worker (verrouillage, cycle de partage, limitation des essais)
+        run: node test/worker.test.mjs

@@ -295,6 +295,12 @@
                         <button onclick="navigator.clipboard.writeText(document.getElementById('input-share-link').value); this.innerText = '<?php echo _('Copied !'); ?>';" autofocus="autofocus" class="btn btn-primary" type="button" id="btn-copy-share-link"><i class="bi bi-clipboard"></i> <?php echo _('Copy'); ?></button>
                     </div>
                     <script>document.querySelector('#input-share-link').value = document.location.href;</script>
+                    <div class="d-flex flex-wrap gap-2 justify-content-center mb-3">
+                        <a id="share-mail" class="btn btn-outline-dark btn-sm" href="#"><i class="bi bi-envelope"></i> <span data-cfx="send_email"></span></a>
+                        <a id="share-sms" class="btn btn-outline-dark btn-sm" href="#"><i class="bi bi-chat-dots"></i> <span data-cfx="send_sms"></span></a>
+                    </div>
+                    <div id="share-qr" class="mx-auto mb-2" style="max-width: 200px;"></div>
+                    <p class="small text-muted text-center" data-cfx="qr_hint"></p>
                     <p class="mb-0"><?php echo _("Each of the signatories can download the latest version of the signed PDF at any time."); ?></p>
                 </div>
                 <div class="modal-footer text-start">

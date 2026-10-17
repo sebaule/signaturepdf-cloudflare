@@ -89,6 +89,7 @@ $map = [
     'signature-shared' => ['signature.html.php',    ['activeTab' => 'sign', 'hash' => 'HASH', 'isPdfEncrypted' => true]],
     'organization'     => ['organization.html.php', ['activeTab' => 'organize']],
     'metadata'         => ['metadata.html.php',     ['activeTab' => 'metadata']],
+    'shares'           => ['shares.html.php',       ['activeTab' => 'shares']],
 ];
 if (!isset($map[$page])) { fwrite(STDERR, "page inconnue: $page\n"); exit(1); }
 

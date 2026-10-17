@@ -7,3 +7,5 @@ Modifications apportées :
 - Chiffrement AES-GCM et assemblage des PDF dans le navigateur (site/public/js/cf-share.js).
 - Adaptation de signature.js et des gabarits (site/templates) ; suppression de la compression PDF et de l'OCR.
 - Génération statique des pages par langue (build/).
+
+Composant tiers ajouté : qrcode-generator 1.4.4 (Kazuhiko Arase, licence MIT) — site/public/vendor/qrcode.js.
