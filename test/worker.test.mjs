@@ -156,6 +156,18 @@ try {
     for (const x of [a, b, c]) await fetch(BASE + '/api/share/' + x.id, { method: 'DELETE', headers: { 'X-Admin-Key': x.adminKey } });
   });
 
+  await test('diagnostic des notifications : statut, test d’envoi, accès réservé aux sessions connectées', async () => {
+    assert.equal((await fetch(BASE + '/api/notify/status')).status, 401);
+    assert.equal((await fetch(BASE + '/api/notify/test', { method: 'POST' })).status, 401);
+    const before = gotifyMessages.length;
+    const t = await (await fetch(BASE + '/api/notify/test', { method: 'POST', headers: { Cookie: cookie } })).json();
+    assert.equal(t.ok, true); assert.equal(t.status, 200);
+    assert.equal(gotifyMessages.length, before + 1);
+    assert.deepEqual(Object.keys(gotifyMessages[before].body).sort(), ['message', 'priority', 'title']);
+    const st = await (await fetch(BASE + '/api/notify/status', { headers: { Cookie: cookie } })).json();
+    assert.equal(st.available, true); assert.equal(st.last.outcome, 'test-sent');
+  });
+
   await test('la déconnexion efface le cookie', async () => {
     const r = await get('/logout', { Cookie: cookie });
     assert.equal(r.status, 303);

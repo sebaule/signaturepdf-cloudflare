@@ -18,6 +18,11 @@
     <div id="shares-error" class="alert alert-warning d-none"></div>
     <div id="shares-empty" class="alert alert-light border d-none" data-cfx="shares_empty"></div>
     <div id="shares-list" class="row g-3"></div>
+    <div id="notify-panel" class="card card-body mt-4 d-none">
+        <h2 class="h6 mb-2"><i class="bi bi-bell"></i> <span data-cfx="notify_diag_title"></span></h2>
+        <p id="notify-last" class="small text-muted mb-2"></p>
+        <div><button id="notify-test" type="button" class="btn btn-sm btn-outline-dark"><i class="bi bi-send"></i> <span data-cfx="notify_test"></span></button> <span id="notify-result" class="small ms-2"></span></div>
+    </div>
 </div>
 <?php include('components/footer.html.php'); ?>
 <?php include('components/common.html.php'); ?>

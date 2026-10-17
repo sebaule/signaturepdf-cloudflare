@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="/vendor/bootstrap.ltr.min.css?5.3.3" rel="stylesheet">
 <link href="/vendor/bootstrap-icons.min.css?1.11.3" rel="stylesheet">
-<link href="/css/app.css?mvcqmk07" rel="stylesheet">
+<link href="/css/app.css?mvctbf8s" rel="stylesheet">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png" />
 <style>
@@ -86,11 +86,16 @@
     <div id="shares-error" class="alert alert-warning d-none"></div>
     <div id="shares-empty" class="alert alert-light border d-none" data-cfx="shares_empty"></div>
     <div id="shares-list" class="row g-3"></div>
+    <div id="notify-panel" class="card card-body mt-4 d-none">
+        <h2 class="h6 mb-2"><i class="bi bi-bell"></i> <span data-cfx="notify_diag_title"></span></h2>
+        <p id="notify-last" class="small text-muted mb-2"></p>
+        <div><button id="notify-test" type="button" class="btn btn-sm btn-outline-dark"><i class="bi bi-send"></i> <span data-cfx="notify_test"></span></button> <span id="notify-result" class="small ms-2"></span></div>
+    </div>
 </div>
 <footer class="text-center text-muted mb-2 mt-3 opacity-75 small">
     <a href="https://github.com/24eme/signaturepdf?tab=readme-ov-file#signature-pdf-libre">Signature PDF</a> - Kode irekiko software librea <span class="d-none d-md-inline">AGPL-3.0 lizentziapean : <a href="https://github.com/TON-COMPTE/signaturepdf-cloudflare">ikusi iturburu-kodea</a> (<a href="https://github.com/24eme/signaturepdf/tree/9e2811a">24eme/signaturepdf 9e2811a</a>)</span>
 </footer>
-<script src="/js/cf-extras.js?mvcqmk07"></script>
+<script src="/js/cf-extras.js?mvctbf8s"></script>
 <div class="modal" id="modalLoading" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content bg-transparent border-0">
@@ -103,12 +108,12 @@
 </div>
 <span id="is_mobile" class="d-md-none"></span>
 <script src="/vendor/bootstrap.bundle.min.js?5.3.3"></script>
-<script src="/js/common.js?mvcqmk07"></script>
+<script src="/js/common.js?mvctbf8s"></script>
 <script>
 var REVERSE_PROXY_URL = "";
 var trad = {"Select this page":"Hautatu orri hau","Delete this page":"Ezabatu orri hau","Restore this page":"Berrezarri orri hau","Move this page":"Mugitu orri hau","Move here":"Mugitu hona","Turn this page":"Biratu orri hau","Download this page":"Deskargatu orri hau","Page":"Orri"};
 </script>
-<script src="/js/cf-share.js?mvcqmk07"></script>
-<script src="/js/cf-shares.js?mvcqmk07"></script>
+<script src="/js/cf-share.js?mvctbf8s"></script>
+<script src="/js/cf-shares.js?mvctbf8s"></script>
 </body>
 </html>

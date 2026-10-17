@@ -163,7 +163,46 @@
         return col;
     }
 
+    // Diagnostic des notifications : dernier événement enregistré par le serveur + bouton de test
+    async function setupNotifyPanel() {
+        const panel = doc.getElementById('notify-panel');
+        if (!panel) return;
+        let st;
+        try {
+            const r = await fetch('/api/notify/status', { cache: 'no-store' });
+            if (!r.ok) return;
+            st = await r.json();
+        } catch (e) { return; }
+        if (!st.available) return;
+        panel.classList.remove('d-none');
+        const last = doc.getElementById('notify-last');
+        const describe = function (l) {
+            if (!l) return CFX.t('notify_none_yet');
+            const when = new Date(l.at * 1000).toLocaleString(doc.documentElement.lang || undefined, { dateStyle: 'short', timeStyle: 'medium' });
+            const key = { sent: 'notify_out_sent', failed: 'notify_out_failed', 'no-config': 'notify_out_no_config', 'below-threshold': 'notify_out_below', 'test-sent': 'notify_out_test_sent', 'test-failed': 'notify_out_test_failed' }[l.outcome] || l.outcome;
+            let txt = when + ' : ' + CFX.t(key);
+            if (typeof l.total === 'number') txt += ' (' + l.total + ' ' + CFX.t('signatures') + ')';
+            if (l.outcome === 'failed' || l.outcome === 'test-failed') txt += ' — HTTP ' + l.status + (l.detail ? ' ' + l.detail : '');
+            return CFX.t('notify_last', txt);
+        };
+        last.textContent = describe(st.last);
+        const btn = doc.getElementById('notify-test'), res = doc.getElementById('notify-result');
+        btn.addEventListener('click', async function () {
+            btn.disabled = true; res.textContent = CFX.t('notify_testing'); res.className = 'small ms-2 text-muted';
+            try {
+                const r = await fetch('/api/notify/test', { method: 'POST' });
+                const j = await r.json();
+                if (j.ok) { res.textContent = CFX.t('notify_ok'); res.className = 'small ms-2 text-success'; }
+                else { res.textContent = CFX.t('notify_ko') + ' — HTTP ' + (j.status || '?') + (j.detail ? ' ' + j.detail : ''); res.className = 'small ms-2 text-danger'; }
+                const s2 = await (await fetch('/api/notify/status', { cache: 'no-store' })).json();
+                last.textContent = describe(s2.last);
+            } catch (e) { res.textContent = CFX.t('notify_ko') + ' — ' + e.message; res.className = 'small ms-2 text-danger'; }
+            btn.disabled = false;
+        });
+    }
+
     async function main() {
+        setupNotifyPanel();
         const list = doc.getElementById('shares-list');
         const empty = doc.getElementById('shares-empty');
         const error = doc.getElementById('shares-error');

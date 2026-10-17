@@ -223,22 +223,38 @@ async function readBody(request, max) {
 // Le message ne contient jamais le nom du fichier (il est chiffré) : seulement le nombre de signatures.
 const NOTIFY_RE = /^(none|each|count:[1-9][0-9]{0,2})$/;
 function notifyAvailable(env) { return /^https?:\/\//i.test(env.GOTIFY_URL || '') && !!env.GOTIFY_TOKEN; }
-async function notifySignature(env, origin, id, total) {
+// Envoie un message au serveur Gotify. Ne lève jamais d'exception : retourne { ok, status, detail }.
+async function sendGotify(env, message) {
+  try {
+    const base = env.GOTIFY_URL.replace(/\/+$/, '').replace(/\/message$/, '');
+    const r = await fetch(base + '/message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Gotify-Key': env.GOTIFY_TOKEN },
+      body: JSON.stringify({ title: 'Signature PDF', message, priority: 5 }),
+      signal: AbortSignal.timeout(8000),
+    });
+    let detail = '';
+    if (!r.ok) { try { detail = (await r.text()).slice(0, 200); } catch (_) { /* ignore */ } }
+    return { ok: r.ok, status: r.status, detail };
+  } catch (e) {
+    return { ok: false, status: 0, detail: String(e).slice(0, 200) };
+  }
+}
+// Garde la trace du dernier envoi pour pouvoir diagnostiquer (visible dans Mes partages, jamais de secret dedans).
+async function rememberNotify(env, entry) {
+  try { await env.BLOBS.put('notify:last', JSON.stringify({ at: Math.floor(Date.now() / 1000), ...entry }), { expirationTtl: 7 * 86400 }); } catch (_) { /* ignore */ }
+}
+async function notifySignature(env, id, total) {
   try {
     if (!notifyAvailable(env)) return;
     const cfg = await env.BLOBS.get(`n:${id}`, 'json');
-    if (!cfg) return;
+    if (!cfg) return rememberNotify(env, { outcome: 'no-config', total });
     let message = null;
     if (cfg.mode === 'each') message = total === 1 ? 'Nouvelle signature reçue (1 au total).' : `Nouvelle signature reçue (${total} au total).`;
     else if (cfg.mode === 'count' && total === cfg.n) message = `${total} signature(s) reçue(s) : le seuil que vous aviez fixé est atteint.`;
-    if (!message) return;
-    const r = await fetch(env.GOTIFY_URL.replace(/\/+$/, '') + '/message', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Gotify-Key': env.GOTIFY_TOKEN },
-      body: JSON.stringify({ title: 'Signature PDF', message, priority: 5, extras: { 'client::notification': { click: { url: origin + '/shares' } } } }),
-      signal: AbortSignal.timeout(5000),
-    });
-    if (!r.ok) console.error('gotify', r.status);
+    if (!message) return rememberNotify(env, { outcome: 'below-threshold', total, mode: cfg.mode, n: cfg.n });
+    const r = await sendGotify(env, message);
+    await rememberNotify(env, { outcome: r.ok ? 'sent' : 'failed', total, mode: cfg.mode, status: r.status, detail: r.detail });
   } catch (e) { console.error('gotify', String(e)); }
 }
 
@@ -255,6 +271,22 @@ async function handleApi(request, env, url, ctx) {
     const gated = !!env.SHARE_PASSWORD;
     const authed = gated && (await isAuthed(request, env));
     return json({ passwordRequired: gated && !authed, gated, authed, maxBytes: maxBytes - 64, maxLayers, notify: notifyAvailable(env) });
+  }
+
+  // Diagnostic des notifications (réservé à une session connectée quand le site est verrouillé)
+  if (parts[0] === 'notify' && parts.length === 2) {
+    if (env.SHARE_PASSWORD && !(await isAuthed(request, env))) return json({ message: 'Non autorisé' }, 401);
+    if (parts[1] === 'status' && method === 'GET') {
+      let last = null;
+      try { last = await env.BLOBS.get('notify:last', 'json'); } catch (_) { /* ignore */ }
+      return json({ available: notifyAvailable(env), last });
+    }
+    if (parts[1] === 'test' && method === 'POST') {
+      if (!notifyAvailable(env)) return json({ ok: false, status: 0, detail: 'GOTIFY_URL ou GOTIFY_TOKEN manquant (ou adresse non http/https)' });
+      const r = await sendGotify(env, 'Notification de test envoyée depuis Signature PDF.');
+      await rememberNotify(env, { outcome: r.ok ? 'test-sent' : 'test-failed', status: r.status, detail: r.detail });
+      return json(r);
+    }
   }
 
   if (parts[0] !== 'share') return json({ message: 'Introuvable' }, 404);
@@ -352,7 +384,7 @@ async function handleApi(request, env, url, ctx) {
       env.DB.prepare('SELECT layers AS n FROM shares WHERE id = ?1').bind(id),
     ]);
     const total = res[2].results[0].n;
-    if (ctx) ctx.waitUntil(notifySignature(env, url.origin, id, total));
+    if (ctx) ctx.waitUntil(notifySignature(env, id, total));
     return json({ n: total }, 201);
   }
 
