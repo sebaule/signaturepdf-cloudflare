@@ -112,11 +112,20 @@
                 try { await root.navigator.clipboard.writeText(link); copy.lastChild.textContent = ' ' + CFX.t('copied'); } catch (e) { /* ignore */ }
             });
             actions.appendChild(copy);
+            const copyMsg = button('bi-chat-left-text', CFX.t('copy_message'));
+            copyMsg.addEventListener('click', async function () {
+                try {
+                    await root.navigator.clipboard.writeText(CFX.shareMessage(link, info.filename || ''));
+                    copyMsg.lastChild.textContent = ' ' + CFX.t('copied');
+                    setTimeout(function () { copyMsg.lastChild.textContent = ' ' + CFX.t('copy_message'); }, 1800);
+                } catch (e) { /* ignore */ }
+            });
+            actions.appendChild(copyMsg);
             const wa = linkButton('bi-whatsapp', 'WhatsApp', CFX.waHref(link, info.filename || ''));
             wa.target = '_blank'; wa.rel = 'noopener';
             actions.appendChild(wa);
             actions.appendChild(linkButton('bi-envelope', CFX.t('send_email'), CFX.mailtoHref(link, info.filename || '')));
-            actions.appendChild(linkButton('bi-chat-dots', CFX.t('send_sms'), CFX.smsHref(link)));
+            actions.appendChild(linkButton('bi-chat-dots', CFX.t('send_sms'), CFX.smsHref(link, info.filename || '')));
             const qr = button('bi-qr-code', CFX.t('show_qr'));
             let shown = false;
             qr.addEventListener('click', async function () {
