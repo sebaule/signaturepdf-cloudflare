@@ -227,17 +227,25 @@ function notifyAvailable(env) { return /^https?:\/\//i.test(env.GOTIFY_URL || ''
 async function sendGotify(env, message) {
   try {
     const base = env.GOTIFY_URL.replace(/\/+$/, '').replace(/\/message$/, '');
-    const r = await fetch(base + '/message', {
+    const init = () => ({
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Gotify-Key': env.GOTIFY_TOKEN },
       body: JSON.stringify({ title: 'Signature PDF', message, priority: 5 }),
       signal: AbortSignal.timeout(8000),
     });
+    let r = null, via = 'http', bindingStatus = 0;
+    // Liaison de service vers le Worker « notify » (facultative) : un appel Worker -> adresse publique du même compte
+    // peut échouer (erreur 522), alors que la liaison de service passe directement, sans réseau.
+    if (env.NOTIFY) {
+      try { r = await env.NOTIFY.fetch(base + '/message', init()); via = 'binding'; } catch (_) { r = null; }
+      if (r && r.status >= 500) { bindingStatus = r.status; r = null; } // liaison indisponible : on retente par l'adresse publique
+    }
+    if (!r) { r = await fetch(base + '/message', init()); via = bindingStatus ? 'http (liaison : ' + bindingStatus + ')' : 'http'; }
     let detail = '';
     if (!r.ok) { try { detail = (await r.text()).slice(0, 200); } catch (_) { /* ignore */ } }
-    return { ok: r.ok, status: r.status, detail };
+    return { ok: r.ok, status: r.status, detail, via };
   } catch (e) {
-    return { ok: false, status: 0, detail: String(e).slice(0, 200) };
+    return { ok: false, status: 0, detail: String(e).slice(0, 200), via: 'http' };
   }
 }
 // Garde la trace du dernier envoi pour pouvoir diagnostiquer (visible dans Mes partages, jamais de secret dedans).
@@ -254,7 +262,7 @@ async function notifySignature(env, id, total) {
     else if (cfg.mode === 'count' && total === cfg.n) message = `${total} signature(s) reçue(s) : le seuil que vous aviez fixé est atteint.`;
     if (!message) return rememberNotify(env, { outcome: 'below-threshold', total, mode: cfg.mode, n: cfg.n });
     const r = await sendGotify(env, message);
-    await rememberNotify(env, { outcome: r.ok ? 'sent' : 'failed', total, mode: cfg.mode, status: r.status, detail: r.detail });
+    await rememberNotify(env, { outcome: r.ok ? 'sent' : 'failed', total, mode: cfg.mode, status: r.status, detail: r.detail, via: r.via });
   } catch (e) { console.error('gotify', String(e)); }
 }
 
@@ -284,7 +292,7 @@ async function handleApi(request, env, url, ctx) {
     if (parts[1] === 'test' && method === 'POST') {
       if (!notifyAvailable(env)) return json({ ok: false, status: 0, detail: 'GOTIFY_URL ou GOTIFY_TOKEN manquant (ou adresse non http/https)' });
       const r = await sendGotify(env, 'Notification de test envoyée depuis Signature PDF.');
-      await rememberNotify(env, { outcome: r.ok ? 'test-sent' : 'test-failed', status: r.status, detail: r.detail });
+      await rememberNotify(env, { outcome: r.ok ? 'test-sent' : 'test-failed', status: r.status, detail: r.detail, via: r.via });
       return json(r);
     }
   }

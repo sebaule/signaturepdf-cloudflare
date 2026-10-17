@@ -183,6 +183,7 @@
             let txt = when + ' : ' + CFX.t(key);
             if (typeof l.total === 'number') txt += ' (' + l.total + ' ' + CFX.t('signatures') + ')';
             if (l.outcome === 'failed' || l.outcome === 'test-failed') txt += ' — HTTP ' + l.status + (l.detail ? ' ' + l.detail : '');
+            if (l.via) txt += ' [' + l.via + ']';
             return CFX.t('notify_last', txt);
         };
         last.textContent = describe(st.last);
@@ -193,7 +194,7 @@
                 const r = await fetch('/api/notify/test', { method: 'POST' });
                 const j = await r.json();
                 if (j.ok) { res.textContent = CFX.t('notify_ok'); res.className = 'small ms-2 text-success'; }
-                else { res.textContent = CFX.t('notify_ko') + ' — HTTP ' + (j.status || '?') + (j.detail ? ' ' + j.detail : ''); res.className = 'small ms-2 text-danger'; }
+                else { res.textContent = CFX.t('notify_ko') + ' — HTTP ' + (j.status || '?') + (j.detail ? ' ' + j.detail : '') + (j.via ? ' [' + j.via + ']' : ''); res.className = 'small ms-2 text-danger'; }
                 const s2 = await (await fetch('/api/notify/status', { cache: 'no-store' })).json();
                 last.textContent = describe(s2.last);
             } catch (e) { res.textContent = CFX.t('notify_ko') + ' — ' + e.message; res.className = 'small ms-2 text-danger'; }
