@@ -189,10 +189,19 @@ try {
     await cron();
     await waitFor(n1 + 1);
     assert.equal(gotifyMessages.length, n1 + 1, 'un seul partage concerné');
-    assert.match(gotifyMessages[n1].body.message, /expire dans moins de 24/);
+    assert.match(gotifyMessages[n1].body.message, /expire dans environ 1 h/);
     await cron();
     await pause();
     assert.equal(gotifyMessages.length, n1 + 1, 'pas de doublon à la passe suivante');
+
+    // le délai dépend de la durée choisie : un partage d'un jour n'est pas signalé tout de suite (alerte à 6 h de l'expiration)
+    const e = await (await create('expire', '86400')).json();
+    await pause();
+    const n1b = gotifyMessages.length;
+    await cron();
+    await pause();
+    assert.equal(gotifyMessages.length, n1b, 'un jour : trop tôt pour prévenir');
+    await fetch(BASE + '/api/share/' + e.id, { method: 'DELETE', headers: { 'X-Admin-Key': e.adminKey } });
 
     // durée : refusée sans clé d'administration ou invalide, sinon l'expiration est recalculée à partir de maintenant
     const dur = (id, key, body) => fetch(BASE + '/api/share/' + id + '/duration', { method: 'POST', headers: { 'X-Admin-Key': key, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });

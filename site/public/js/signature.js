@@ -1531,6 +1531,23 @@ function cfReadNotify() {
     return parts.length ? parts.join('+') : 'none';
 }
 
+// Délai d'alerte avant expiration : un quart de la durée choisie (1 h minimum, 7 jours maximum), comme le calcule le serveur
+function cfUpdateExpireLead() {
+    const sel = document.querySelector('select[name=duration]');
+    const box = document.getElementById('share_notify_expire');
+    const out = document.getElementById('share_expire_lead');
+    if (!sel || !box || !out) return;
+    const d = CF.durationToSeconds(sel.value);
+    box.disabled = d < 4 * 3600; // 1 heure : l'alerte partirait tout de suite, elle n'a pas de sens
+    if (box.disabled) box.checked = false;
+    const h = Math.max(1, Math.round(Math.min(Math.max(d / 4, 3600), 7 * 86400) / 3600));
+    out.textContent = box.disabled ? '(' + CFX.t('lead_off') + ')' : '(' + (h >= 48 ? CFX.t('lead_d', String(Math.round(h / 24))) : CFX.t('lead_h', String(h))) + ')';
+}
+document.addEventListener('DOMContentLoaded', function () {
+    const sel = document.querySelector('select[name=duration]');
+    if (sel) { sel.addEventListener('change', cfUpdateExpireLead); setTimeout(cfUpdateExpireLead, 300); }
+});
+
 function cfReadNotifyEvents() {
     const block = document.getElementById('share_notify_block');
     if (!block || block.classList.contains('d-none')) return '';

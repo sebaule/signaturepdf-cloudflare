@@ -223,7 +223,7 @@ async function readBody(request, max) {
 // Le message ne contient jamais le nom du fichier (il est chiffré) : seulement le nombre de signatures.
 // none | each | count:N (message final seul) | each+count:N (chaque signature + message final)
 const NOTIFY_RE = /^(none|each|count:[1-9][0-9]{0,2}|each\+count:[1-9][0-9]{0,2})$/;
-// Événements facultatifs : open (lien ouvert pour la première fois), expire (expire dans 24 h sans aucune signature)
+// Événements facultatifs : open (lien ouvert pour la première fois), expire (expiration proche sans aucune signature)
 const EVENTS_RE = /^(|open|expire|open,expire)$/;
 // Le drapeau « w » (alerte d'expiration encore à envoyer) est copié dans les métadonnées KV : le cron le retrouve avec un seul list().
 async function putNotifyCfg(env, id, cfg) {
@@ -289,7 +289,9 @@ async function notifyOpened(env, id) {
   } catch (e) { console.error('gotify', String(e)); }
 }
 
-/** Cron : prévient (une seule fois) quand un partage sans aucune signature expire dans moins de 24 h. 2 partages par passage au maximum (limite de sous-requêtes). */
+/** Cron : prévient (une seule fois) quand un partage sans aucune signature approche de son expiration :
+ *  délai d'alerte = un quart de la durée choisie, au moins 1 h et au plus 7 jours (1 mois -> 7 j, 1 semaine -> 42 h, 1 jour -> 6 h).
+ *  2 partages par passage au maximum (limite de sous-requêtes). */
 export async function warnExpiring(env) {
   if (!notifyAvailable(env)) return 0;
   let listed;
@@ -299,8 +301,9 @@ export async function warnExpiring(env) {
   const now = Math.floor(Date.now() / 1000);
   const ph = ids.map((_, i) => '?' + (i + 1)).join(',');
   const due = await env.DB.prepare(
-    `SELECT id FROM shares WHERE id IN (${ph}) AND layers = 0 AND expires_at > ?${ids.length + 1} AND expires_at <= ?${ids.length + 2} ORDER BY expires_at LIMIT 2`
-  ).bind(...ids, now, now + 86400).all();
+    `SELECT id, expires_at FROM shares WHERE id IN (${ph}) AND layers = 0 AND expires_at > ?${ids.length + 1}
+       AND expires_at - ?${ids.length + 1} <= MAX(3600, MIN(604800, duration / 4)) ORDER BY expires_at LIMIT 2`
+  ).bind(...ids, now).all();
   let sent = 0;
   for (const row of due.results) {
     try {
@@ -308,7 +311,9 @@ export async function warnExpiring(env) {
       if (!cfg || !cfg.expire || cfg.warned) continue;
       cfg.warned = true;
       await putNotifyCfg(env, row.id, cfg); // marqué avant l'envoi : pas de doublon à l'heure suivante
-      const r = await sendGotify(env, "Un partage expire dans moins de 24 h et n'a encore reçu aucune signature.");
+      const h = Math.max(1, Math.round((row.expires_at - now) / 3600));
+      const left = h >= 48 ? Math.round(h / 24) + ' jours' : h + ' h';
+      const r = await sendGotify(env, `Un partage expire dans environ ${left} et n'a encore reçu aucune signature.`);
       await rememberNotify(env, { outcome: r.ok ? 'sent' : 'failed', event: 'expire', status: r.status, detail: r.detail, via: r.via });
       sent++;
     } catch (e) { console.error('gotify', String(e)); }

@@ -156,7 +156,7 @@
 
                 // Durée : nouvelle expiration à partir de maintenant
                 const dur = button('bi-clock-history', CFX.t('change_duration'));
-                durRow = el('div', 'd-flex align-items-center gap-2 mt-2 flex-wrap');
+                durRow = el('div', 'align-items-center gap-2 mt-2 flex-wrap'); // pas de classe d-flex : son !important écraserait le masquage
                 durRow.style.display = 'none';
                 durRow.appendChild(el('span', 'small', CFX.t('duration_from_now')));
                 const sel = el('select', 'form-select form-select-sm w-auto');
@@ -166,7 +166,7 @@
                 durRow.appendChild(sel);
                 const ok = button('bi-check-lg', CFX.t('apply'), 'btn-dark');
                 durRow.appendChild(ok);
-                dur.addEventListener('click', function () { durRow.style.display = durRow.style.display === 'none' ? '' : 'none'; });
+                dur.addEventListener('click', function () { durRow.style.display = durRow.style.display === 'none' ? 'flex' : 'none'; });
                 ok.addEventListener('click', async function () {
                     ok.disabled = true;
                     try {
