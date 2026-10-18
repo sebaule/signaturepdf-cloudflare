@@ -34,7 +34,7 @@ const cookieFrom = (res) => (res.headers.get('set-cookie') || '').split(';')[0];
 // Le compteur de limitation est conservé sur disque : on le remet à zéro pour que deux exécutions rapprochées ne se gênent pas
 rmSync(join(root, '.wrangler', 'state', 'v3', 'ratelimit'), { recursive: true, force: true });
 execFileSync(process.execPath, [wrangler, 'd1', 'migrations', 'apply', 'signaturepdf', '--local'], { cwd: root, stdio: 'ignore' });
-const dev = spawn(process.execPath, [wrangler, 'dev', '--local', '--port', PORT, '--ip', '127.0.0.1', '--var', `SHARE_PASSWORD:${PW}`, '--var', `GOTIFY_URL:http://127.0.0.1:${GOTIFY_PORT}`, '--var', 'GOTIFY_TOKEN:jeton-test'], { cwd: root, stdio: process.env.TEST_DEBUG ? 'inherit' : 'ignore' });
+const dev = spawn(process.execPath, [wrangler, 'dev', '--local', '--test-scheduled', '--port', PORT, '--ip', '127.0.0.1', '--var', `SHARE_PASSWORD:${PW}`, '--var', `GOTIFY_URL:http://127.0.0.1:${GOTIFY_PORT}`, '--var', 'GOTIFY_TOKEN:jeton-test'], { cwd: root, stdio: process.env.TEST_DEBUG ? 'inherit' : 'ignore' });
 const stop = () => { try { dev.kill('SIGTERM'); } catch (e) { /* déjà arrêté */ } try { gotify.close(); } catch (e) { /* ignore */ } };
 process.on('exit', stop);
 
@@ -159,6 +159,66 @@ try {
     await sign(c.id);
     await new Promise((r) => setTimeout(r, 400));
     assert.equal(gotifyMessages.length, 6, 'aucune notification demandée');
+    for (const x of [a, b, c, d]) await fetch(BASE + '/api/share/' + x.id, { method: 'DELETE', headers: { 'X-Admin-Key': x.adminKey } });
+  });
+
+  await test('premier accès, alerte avant expiration, durée modifiable, duplication', async () => {
+    const create = (events, duration = '3600') => fetch(BASE + '/api/share', { method: 'POST', headers: { Cookie: cookie, 'X-Meta': 'bWV0YQ', 'X-Duration': duration, 'X-Notify': 'none', 'X-Notify-Events': events }, body: new Uint8Array(50).fill(7) });
+    const waitFor = async (n) => { for (let i = 0; i < 30 && gotifyMessages.length < n; i++) await new Promise((r) => setTimeout(r, 100)); };
+    const cron = () => fetch(BASE + '/cdn-cgi/handler/scheduled');
+    const pause = () => new Promise((r) => setTimeout(r, 600));
+    assert.equal((await create('n-importe-quoi')).status, 400);
+
+    // premier accès : un seul message, même si le lien est ouvert plusieurs fois
+    const a = await (await create('open')).json();
+    const n0 = gotifyMessages.length;
+    assert.equal((await fetch(BASE + '/api/share/' + a.id + '/opened', { method: 'POST' })).status, 200);
+    await waitFor(n0 + 1);
+    assert.equal(gotifyMessages.length, n0 + 1);
+    assert.match(gotifyMessages[n0].body.message, /première fois/);
+    await fetch(BASE + '/api/share/' + a.id + '/opened', { method: 'POST' });
+    await pause();
+    assert.equal(gotifyMessages.length, n0 + 1, 'pas de second message');
+
+    // alerte d'expiration : partage d'1 h sans signature -> prévenu une fois ; avec une signature -> jamais
+    const b = await (await create('expire')).json();
+    const c = await (await create('expire')).json();
+    await fetch(BASE + '/api/share/' + c.id + '/layers', { method: 'POST', body: new Uint8Array(30).fill(3) });
+    await pause();
+    const n1 = gotifyMessages.length;
+    await cron();
+    await waitFor(n1 + 1);
+    assert.equal(gotifyMessages.length, n1 + 1, 'un seul partage concerné');
+    assert.match(gotifyMessages[n1].body.message, /expire dans moins de 24/);
+    await cron();
+    await pause();
+    assert.equal(gotifyMessages.length, n1 + 1, 'pas de doublon à la passe suivante');
+
+    // durée : refusée sans clé d'administration ou invalide, sinon l'expiration est recalculée à partir de maintenant
+    const dur = (id, key, body) => fetch(BASE + '/api/share/' + id + '/duration', { method: 'POST', headers: { 'X-Admin-Key': key, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    assert.equal((await dur(b.id, 'mauvaise-cle', { duration: 86400 })).status, 403);
+    assert.equal((await dur(b.id, b.adminKey, { duration: 'abc' })).status, 400);
+    const now = Math.floor(Date.now() / 1000);
+    const ok = await (await dur(b.id, b.adminKey, { duration: 7 * 86400 })).json();
+    assert.ok(Math.abs(ok.expires - (now + 7 * 86400)) < 30);
+    assert.equal((await (await fetch(BASE + '/api/share/' + b.id)).json()).expires, ok.expires);
+    // 7 jours : plus dans la fenêtre de 24 h, puis ré-armée : raccourcie à 1 h, elle prévient de nouveau
+    await dur(b.id, b.adminKey, { duration: 3600 });
+    const n2 = gotifyMessages.length;
+    await cron();
+    await waitFor(n2 + 1);
+    assert.equal(gotifyMessages.length, n2 + 1, 'alerte ré-armée après changement de durée');
+
+    // duplication : nouveau lien, même document chiffré, sans signature
+    assert.equal((await fetch(BASE + '/api/share/' + c.id + '/duplicate', { method: 'POST', headers: { 'X-Admin-Key': 'mauvaise-cle' } })).status, 403);
+    const dup = await fetch(BASE + '/api/share/' + c.id + '/duplicate', { method: 'POST', headers: { 'X-Admin-Key': c.adminKey } });
+    assert.equal(dup.status, 201);
+    const d = await dup.json();
+    assert.notEqual(d.id, c.id);
+    assert.equal((await (await fetch(BASE + '/api/share/' + d.id)).json()).layers, 0, 'sans les signatures');
+    const o1 = new Uint8Array(await (await fetch(BASE + '/api/share/' + c.id + '/original')).arrayBuffer());
+    const o2 = new Uint8Array(await (await fetch(BASE + '/api/share/' + d.id + '/original')).arrayBuffer());
+    assert.deepEqual(o2, o1);
     for (const x of [a, b, c, d]) await fetch(BASE + '/api/share/' + x.id, { method: 'DELETE', headers: { 'X-Admin-Key': x.adminKey } });
   });
 

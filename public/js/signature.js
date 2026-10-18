@@ -1444,11 +1444,27 @@ const CF_PERM_TARGETS = {
     check: ['#radio_svg_check'],
     create: ['#btn-add-svg'],
 };
-async function cfApplyPolicy() {
-    if (!cfShared || !cfShared.perms) return;
+async function cfIsOwner() {
     let owner = false;
     try { owner = !!localStorage.getItem(cfShared.id + '.adminKey'); } catch (e) { /* ignore */ }
     if (!owner) { try { owner = !!(await CF.getConfig()).authed; } catch (e) { /* ignore */ } }
+    return owner;
+}
+// Prévient le serveur qu'un invité a ouvert le lien (une seule fois par navigateur) : sert à la notification « premier accès »
+async function cfPingOpened() {
+    try {
+        const flag = 'cfopened.' + cfShared.id;
+        if (localStorage.getItem(flag)) return;
+        if (await cfIsOwner()) return;
+        localStorage.setItem(flag, '1');
+        fetch('/api/share/' + cfShared.id + '/opened', { method: 'POST', keepalive: true }).catch(function () { /* ignore */ });
+    } catch (e) { /* ignore */ }
+}
+async function cfApplyPolicy() {
+    if (!cfShared) return;
+    cfPingOpened();
+    if (!cfShared.perms) return;
+    const owner = await cfIsOwner();
     if (owner) return;
     const perms = cfShared.perms;
     if (perms.dl === false) {
@@ -1506,10 +1522,22 @@ function cfReadPerms() {
 function cfReadNotify() {
     const block = document.getElementById('share_notify_block');
     if (!block || block.classList.contains('d-none')) return 'none';
-    const mode = (document.querySelector('input[name=share_notify]:checked') || {}).value || 'none';
-    if (mode !== 'count') return mode;
+    const each = document.getElementById('share_notify_each').checked;
+    const fin = document.getElementById('share_notify_final').checked;
     const n = parseInt(document.getElementById('share_notify_n').value, 10);
-    return Number.isFinite(n) && n >= 1 ? 'count:' + Math.min(n, 999) : 'each';
+    const parts = [];
+    if (each) parts.push('each');
+    if (fin && Number.isFinite(n) && n >= 1) parts.push('count:' + Math.min(n, 999));
+    return parts.length ? parts.join('+') : 'none';
+}
+
+function cfReadNotifyEvents() {
+    const block = document.getElementById('share_notify_block');
+    if (!block || block.classList.contains('d-none')) return '';
+    const ev = [];
+    if (document.getElementById('share_notify_open').checked) ev.push('open');
+    if (document.getElementById('share_notify_expire').checked) ev.push('expire');
+    return ev.join(',');
 }
 
 async function cfStartShare(btn) {
@@ -1534,6 +1562,7 @@ async function cfStartShare(btn) {
             layer: layer,
             perms: cfReadPerms(),
             notify: cfReadNotify(),
+            notifyEvents: cfReadNotifyEvents(),
         });
         try {
             localStorage.setItem(res.id + '.adminKey', res.adminKey);

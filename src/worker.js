@@ -223,6 +223,12 @@ async function readBody(request, max) {
 // Le message ne contient jamais le nom du fichier (il est chiffré) : seulement le nombre de signatures.
 // none | each | count:N (message final seul) | each+count:N (chaque signature + message final)
 const NOTIFY_RE = /^(none|each|count:[1-9][0-9]{0,2}|each\+count:[1-9][0-9]{0,2})$/;
+// Événements facultatifs : open (lien ouvert pour la première fois), expire (expire dans 24 h sans aucune signature)
+const EVENTS_RE = /^(|open|expire|open,expire)$/;
+// Le drapeau « w » (alerte d'expiration encore à envoyer) est copié dans les métadonnées KV : le cron le retrouve avec un seul list().
+async function putNotifyCfg(env, id, cfg) {
+  await env.BLOBS.put(`n:${id}`, JSON.stringify(cfg), { metadata: { w: cfg.expire && !cfg.warned ? 1 : 0 } });
+}
 function notifyAvailable(env) { return /^https?:\/\//i.test(env.GOTIFY_URL || '') && !!env.GOTIFY_TOKEN; }
 // Envoie un message au serveur Gotify. Ne lève jamais d'exception : retourne { ok, status, detail }.
 async function sendGotify(env, message) {
@@ -258,6 +264,7 @@ async function notifySignature(env, id, total) {
     if (!notifyAvailable(env)) return;
     const cfg = await env.BLOBS.get(`n:${id}`, 'json');
     if (!cfg) return rememberNotify(env, { outcome: 'no-config', total });
+    if (cfg.expire && !cfg.warned) { cfg.warned = true; await putNotifyCfg(env, id, cfg); } // une signature est arrivée : plus d'alerte d'expiration
     // Anciens réglages : { mode:'each' } ou { mode:'count', n }. Nouveaux : { each, n }.
     const each = cfg.each === true || cfg.mode === 'each';
     const n = Number.isInteger(cfg.n) && cfg.n > 0 ? cfg.n : 0;
@@ -268,6 +275,45 @@ async function notifySignature(env, id, total) {
     const r = await sendGotify(env, message);
     await rememberNotify(env, { outcome: r.ok ? 'sent' : 'failed', total, each, n, status: r.status, detail: r.detail, via: r.via });
   } catch (e) { console.error('gotify', String(e)); }
+}
+
+async function notifyOpened(env, id) {
+  try {
+    if (!notifyAvailable(env)) return;
+    const cfg = await env.BLOBS.get(`n:${id}`, 'json');
+    if (!cfg || !cfg.open || cfg.opened) return;
+    cfg.opened = true;
+    await putNotifyCfg(env, id, cfg); // marqué avant l'envoi : un seul message même si deux personnes ouvrent en même temps (à quelques secondes près)
+    const r = await sendGotify(env, "Le lien de partage vient d'être ouvert pour la première fois.");
+    await rememberNotify(env, { outcome: r.ok ? 'sent' : 'failed', event: 'open', status: r.status, detail: r.detail, via: r.via });
+  } catch (e) { console.error('gotify', String(e)); }
+}
+
+/** Cron : prévient (une seule fois) quand un partage sans aucune signature expire dans moins de 24 h. 2 partages par passage au maximum (limite de sous-requêtes). */
+export async function warnExpiring(env) {
+  if (!notifyAvailable(env)) return 0;
+  let listed;
+  try { listed = await env.BLOBS.list({ prefix: 'n:', limit: 1000 }); } catch (_) { return 0; }
+  const ids = listed.keys.filter((k) => k.metadata && k.metadata.w === 1).map((k) => k.name.slice(2)).filter((x) => ID_RE.test(x)).slice(0, 50);
+  if (!ids.length) return 0;
+  const now = Math.floor(Date.now() / 1000);
+  const ph = ids.map((_, i) => '?' + (i + 1)).join(',');
+  const due = await env.DB.prepare(
+    `SELECT id FROM shares WHERE id IN (${ph}) AND layers = 0 AND expires_at > ?${ids.length + 1} AND expires_at <= ?${ids.length + 2} ORDER BY expires_at LIMIT 2`
+  ).bind(...ids, now, now + 86400).all();
+  let sent = 0;
+  for (const row of due.results) {
+    try {
+      const cfg = await env.BLOBS.get(`n:${row.id}`, 'json');
+      if (!cfg || !cfg.expire || cfg.warned) continue;
+      cfg.warned = true;
+      await putNotifyCfg(env, row.id, cfg); // marqué avant l'envoi : pas de doublon à l'heure suivante
+      const r = await sendGotify(env, "Un partage expire dans moins de 24 h et n'a encore reçu aucune signature.");
+      await rememberNotify(env, { outcome: r.ok ? 'sent' : 'failed', event: 'expire', status: r.status, detail: r.detail, via: r.via });
+      sent++;
+    } catch (e) { console.error('gotify', String(e)); }
+  }
+  return sent;
 }
 
 async function handleApi(request, env, url, ctx) {
@@ -316,6 +362,8 @@ async function handleApi(request, env, url, ctx) {
     if (!META_RE.test(meta)) return json({ message: 'Métadonnées invalides' }, 400);
     const notify = request.headers.get('X-Notify') || 'none';
     if (!NOTIFY_RE.test(notify)) return json({ message: 'Option de notification invalide' }, 400);
+    const events = request.headers.get('X-Notify-Events') || '';
+    if (!EVENTS_RE.test(events)) return json({ message: 'Option de notification invalide' }, 400);
     let duration = parseInt(request.headers.get('X-Duration') || '', 10);
     if (!Number.isFinite(duration)) duration = 30 * 86400;
     duration = Math.min(Math.max(duration, 3600), 365 * 86400);
@@ -340,10 +388,10 @@ async function handleApi(request, env, url, ctx) {
       try { await env.BLOBS.delete(`o:${id}`); } catch (_) { /* ignore */ }
       return json({ message: 'Écriture impossible (quota Cloudflare atteint ?)' }, 503);
     }
-    if (notify !== 'none' && notifyAvailable(env)) {
+    if ((notify !== 'none' || events) && notifyAvailable(env)) {
       const m = /count:([0-9]+)$/.exec(notify);
-      const cfg = { each: notify.startsWith('each'), n: m ? parseInt(m[1], 10) : 0 };
-      try { await env.BLOBS.put(`n:${id}`, JSON.stringify(cfg)); } catch (_) { /* ignore */ }
+      const cfg = { each: notify.startsWith('each'), n: m ? parseInt(m[1], 10) : 0, open: events.includes('open'), expire: events.includes('expire') };
+      try { await putNotifyCfg(env, id, cfg); } catch (_) { /* ignore */ }
     }
     return json({ id, adminKey }, 201);
   }
@@ -367,6 +415,54 @@ async function handleApi(request, env, url, ctx) {
   // GET /api/share/:id
   if (parts.length === 2 && method === 'GET') {
     return json({ meta: share.meta, layers: share.layers, expires: share.expires_at });
+  }
+
+  // POST /api/share/:id/opened : appelé par la page de partage quand un invité l'ouvre (le propriétaire ne l'appelle pas)
+  if (parts.length === 3 && parts[2] === 'opened' && method === 'POST') {
+    if (ctx) ctx.waitUntil(notifyOpened(env, id));
+    return json({ ok: true });
+  }
+
+  // POST /api/share/:id/duration { duration } : nouvelle durée (en secondes) à partir de maintenant ; propriétaire seulement
+  if (parts.length === 3 && parts[2] === 'duration' && method === 'POST') {
+    if (!safeEqual(await sha256Hex(request.headers.get('X-Admin-Key') || ''), share.admin_hash)) return json({ message: 'Non autorisé' }, 403);
+    let d = NaN;
+    try { d = parseInt((await request.json()).duration, 10); } catch (_) { /* corps invalide */ }
+    if (!Number.isFinite(d)) return json({ message: 'Durée invalide' }, 400);
+    d = Math.min(Math.max(d, 3600), 365 * 86400);
+    const now = Math.floor(Date.now() / 1000);
+    await env.DB.prepare('UPDATE shares SET duration = ?2, expires_at = ?3 WHERE id = ?1').bind(id, d, now + d).run();
+    try { // une durée rallongée ré-arme l'alerte « expire dans 24 h »
+      const cfg = await env.BLOBS.get(`n:${id}`, 'json');
+      if (cfg && cfg.expire && cfg.warned && share.layers === 0) { cfg.warned = false; await putNotifyCfg(env, id, cfg); }
+    } catch (_) { /* ignore */ }
+    return json({ expires: now + d, duration: d });
+  }
+
+  // POST /api/share/:id/duplicate : nouveau partage du même document chiffré (même clé, sans les signatures) ; propriétaire seulement
+  if (parts.length === 3 && parts[2] === 'duplicate' && method === 'POST') {
+    if (!safeEqual(await sha256Hex(request.headers.get('X-Admin-Key') || ''), share.admin_hash)) return json({ message: 'Non autorisé' }, 403);
+    const now = Math.floor(Date.now() / 1000);
+    const count = await env.DB.prepare('SELECT COUNT(*) AS n FROM shares WHERE expires_at > ?1').bind(now).first();
+    if (count.n >= maxShares || (await usedBytes(env)) + share.size > totalBytes) return json({ message: 'Stockage plein, réessayez plus tard' }, 507);
+    const orig = await env.BLOBS.get(`o:${id}`, 'arrayBuffer');
+    if (!orig) return json({ message: 'Introuvable' }, 404);
+    const newId = randomString(24);
+    const newAdmin = randomString(32);
+    try {
+      await env.BLOBS.put(`o:${newId}`, orig);
+      await env.DB.prepare(
+        'INSERT INTO shares (id, admin_hash, meta, size, duration, layers, created_at, expires_at) VALUES (?1,?2,?3,?4,?5,0,?6,?7)'
+      ).bind(newId, await sha256Hex(newAdmin), share.meta, share.size, share.duration, now, now + share.duration).run();
+    } catch (e) {
+      try { await env.BLOBS.delete(`o:${newId}`); } catch (_) { /* ignore */ }
+      return json({ message: 'Écriture impossible (quota Cloudflare atteint ?)' }, 503);
+    }
+    try { // mêmes notifications que le partage d'origine, compteurs remis à zéro
+      const cfg = await env.BLOBS.get(`n:${id}`, 'json');
+      if (cfg && notifyAvailable(env)) await putNotifyCfg(env, newId, { each: !!cfg.each, n: cfg.n || 0, open: !!cfg.open, expire: !!cfg.expire });
+    } catch (_) { /* ignore */ }
+    return json({ id: newId, adminKey: newAdmin }, 201);
   }
 
   // GET /api/share/:id/original
@@ -430,7 +526,7 @@ async function deleteShare(env, id) {
 /** Purge des partages expirés. Budget d'opérations limité (plan gratuit : 50 sous-requêtes par exécution). */
 export async function purgeExpired(env) {
   const now = Math.floor(Date.now() / 1000);
-  let budget = 40;
+  let budget = 32; // le reste des 50 sous-requêtes est réservé à warnExpiring()
   const expired = await env.DB.prepare('SELECT id, layers FROM shares WHERE expires_at <= ?1 ORDER BY expires_at LIMIT 20').bind(now).all();
   budget -= 1;
   let purged = 0;
@@ -482,6 +578,6 @@ export default {
   },
 
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(purgeExpired(env));
+    ctx.waitUntil(warnExpiring(env).catch((e) => console.error('warn', String(e))).then(() => purgeExpired(env)));
   },
 };

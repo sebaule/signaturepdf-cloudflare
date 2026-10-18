@@ -117,7 +117,7 @@
     function durationToSeconds(v) { return DURATIONS[v] || 2592000; }
 
     /** Crée un partage. Retourne { id, adminKey, key }. */
-    async function createShare({ pdfBytes, filename, duration, password, layer, perms, notify }) {
+    async function createShare({ pdfBytes, filename, duration, password, layer, perms, notify, notifyEvents }) {
         const cfg = await getConfig();
         if (pdfBytes.length + 64 > cfg.maxBytes) throw new Error('too_big');
         const keyStr = generateKey();
@@ -129,6 +129,7 @@
             'X-Duration': String(durationToSeconds(duration)),
             'X-Meta': b64uEncode(encMeta),
             'X-Notify': notify || 'none',
+            'X-Notify-Events': notifyEvents || '',
         };
         if (password) headers['X-Share-Password'] = password;
         const r = await api('/share', { method: 'POST', headers, body: encPdf });

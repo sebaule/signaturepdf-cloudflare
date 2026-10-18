@@ -89,6 +89,7 @@
         head.appendChild(el('span', 'badge text-bg-' + (share.admin ? 'dark' : 'secondary') + ' flex-shrink-0', share.admin ? CFX.t('role_owner') : CFX.t('role_guest')));
         body.appendChild(head);
 
+        let durRow = null;
         const actions = el('div', 'd-flex flex-wrap gap-2 mt-3');
         const qrBox = el('div', 'mt-3 mx-auto d-none');
         qrBox.style.maxWidth = '200px';
@@ -152,6 +153,49 @@
                     }
                 });
                 actions.appendChild(del);
+
+                // Durée : nouvelle expiration à partir de maintenant
+                const dur = button('bi-clock-history', CFX.t('change_duration'));
+                durRow = el('div', 'd-flex align-items-center gap-2 mt-2 flex-wrap');
+                durRow.style.display = 'none';
+                durRow.appendChild(el('span', 'small', CFX.t('duration_from_now')));
+                const sel = el('select', 'form-select form-select-sm w-auto');
+                [3600, 86400, 604800, 2592000, 15552000, 31536000].forEach(function (sec) {
+                    const o = el('option', '', CFX.t('dur_' + sec)); o.value = String(sec); if (sec === 2592000) o.selected = true; sel.appendChild(o);
+                });
+                durRow.appendChild(sel);
+                const ok = button('bi-check-lg', CFX.t('apply'), 'btn-dark');
+                durRow.appendChild(ok);
+                dur.addEventListener('click', function () { durRow.style.display = durRow.style.display === 'none' ? '' : 'none'; });
+                ok.addEventListener('click', async function () {
+                    ok.disabled = true;
+                    try {
+                        const r = await fetch('/api/share/' + share.id + '/duration', { method: 'POST', headers: { 'X-Admin-Key': share.admin, 'Content-Type': 'application/json' }, body: JSON.stringify({ duration: parseInt(sel.value, 10) }) });
+                        if (!r.ok) throw new Error('duration_failed');
+                        const j = await r.json();
+                        meta.lastChild.textContent = ' ' + info.layers + ' ' + CFX.t('signatures') + ' · ' + expiryText(j.expires);
+                        durRow.style.display = 'none';
+                    } catch (e) { root.alert(CFX.t('duration_failed')); }
+                    ok.disabled = false;
+                });
+                actions.appendChild(dur);
+
+                // Dupliquer : nouveau partage du même document (même clé), sans les signatures
+                const dup = button('bi-copy', CFX.t('duplicate'));
+                dup.title = CFX.t('duplicate_hint');
+                dup.addEventListener('click', async function () {
+                    dup.disabled = true;
+                    try {
+                        const r = await fetch('/api/share/' + share.id + '/duplicate', { method: 'POST', headers: { 'X-Admin-Key': share.admin } });
+                        if (!r.ok) throw new Error('duplicate_failed');
+                        const j = await r.json();
+                        root.localStorage.setItem(j.id + '.adminKey', j.adminKey);
+                        root.localStorage.setItem('cfkey.' + j.id, share.key);
+                        root.localStorage.setItem('cfinfo.' + j.id, JSON.stringify({ filename: info.filename || '' }));
+                        root.location.reload();
+                    } catch (e) { dup.disabled = false; root.alert(CFX.t('duplicate_failed')); }
+                });
+                actions.appendChild(dup);
             } else {
                 const rm = button('bi-x-circle', CFX.t('forget'));
                 rm.addEventListener('click', function () { forget(share.id); onRemoved(col); });
@@ -159,6 +203,7 @@
             }
         }
         body.appendChild(actions);
+        if (durRow) body.appendChild(durRow);
         body.appendChild(qrBox);
         return col;
     }
@@ -182,6 +227,7 @@
             const key = { sent: 'notify_out_sent', failed: 'notify_out_failed', 'no-config': 'notify_out_no_config', 'below-threshold': 'notify_out_below', 'test-sent': 'notify_out_test_sent', 'test-failed': 'notify_out_test_failed' }[l.outcome] || l.outcome;
             let txt = when + ' : ' + CFX.t(key);
             if (typeof l.total === 'number') txt += ' (' + l.total + ' ' + CFX.t('signatures') + ')';
+            if (l.event) txt += ' (' + CFX.t('notify_ev_' + l.event) + ')';
             if (l.outcome === 'failed' || l.outcome === 'test-failed') txt += ' — HTTP ' + l.status + (l.detail ? ' ' + l.detail : '');
             if (l.via) txt += ' [' + l.via + ']';
             return CFX.t('notify_last', txt);

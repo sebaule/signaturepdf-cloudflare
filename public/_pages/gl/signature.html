@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="/vendor/bootstrap.ltr.min.css?5.3.3" rel="stylesheet">
 <link href="/vendor/bootstrap-icons.min.css?1.11.3" rel="stylesheet">
-<link href="/css/app.css?mvctf833" rel="stylesheet">
+<link href="/css/app.css?mvdfhkiz" rel="stylesheet">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png" />
 <style>
@@ -128,7 +128,7 @@
     <footer class="text-center text-muted mb-2 mt-3 opacity-75 small">
     <a href="https://github.com/24eme/signaturepdf?tab=readme-ov-file#signature-pdf-libre">Signature PDF</a> - Software gratuíto e de código aberto <span class="d-none d-md-inline">baixo licenza AGPL-3.0 : <a href="https://github.com/TON-COMPTE/signaturepdf-cloudflare">ver o código fonte</a> (<a href="https://github.com/24eme/signaturepdf/tree/9e2811a">24eme/signaturepdf 9e2811a</a>)</span>
 </footer>
-<script src="/js/cf-extras.js?mvctf833"></script>
+<script src="/js/cf-extras.js?mvdfhkiz"></script>
 </div>
 <div id="page-signature" class="d-none decalage-pdf-div">
         <div style="height: 65px;" class="d-md-none"></div>
@@ -355,9 +355,10 @@
                     <p class="small text-muted mb-3" data-cfx="perms_hint"></p>
                     <div id="share_notify_block" class="d-none mb-3">
                         <p class="fw-semibold mb-1"><i class="bi bi-bell"></i> <span data-cfx="notify_title"></span></p>
-                        <div class="form-check"><input class="form-check-input" type="radio" name="share_notify" id="share_notify_none" value="none" checked="checked"><label class="form-check-label" for="share_notify_none" data-cfx="notify_none"></label></div>
-                        <div class="form-check"><input class="form-check-input" type="radio" name="share_notify" id="share_notify_each" value="each"><label class="form-check-label" for="share_notify_each" data-cfx="notify_each"></label></div>
-                        <div class="form-check d-flex align-items-center gap-2"><input class="form-check-input mt-0" type="radio" name="share_notify" id="share_notify_count" value="count"><label class="form-check-label" for="share_notify_count" data-cfx="notify_count"></label> <input type="number" min="1" max="999" value="2" id="share_notify_n" class="form-control form-control-sm" style="width: 4.5rem;" onfocus="document.getElementById('share_notify_count').checked = true;"> <span data-cfx="notify_count_suffix"></span></div>
+                        <div class="form-check"><input class="form-check-input" type="checkbox" id="share_notify_each" checked="checked"><label class="form-check-label" for="share_notify_each" data-cfx="notify_each"></label></div>
+                        <div class="form-check d-flex align-items-center gap-2 flex-wrap"><input class="form-check-input mt-0" type="checkbox" id="share_notify_final"><label class="form-check-label" for="share_notify_final" data-cfx="notify_final"></label> <input type="number" min="1" max="999" value="2" id="share_notify_n" class="form-control form-control-sm" style="width: 4.5rem;" onfocus="document.getElementById('share_notify_final').checked = true;"> <span data-cfx="notify_count_suffix"></span></div>
+                        <div class="form-check"><input class="form-check-input" type="checkbox" id="share_notify_open"><label class="form-check-label" for="share_notify_open" data-cfx="notify_open"></label></div>
+                        <div class="form-check"><input class="form-check-input" type="checkbox" id="share_notify_expire"><label class="form-check-label" for="share_notify_expire" data-cfx="notify_expire"></label></div>
                     </div>
                     <div id="share_password_block" class="d-none mb-2">
                         <label for="share_password" class="form-label small mb-1"><i class="bi bi-key"></i> <span data-cf="share_password"></span></label>
@@ -406,7 +407,7 @@
 </script>
 <script src="/vendor/pdf-lib.min.js?2.2.4"></script>
 <script src="/vendor/exif.min.js?2.3.0"></script>
-<script src="/js/common.js?mvctf833"></script>
+<script src="/js/common.js?mvdfhkiz"></script>
 <script>
 var REVERSE_PROXY_URL = "";
 var trad = {"Select this page":"Seleccionar esta p\u00e1xina","Delete this page":"Eliminar esta p\u00e1xina","Restore this page":"Restablecer esta p\u00e1xina","Move this page":"Mover esta p\u00e1xina","Move here":"Mover aqu\u00ed","Turn this page":"Xirar esta p\u00e1xina","Download this page":"Descargar esta p\u00e1xina","Page":"P\u00e1xina"};
@@ -452,7 +453,7 @@ var trad = {"Select this page":"Seleccionar esta p\u00e1xina","Delete this page"
     var trad = {"Text to modify":"Texto a modificar"};
 
         url_font = "\/vendor\/fonts\/Caveat-Regular.ttf"        </script>
-    <script src="/js/cf-share.js?mvctf833"></script>
-    <script src="/js/signature.js?mvctf833"></script>
+    <script src="/js/cf-share.js?mvdfhkiz"></script>
+    <script src="/js/signature.js?mvdfhkiz"></script>
   </body>
 </html>
